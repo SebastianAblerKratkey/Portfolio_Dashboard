@@ -314,7 +314,7 @@ rf_b = st.slider("What is your risk-free interest rate for borrwoing money?",
 rf_b = rf_b/100
 
 A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, lower = less risk averse).",
-                min_value=0.0000001, max_value=15.0, step=0.1, value=5.0)
+                min_value=0.1, max_value=15.0, step=0.1, value=5.0)
 
 
 
