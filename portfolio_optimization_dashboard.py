@@ -573,7 +573,7 @@ if download_sucess:
         selected_p = st.selectbox("What portfolio do you want to invest in?", portfolios)
 
 
-        col1, col2 = st.columns([1,4])
+        col1, col2 = st.columns([1,3])
         
         # Here the "abrev" version of the summary must be used. Just the sumamry is not correct anymore at this point for some reason.
         if selected_p == "MVP":
