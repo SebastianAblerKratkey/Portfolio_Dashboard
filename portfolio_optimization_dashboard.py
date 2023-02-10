@@ -540,7 +540,7 @@ if download_sucess:
         st.pyplot()
 
     if option == "Savings plan simulation":
-        num_trials = 100000
+        num_trials = 50000
         currency_symbols = ["€","$"]
 
         r_ocp = float(KPIs_ocp["portfolio retrun"])
