@@ -310,7 +310,7 @@ rf_l = st.slider("What is your risk-free interest rate for lending money?",
                 min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
 rf_l = rf_l/100
 
-rf_b = st.slider("What is your risk-free interest rate for borrwoing money?",
+rf_b = st.slider("What is your risk-free interest rate for borrowing money?",
                 min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
 rf_b = rf_b/100
 
@@ -530,7 +530,7 @@ if download_sucess:
         else:
             st.write(f"""
             For the selected assets, the OCP can be obtained by investing {weight_orp:.2%} of 
-            your money in the ORP i.e., borrwoing the missing {(weight_orp-1):.2%} at the risk-free rate. 
+            your money in the ORP i.e., borrowing the missing {(weight_orp-1):.2%} at the risk-free rate. 
             In this case the OCP would be expected to generate a return of {float(KPIs_ocp['portfolio retrun']):.2%} 
             p.a. at a standard deviation of {float(KPIs_ocp['protfolio std']):.2%}.
             """)
