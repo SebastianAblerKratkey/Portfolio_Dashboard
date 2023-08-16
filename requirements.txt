@@ -1,6 +1,6 @@
 adjustText==0.8
 matplotlib==3.5.2
-numpy==1.21.5
+numpy==1.25.0
 numpy_financial==1.0.0
 pandas==1.4.4
 scipy==1.9.1
