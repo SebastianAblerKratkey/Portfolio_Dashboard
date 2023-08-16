@@ -290,7 +290,7 @@ input_tickers = st.text_input("Enter the [Yahoo Finace](https://finance.yahoo.co
 # [link](https://share.streamlit.io/mesmith027/streamlit_webapps/main/MC_pi/streamlit_app.py)
 tickers  = input_tickers.split(",")
 tickers = [x.strip() for x in tickers]
-price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
+price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"].copy()
 price_df.sort_index(ascending=False, inplace=True)   
 montly_adjusted_closing_prices = convert_date_index(price_df).dropna()
 
