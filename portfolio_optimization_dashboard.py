@@ -103,9 +103,9 @@ def visualize_summary(summary):
                 ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
                 ax1.barh(index, abs(row['mean retrun']), height=bar_width, color="deepskyblue")
     ax1_patch = mpatches.Patch(color='deepskyblue', label='Mean retrun')
-    ax1.legend(handles=[ax1_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(1, 1+0.9/len(summary)))
+    ax1.legend(handles=[ax1_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(1, 1+0.8/len(summary)))
     ax2_patch = mpatches.Patch(color='steelblue', label='Standard deviation')
-    ax2.legend(handles=[ax2_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(0, -0.9/len(summary)))
+    ax2.legend(handles=[ax2_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(0, -0.8/len(summary)))
     plt.show()
 
 
