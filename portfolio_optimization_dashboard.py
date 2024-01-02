@@ -618,7 +618,7 @@ if download_sucess:
 
             plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.2%}'.format))
             plt.gca().xaxis.set_major_formatter(plt.FuncFormatter('{:,.2}'.format))
-            plt.gca().set_xlim(left=0)
+            plt.gca().set_xlim(left=min(min(CAPM_summary["Beta"])*1.5,0))
             plt.gca().set_xlim(right=max(CAPM_summary["Beta"])*1.5)
 
             plt.scatter(CAPM_summary["Beta"], CAPM_summary["Expected return"], color=color2, label="Expected return")
@@ -637,7 +637,7 @@ if download_sucess:
             # SML
             endpoint_sml = plt.gca().get_xlim()[1] 
 
-            betas_sml = np.arange(0, endpoint_sml, step)
+            betas_sml = np.arange(min(min(CAPM_summary["Beta"])*1.5,0), endpoint_sml, step)
             retrun_sml = mean_rf + betas_sml*mean_MRP
             plt.plot(betas_sml ,retrun_sml, color=color1, label='Security market line')
 
