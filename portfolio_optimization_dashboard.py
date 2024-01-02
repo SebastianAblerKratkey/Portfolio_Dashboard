@@ -56,7 +56,9 @@ def visualize_performance(prices, list_of_names):
     plt.legend(fontsize=12)
     plt.show()
 
-def visualize_summary(summary):    
+def visualize_summary(summary):
+    fontsize=8
+    plt.rc('font', size=fontsize)    
     fig, (ax1, ax2) = plt.subplots(1, 2, clip_on=False)
     ax1.grid('on', ls="--")
     ax1.set_axisbelow(True)
@@ -71,8 +73,9 @@ def visualize_summary(summary):
     ax3.xaxis.set_major_locator(MaxNLocator(nbins="auto"))
     ax4.xaxis.set_major_locator(MaxNLocator(prune='upper', nbins="auto"))
     x_dim = max(max(summary["mean retrun"]), max(summary['standard deviation'])) * 1.1
-    ax1.set_position([0, 0, 0.35, 1.5])
-    ax2.set_position([0.35, 0, 0.35, 1.5])
+    height_of_fig = len(summary)*0.1
+    ax1.set_position([0, 0, 0.35, height_of_fig])
+    ax2.set_position([0.35, 0, 0.35, height_of_fig])
     ax1.set_xlim(left=0, right=x_dim)
     ax2.set_xlim(left=0, right=x_dim)
     ax3.set_xlim(left=0, right=x_dim)
@@ -88,20 +91,21 @@ def visualize_summary(summary):
     summary_sorted = summary.copy()
     summary_sorted["r/std"] = summary["mean retrun"] / summary['standard deviation']
     summary_sorted.sort_values("r/std", inplace=True)
+    bar_width = 0.6  # Set a fixed width for the horizontal bars
     for index, row in summary_sorted.iterrows():
-        ax1.barh(index, row['standard deviation'], color="steelblue")
-        ax2.barh(index,  row['mean retrun'], color="deepskyblue")
+        ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
+        ax2.barh(index,  row['mean retrun'], height=bar_width, color="deepskyblue")
         if row['mean retrun'] < 0:
             if abs(row['mean retrun']) > abs(row['standard deviation']):
-                ax1.barh(index, abs(row['mean retrun']), color="deepskyblue")
-                ax1.barh(index, row['standard deviation'], color="steelblue")
+                ax1.barh(index, abs(row['mean retrun']), height=bar_width, color="deepskyblue")
+                ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
             if abs(row['mean retrun']) <= abs(row['standard deviation']):
-                ax1.barh(index, row['standard deviation'], color="steelblue")
-                ax1.barh(index, abs(row['mean retrun']), color="deepskyblue")
+                ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
+                ax1.barh(index, abs(row['mean retrun']), height=bar_width, color="deepskyblue")
     ax1_patch = mpatches.Patch(color='deepskyblue', label='Mean retrun')
-    ax1.legend(handles=[ax1_patch], fontsize=10, frameon=False, loc='center', ncol=2, bbox_to_anchor=(1, 1.08))
+    ax1.legend(handles=[ax1_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(1, 1+0.9/len(summary)))
     ax2_patch = mpatches.Patch(color='steelblue', label='Standard deviation')
-    ax2.legend(handles=[ax2_patch], fontsize=10, frameon=False, loc='center', ncol=2, bbox_to_anchor=(0, -0.08))
+    ax2.legend(handles=[ax2_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(0, -0.9/len(summary)))
     plt.show()
 
 
@@ -467,6 +471,9 @@ if download_sucess:
         display_summary["Standard Deviation"] = display_summary["Standard Deviation"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe Ratio", inplace=True, ascending=False)
         st.dataframe(display_summary)
+
+        visualize_summary(summary)
+        st.pyplot()
 
         tickers_chosen = st.multiselect("Select the assets you want to compare:", tickers)
         visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
