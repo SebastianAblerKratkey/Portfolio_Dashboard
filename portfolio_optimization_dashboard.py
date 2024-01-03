@@ -575,11 +575,7 @@ if download_sucess:
         proxys_M_rf = [market_proxy, riskfree_proxy]
 
         CAPM_data = yf.download(proxys_M_rf, period='max', interval='1mo')["Adj Close"]
-        CAPM_data.dropna(inplace=True)
-
-        months_back = st.slider("The betas are calculated on a monthly basis and by default the sample period is determined by data availability. Here you can specify how many months back from today the sample period shall reach:",
-                      min_value=12, max_value=len(CAPM_data), step=1, value=len(CAPM_data))
-        CAPM_data = CAPM_data.tail(months_back)           
+        CAPM_data.dropna(inplace=True)       
 
         download_sucess2 = False
         if len(CAPM_data) < 1:
