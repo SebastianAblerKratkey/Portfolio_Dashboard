@@ -296,7 +296,7 @@ tickers  = input_tickers.split(",")
 tickers = [x.strip() for x in tickers]
 price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
 price_df.sort_index(ascending=False, inplace=True)   
-montly_adjusted_closing_prices = convert_date_index(price_df).dropna()
+montly_adjusted_closing_prices = price_df.dropna()
 
 download_sucess = False
 if input_tickers:
@@ -325,6 +325,17 @@ A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, l
 
 
 if download_sucess:
+    start_date = montly_adjusted_closing_prices.index.min().date()
+    end_date = montly_adjusted_closing_prices.index.max().date()
+    start_date = montly_adjusted_closing_prices.index.min().date()
+    end_date = montly_adjusted_closing_prices.index.max().date()
+    date_range = st.slider("Define the timeframe to be considered for the analysis.", value=[start_date, end_date], min_value=start_date, max_value=end_date, format ='MMM YYYY')
+    start_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[0].month) & (montly_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
+    end_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[1].month) & (montly_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
+    montly_adjusted_closing_prices = montly_adjusted_closing_prices.loc[end_date_from_index:start_date_from_index]
+
+    montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
+    
     monthly_log_retruns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(-1))
 
     annualized_mean_retruns = monthly_log_retruns.mean() * 12
