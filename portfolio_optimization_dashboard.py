@@ -584,22 +584,22 @@ if download_sucess:
             CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
             CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
             CAPM_quotes = convert_date_index(CAPM_quotes)
-            CAPM_retruns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(-1))
-            CAPM_retruns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
-            CAPM_retruns["MRP"] = CAPM_retruns["Market"] - CAPM_retruns["risk-free"]
+            CAPM_returns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(-1))
+            CAPM_returns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
+            CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
 
             for asset in monthly_log_retruns.columns:
-                CAPM_retruns[f"{asset}-rf"] = monthly_log_retruns[asset] - CAPM_retruns["risk-free"]
+                CAPM_returns[f"{asset}-rf"] = monthly_log_retruns[asset] - CAPM_returns["risk-free"]
             
-            CAPM_retruns.dropna(inplace=True)
+            CAPM_returns.dropna(inplace=True)
 
             mean_rf = CAPM_quotes["risk-free"].mean()
-            mean_MRP = CAPM_retruns["MRP"].mean()*12
+            mean_MRP = CAPM_returns["MRP"].mean()*12
             
             CAPM_summary = pd.DataFrame()
             for asset in monthly_log_retruns.columns:
-                Y=CAPM_retruns[f"{asset}-rf"]
-                X= sm.add_constant(CAPM_retruns["MRP"])
+                Y=CAPM_returns[f"{asset}-rf"]
+                X= sm.add_constant(CAPM_returns["MRP"])
                 regress = sm.OLS(Y, X)
                 result = regress.fit()
                 CAPM_summary.loc[asset,"Mean rf"] = mean_rf
