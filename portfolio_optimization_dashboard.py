@@ -584,6 +584,7 @@ if download_sucess:
             CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
             CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
             CAPM_quotes = convert_date_index(CAPM_quotes)
+            CAPM_returns = pd.DataFrame()
             CAPM_returns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(-1))
             CAPM_returns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
             CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
