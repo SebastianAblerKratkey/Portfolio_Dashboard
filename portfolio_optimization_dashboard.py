@@ -549,17 +549,17 @@ if download_sucess:
 
     if option == "CAPM":
         
-        market_proxy_input = st.text_input("As per default, the iShares MSCI ACWI ETF is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker here:")
-        riskfree_proxy_input = st.text_input("As per default, the SPDR Bloomberg 1-3 Month T-Bill ETF is used as a proxy for the risk-free rate. You may enter the ticker of a different proxy here:")
+        market_proxy_input = st.text_input("As per default, the S&P 500 index is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker here:")
+        riskfree_proxy_input = st.text_input("As per default, 10-year U.S. Treasury yields are used as a proxy for the risk-free rate. You may enter the ticker of a different proxy here (make sure the proxy is quoted in yields, not prices):")
 
         if market_proxy_input:
             market_proxy = market_proxy_input
         else:
-            market_proxy = "ACWI"
+            market_proxy = "^GSPC"
         if riskfree_proxy_input:
             riskfree_proxy = riskfree_proxy_input
         else:
-            riskfree_proxy = "BIL"
+            riskfree_proxy = "^TNX"
 
         proxys_M_rf = [market_proxy, riskfree_proxy]
 
@@ -580,17 +580,20 @@ if download_sucess:
 
         if download_sucess2:
             CAPM_data.sort_index(ascending=False, inplace=True)
-            CAPM_prices = pd.DataFrame()
-            CAPM_prices[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
-            CAPM_prices = convert_date_index(CAPM_prices)
-            CAPM_retruns = np.log(CAPM_prices / CAPM_prices.shift(-1))
+            CAPM_quotes = pd.DataFrame()
+            CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
+            CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
+            CAPM_quotes = convert_date_index(CAPM_quotes)
+            CAPM_retruns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(-1))
+            CAPM_retruns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
             CAPM_retruns["MRP"] = CAPM_retruns["Market"] - CAPM_retruns["risk-free"]
 
             for asset in monthly_log_retruns.columns:
                 CAPM_retruns[f"{asset}-rf"] = monthly_log_retruns[asset] - CAPM_retruns["risk-free"]
+            
             CAPM_retruns.dropna(inplace=True)
 
-            mean_rf = CAPM_retruns["risk-free"].mean()*12
+            mean_rf = CAPM_quotes["risk-free"].mean()
             mean_MRP = CAPM_retruns["MRP"].mean()*12
             
             CAPM_summary = pd.DataFrame()
