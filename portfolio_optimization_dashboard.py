@@ -601,7 +601,7 @@ if download_sucess:
             
             CAPM_returns.dropna(inplace=True)
 
-            mean_rf = CAPM_quotes["risk-free"].mean()
+            mean_rf = (1+CAPM_returns["risk-free"].mean())**12 - 1
             mean_MRP = CAPM_returns["MRP"].mean()*12
             
             CAPM_summary = pd.DataFrame()
