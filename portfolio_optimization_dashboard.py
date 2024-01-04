@@ -37,22 +37,27 @@ def convert_date_index(df):
 
 def visualize_performance(prices, list_of_names):
     benchmarking_data_ = prices / prices.iloc[-1]
-    benchmarking_data = benchmarking_data_[::-1]
+    benchmarking_data = benchmarking_data_[::-1]*100
     individual_prices_list = []
     for n in list_of_names:
         individual_prices_list.append(benchmarking_data[n])
     plt.figure(figsize=(15, 10))
-    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:.0%}'.format))
+    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
     plt.fill_between(benchmarking_data.index, benchmarking_data.max(axis=1), benchmarking_data.min(axis=1),
-                     color='grey', alpha=0.17, label="Range of all")
+                     color='grey', alpha=0.17, label="Range of all assets")
     color_list = ['deepskyblue', 'steelblue', 'mediumslateblue', 'cornflowerblue', 'lightsteelblue', 
                   'mediumslateblue', 'lightblue']
+    
     for p, c in zip(individual_prices_list, color_list):
         plt.plot(p.index, p, color=c, label = p.name)
+        plt.scatter(p.tail(1).index.max(), p[p.tail(1).index.max()], color=c)
+        plt.text(len(benchmarking_data), p[p.tail(1).index.max()], '{:,.2f}'.format(p[p.tail(1).index.max()]),color=c, size=12)
+
     plt.gca().xaxis.set_major_locator(MaxNLocator())
-    plt.gca().set_xlim(left=benchmarking_data.head(1).index.max(), right=benchmarking_data.tail(1).index.max())
+    #plt.gca().set_xlim(left=benchmarking_data.head(1).index.max(), right=benchmarking_data.tail(1).index.max())
+    plt.gca().set_xlim(left=benchmarking_data.head(1).index.max(), right=len(benchmarking_data)*1.1)
     plt.grid('on', ls="--")
-    plt.ylabel("Performance", fontsize=12)
+    plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max()} = 100)", fontsize=12)
     plt.legend(fontsize=12)
     plt.show()
 
@@ -325,6 +330,8 @@ A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, l
 
 
 if download_sucess:
+    now = price_df.index[0]
+    end_prev_y = price_df.index[price_df.index.year<now.year][0]
     start_date = montly_adjusted_closing_prices.index.min().date()
     end_date = montly_adjusted_closing_prices.index.max().date()
     start_date = montly_adjusted_closing_prices.index.min().date()
@@ -475,12 +482,14 @@ if download_sucess:
     st.subheader(option)
     if option == "Past performance":
         display_summary = pd.DataFrame()
-        display_summary["Mean Return p.a."] = summary["mean retrun"]
-        display_summary["Standard Deviation"] = summary["standard deviation"]
-        display_summary["Sharpe Ratio"] = (summary["mean retrun"]- rf_l) / summary['standard deviation']
-        display_summary["Mean Return p.a."] = display_summary["Mean Return p.a."].map('{:.2%}'.format)
-        display_summary["Standard Deviation"] = display_summary["Standard Deviation"].map('{:.2%}'.format)
-        display_summary.sort_values("Sharpe Ratio", inplace=True, ascending=False)
+        display_summary["Mean return p.a."] = summary["mean retrun"]
+        display_summary["Standard deviation"] = summary["standard deviation"]
+        display_summary["YTD return"] = price_df.loc[now] / price_df.loc[end_prev_y] - 1
+        display_summary["Sharpe ratio"] = (summary["mean retrun"]- rf_l) / summary['standard deviation']
+        display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
+        display_summary["Standard deviation"] = display_summary["Standard deviation"].map('{:.2%}'.format)
+        display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
+        display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
         st.dataframe(display_summary)
 
         visualize_summary(summary)
@@ -856,3 +865,4 @@ if download_sucess:
         st.dataframe(montly_adjusted_closing_prices)
         st.write("Monthly log retruns:")
         st.dataframe(monthly_log_retruns)
+
