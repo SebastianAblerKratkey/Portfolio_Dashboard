@@ -9,3 +9,4 @@ statsmodels==0.14.1
 streamlit==1.29.0
 yfinance==0.2.33
 io==0.0.1
+base64==0.0.1
