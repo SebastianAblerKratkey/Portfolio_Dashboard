@@ -362,7 +362,7 @@ rf_b = st.slider("What is your risk-free interest rate for borrowing money?",
 rf_b = rf_b/100
 
 A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, lower = less risk averse).",
-                min_value=0.1, max_value=15.0, step=0.1, value=5.0)
+                min_value=0.1, max_value=15.0, step=0.1, value=10.0)
 
 
 
@@ -395,8 +395,12 @@ if download_sucess:
     price_df = price_df * curr_conv_tabl
 
     montly_adjusted_closing_prices = price_df
+
+    #Calculate YTD returns
     now = price_df.index[0]
     end_prev_y = price_df.index[price_df.index.year<now.year][0]
+    ytd_returns = price_df.loc[now] / price_df.loc[end_prev_y] - 1
+
     start_date = montly_adjusted_closing_prices.index.min().date()
     end_date = montly_adjusted_closing_prices.index.max().date()
     start_date = montly_adjusted_closing_prices.index.min().date()
@@ -549,7 +553,7 @@ if download_sucess:
         display_summary["Full name"] = pd.Series(long_name_dict)
         display_summary["Mean return p.a."] = summary["mean return"]
         display_summary["Volatility p.a."] = summary["standard deviation"]
-        display_summary["YTD return"] = price_df.loc[now] / price_df.loc[end_prev_y] - 1
+        display_summary["YTD return"] = ytd_returns
         display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
         display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
         display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
@@ -572,7 +576,10 @@ if download_sucess:
             custom_p_df.set_index(keys="Yahoo finance ticker", inplace=True)
             custom_p_df.index.name = None
             custom_p_df["Full name"] = pd.Series(long_name_dict)
-            st.dataframe(custom_p_df)
+            custom_p_df["YTD return"] = ytd_returns
+            #st.dataframe(custom_p_df)
+            asset_class_df = custom_p_df.groupby('Asset class').weight.sum().to_frame()
+            #st.dataframe(asset_class_df)
 
             custom_p_summary = summary.loc[tickers_template].copy()
             custom_p_summary["weight"] = custom_p_df["weight"]
@@ -585,9 +592,25 @@ if download_sucess:
             custom_p_summary["Full name"] = custom_p_df["Full name"]
             custom_p_summary_long_name = custom_p_summary.set_index(keys="Full name")
             custom_p_summary_long_name.index.name = None
+                      
+            r_custom_p = float(KPIs_custom_p["portfolio return"])
+            std_custom_p = float(KPIs_custom_p["protfolio std"])
+            weight_avg_TER = sum(custom_p_df["TER"] * custom_p_df["weight"])
+            ytd_return_custom_p = sum(custom_p_df["YTD return"] * custom_p_df["weight"])
+            
+            colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
+            colmn_1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
+            colmn_2.metric("Volatility p.a.", f"{std_custom_p:.2%}")
+            colmn_3.metric("YTD return", f"{ytd_return_custom_p:.2%}")
+            colmn_4.metric("Weighted average TER", f"{weight_avg_TER:.2%}")
 
-            create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
-            st.pyplot()
+            display_option = st.selectbox("Select a view setting for the portfolio visualization.", ["Individual asset view", "Asset class view"])
+            if display_option == "Individual asset view":
+                create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
+                st.pyplot()
+            elif display_option == "Asset class view": 
+                create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', asset_class_df, KPIs_custom_p)
+                st.pyplot()
 
             
         else:
@@ -811,21 +834,21 @@ if download_sucess:
         # Here the "abrev" version of the summary must be used. Just the sumamry is not correct anymore at this point for some reason.
         if selected_p == "MVP":
             col1.metric("Expected return p.a.", f"{r_mvp:.2%}")
-            col2.metric("Standard Deviation", f"{std_mvp:.2%}")
+            col2.metric("Volatility p.a.", f"{std_mvp:.2%}")
 
             sim_summary = mvp_summary_abrev.copy()
             sim_summary["mean return"] = mvp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = mvp_summary_abrev["standard deviation"] / (12**0.5)
         elif selected_p == "ORP":
             col1.metric("Expected return p.a.", f"{r_orp:.2%}")
-            col2.metric("Standard Deviation", f"{std_orp:.2%}")
+            col2.metric("Volatility p.a.", f"{std_orp:.2%}")
 
             sim_summary = orp_summary_abrev.copy()
             sim_summary["mean return"] = orp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = orp_summary_abrev["standard deviation"] / (12**0.5)
         elif selected_p == "OCP":
             col1.metric("Expected return p.a.", f"{r_ocp:.2%}")
-            col2.metric("Standard Deviation", f"{std_ocp:.2%}")
+            col2.metric("Volatility p.a.", f"{std_ocp:.2%}")
 
             sim_summary = ocp_summary_abrev.copy()
             sim_summary["mean return"] = ocp_summary_abrev["mean return"] / 12
