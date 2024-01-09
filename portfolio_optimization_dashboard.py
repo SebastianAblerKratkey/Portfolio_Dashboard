@@ -14,6 +14,8 @@ from scipy.stats import norm
 import os
 import datetime
 import statsmodels.api as sm
+import base64
+from io import StringIO, BytesIO
 
 # this module is utilized to prevent the annotations in the plot from overlapping
 from adjustText import adjust_text
@@ -77,7 +79,7 @@ def visualize_summary(summary):
     ax2.xaxis.set_major_locator(MaxNLocator(nbins="auto"))
     ax3.xaxis.set_major_locator(MaxNLocator(nbins="auto"))
     ax4.xaxis.set_major_locator(MaxNLocator(prune='upper', nbins="auto"))
-    x_dim = max(max(summary["mean retrun"]), max(summary['standard deviation'])) * 1.1
+    x_dim = max(max(summary["mean return"]), max(summary['standard deviation'])) * 1.1
     height_of_fig = len(summary)*0.1
     ax1.set_position([0, 0, 0.35, height_of_fig])
     ax2.set_position([0.35, 0, 0.35, height_of_fig])
@@ -94,22 +96,22 @@ def visualize_summary(summary):
     ax2.set_yticklabels([])
     ax2.set_xticklabels([])
     summary_sorted = summary.copy()
-    summary_sorted["r/std"] = summary["mean retrun"] / summary['standard deviation']
+    summary_sorted["r/std"] = summary["mean return"] / summary['standard deviation']
     summary_sorted.sort_values("r/std", inplace=True)
     bar_width = 0.6  # Set a fixed width for the horizontal bars
     for index, row in summary_sorted.iterrows():
         ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
-        ax2.barh(index,  row['mean retrun'], height=bar_width, color="deepskyblue")
-        if row['mean retrun'] < 0:
-            if abs(row['mean retrun']) > abs(row['standard deviation']):
-                ax1.barh(index, abs(row['mean retrun']), height=bar_width, color="deepskyblue")
+        ax2.barh(index,  row['mean return'], height=bar_width, color="deepskyblue")
+        if row['mean return'] < 0:
+            if abs(row['mean return']) > abs(row['standard deviation']):
+                ax1.barh(index, abs(row['mean return']), height=bar_width, color="deepskyblue")
                 ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
-            if abs(row['mean retrun']) <= abs(row['standard deviation']):
+            if abs(row['mean return']) <= abs(row['standard deviation']):
                 ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
-                ax1.barh(index, abs(row['mean retrun']), height=bar_width, color="deepskyblue")
-    ax1_patch = mpatches.Patch(color='deepskyblue', label='Mean retrun')
+                ax1.barh(index, abs(row['mean return']), height=bar_width, color="deepskyblue")
+    ax1_patch = mpatches.Patch(color='deepskyblue', label='Mean return')
     ax1.legend(handles=[ax1_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(1, 1+0.8/len(summary)))
-    ax2_patch = mpatches.Patch(color='steelblue', label='Standard deviation')
+    ax2_patch = mpatches.Patch(color='steelblue', label='Volatility')
     ax2.legend(handles=[ax2_patch], fontsize=fontsize, frameon=False, loc='center', ncol=2, bbox_to_anchor=(0, -0.8/len(summary)))
     plt.show()
 
@@ -123,31 +125,31 @@ def visualize_correlation(corr):
     plt.show()
 
 def portfolio_std(weights):
-    portfolio_std = np.sum(weights * np.sum(weights * annualized_cov_retruns, axis=1)) ** 0.5
+    portfolio_std = np.sum(weights * np.sum(weights * annualized_cov_returns, axis=1)) ** 0.5
     return portfolio_std
 
-def portfolio_retrun(weights, retruns):
-    portfolio_retrun = np.sum(weights * retruns)
-    return portfolio_retrun
+def portfolio_return(weights, returns):
+    portfolio_return = np.sum(weights * returns)
+    return portfolio_return
 
-def negative_portfolio_SR(weights, rf, retruns):
-    retrun_p = portfolio_retrun(weights, retruns)
+def negative_portfolio_SR(weights, rf, returns):
+    return_p = portfolio_return(weights, returns)
     std_p = portfolio_std(weights)
-    negative_sharpe_ratio = -1*(retrun_p - rf) / std_p
+    negative_sharpe_ratio = -1*(return_p - rf) / std_p
     return negative_sharpe_ratio
 
-def negative_portfolio_utility(weights, retruns):
-    retrun_p = portfolio_retrun(weights, retruns)
+def negative_portfolio_utility(weights, returns):
+    return_p = portfolio_return(weights, returns)
     std_p = portfolio_std(weights)
-    negative_portfolio_utility = -1*(retrun_p - 0.5*A*std_p**2)
+    negative_portfolio_utility = -1*(return_p - 0.5*A*std_p**2)
     return negative_portfolio_utility
 
-def create_KPI_report(name, weights, rf, retruns):
+def create_KPI_report(name, weights, rf, returns):
     KPIs = pd.DataFrame(index=[name])
-    KPIs["portfolio retrun"] = portfolio_retrun(weights, retruns)
+    KPIs["portfolio return"] = portfolio_return(weights, returns)
     KPIs["protfolio std"] = portfolio_std(weights)
-    KPIs["sharpe ratio"] = (KPIs["portfolio retrun"]- rf) / KPIs["protfolio std"]
-    KPIs["utility"] = KPIs["portfolio retrun"] - 0.5*A*KPIs["protfolio std"]**2
+    KPIs["sharpe ratio"] = (KPIs["portfolio return"]- rf) / KPIs["protfolio std"]
+    KPIs["utility"] = KPIs["portfolio return"] - 0.5*A*KPIs["protfolio std"]**2
     return KPIs
 
 def create_portfolio_visual(name, summary, KPIs):
@@ -157,9 +159,9 @@ def create_portfolio_visual(name, summary, KPIs):
                     'mediumslateblue','thistle', 'dodgerblue', 'slategrey'],
             autopct='%.2f%%',pctdistance=0.8, startangle=90,labels=summary.index)
     plt.annotate(name, xy=(0,0), fontsize=30, va="center", ha="center")
-    plt.annotate("E(r): {}%".format(float((KPIs["portfolio retrun"]*100).round(decimals=2))), 
+    plt.annotate("E(r): {}%".format(float((KPIs["portfolio return"]*100).round(decimals=2))), 
                  xy=(-0.07,-0.18), fontsize=10, va="center", ha="right")
-    plt.annotate("Std: {}%".format(float((KPIs["protfolio std"]*100).round(decimals=2))), 
+    plt.annotate("Vola: {}%".format(float((KPIs["protfolio std"]*100).round(decimals=2))), 
                  xy=(+0.07,-0.18), fontsize=10, va="center", ha="left")
     plt.show()
 
@@ -175,62 +177,71 @@ def create_mvf_cal_visual():
     plt.gca().set_xlim(left=0)
     plt.gca().set_xlim(right=max(max(summary["standard deviation"]),float(KPIs_ocp["protfolio std"]))*1.05)
 
-    plt.scatter(summary["standard deviation"], summary["mean retrun"], color=color1)
+    plt.scatter(summary["standard deviation"], summary["mean return"], color=color1)
 
     # capital allocation line
 
     # between std = 0 and std = std_orp_l
     std_cal_1 = np.arange(0, float(KPIs_orp_l["protfolio std"]), step)
-    retrun_cal_1 = rf_l + float(KPIs_orp_l["sharpe ratio"])*std_cal_1
-    plt.plot(std_cal_1 ,retrun_cal_1, color=color1, label='Capital allocation line')
+    return_cal_1 = rf_l + float(KPIs_orp_l["sharpe ratio"])*std_cal_1
+    plt.plot(std_cal_1 ,return_cal_1, color=color1, label='Capital allocation line')
 
     # between std_orp_l and std_orp_b -> follows minimum varriance frontier
-    mvf_plot_slice = mvf_plot_data[(mvf_plot_data["retrun"] >= float(KPIs_orp_l["portfolio retrun"])) & 
-                               (mvf_plot_data["retrun"] <= float(KPIs_orp_b["portfolio retrun"]))]
+    mvf_plot_slice = mvf_plot_data[(mvf_plot_data["return"] >= float(KPIs_orp_l["portfolio return"])) & 
+                               (mvf_plot_data["return"] <= float(KPIs_orp_b["portfolio return"]))]
     std_cal_2 = mvf_plot_slice["std"]
-    retrun_cal_2 = mvf_plot_slice["retrun"]
-    plt.plot(std_cal_2,retrun_cal_2,color=color1)
+    return_cal_2 = mvf_plot_slice["return"]
+    plt.plot(std_cal_2,return_cal_2,color=color1)
 
     # after std_orp_b
     endpoint_cal = plt.gca().get_xlim()[1] 
     std_cal_3 = np.arange(float(KPIs_orp_b["protfolio std"]), endpoint_cal, step)
-    retrun_cal_3 = rf_b + float(KPIs_orp_b["sharpe ratio"])*std_cal_3
-    plt.plot(std_cal_3 ,retrun_cal_3, color=color1)
+    return_cal_3 = rf_b + float(KPIs_orp_b["sharpe ratio"])*std_cal_3
+    plt.plot(std_cal_3 ,return_cal_3, color=color1)
 
     # minimum varriance frontier
-    plt.plot(mvf_plot_data["std"], mvf_plot_data["retrun"], color=color1, linestyle='--',
+    plt.plot(mvf_plot_data["std"], mvf_plot_data["return"], color=color1, linestyle='--',
          label='Minimum varriance frontier')
 
-    plt.scatter(KPIs_mvp["protfolio std"], KPIs_mvp["portfolio retrun"], color=color2)
-    plt.scatter(KPIs_orp["protfolio std"], KPIs_orp["portfolio retrun"], color=color2)
-    plt.scatter(KPIs_ocp["protfolio std"], KPIs_ocp["portfolio retrun"], color=color2)
+    plt.scatter(KPIs_mvp["protfolio std"], KPIs_mvp["portfolio return"], color=color2)
+    plt.scatter(KPIs_orp["protfolio std"], KPIs_orp["portfolio return"], color=color2)
+    plt.scatter(KPIs_ocp["protfolio std"], KPIs_ocp["portfolio return"], color=color2)
 
     plt.legend(fontsize=12)
-    plt.xlabel("Standard deviation", fontsize=12)
+    plt.xlabel("Volatility", fontsize=12)
     plt.ylabel("Mean return", fontsize=12)
     plt.grid('on', ls="--")
 
     # labeling
     x_offset = plt.gca().get_xlim()[1]*0.01
     for i in summary_p.index:
-        plt.annotate(i,(summary_p["protfolio std"][i], summary_p["portfolio retrun"][i]),
-                 (summary_p["protfolio std"][i]-x_offset, summary_p["portfolio retrun"][i]), 
+        plt.annotate(i,(summary_p["protfolio std"][i], summary_p["portfolio return"][i]),
+                 (summary_p["protfolio std"][i]-x_offset, summary_p["portfolio return"][i]), 
                  color=color2, fontsize=12, ha='right')   
 
     labels = []
     for i in summary.index:
-        labels.append(plt.text(summary["standard deviation"][i], summary["mean retrun"][i], i, size=8))
+        labels.append(plt.text(summary["standard deviation"][i], summary["mean return"][i], i, size=8))
     adjust_text(labels) 
     
     plt.show()
 
-def currency_formatter(x, currency="€"):
-         if currency == '€':
-            return f'{currency}{x:,.2f}'.replace(",", "X").replace(".", ",").replace("X", ".")
-         elif currency == '$':
-            return f'{currency}{x:,.2f}'
+def currency_formatter_alt_EUR_decimal_seperator(x, currency="EUR"):
+         if currency == 'EUR':
+            return f'{currency} {x:,.2f}'.replace(",", "X").replace(".", ",").replace("X", ".")
+         elif currency == 'USD':
+            return f'{currency} {x:,.2f}'
+         
+def currency_formatter(x, currency="EUR"):
+    return f'{currency} {x:,.2f}'
 
-def visualize_simulaiton(sim_avg, deposits, currency='€'):
+def currency_formatter_signs(x, currency="EUR"):
+         if currency == 'EUR':
+            return f'€ {x:,.2f}'
+         elif currency == 'USD':
+            return f'$ {x:,.2f}'
+
+def visualize_simulaiton(sim_avg, deposits, currency='EUR'):
     """
     Plots the average simulated performance over time.
     
@@ -241,12 +252,11 @@ def visualize_simulaiton(sim_avg, deposits, currency='€'):
     Returns:
     None
     """
-    # Define a function that formats y-axis values as currency
     def currency_formatter(x, pos):
-         if currency == '€':
-            return f'{currency}{x:,.2f}'.replace(",", "X").replace(".", ",").replace("X", ".")
-         elif currency == '$':
-            return f'{currency}{x:,.2f}'
+         if currency == 'EUR':
+            return f'€ {x:,.2f}'
+         elif currency == 'USD':
+            return f'$ {x:,.2f}'
     
     plt.figure(figsize=(15, 5))
     
@@ -284,28 +294,53 @@ def visualize_simulaiton(sim_avg, deposits, currency='€'):
     
     plt.show()
 
+def generate_excel_download_link(df):
+    towrite = BytesIO()
+    df.to_excel(towrite, index=False, header=True)
+    towrite.seek(0)
+    b64 = base64.b64encode(towrite.read()).decode()
+    href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="template.xlsx">Excel template'
+    return st.markdown(href, unsafe_allow_html=True)
 
 
-tickers = []
-Name_dict = {}
-for t in tickers:
-    Name_dict[t] = yf.Ticker(t).info["longName"]
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Data"))
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Data"))
 
 st.header("Portfolio Analysis")
 
+tickers = []
 input_tickers = st.text_input("Enter the [Yahoo Finace](https://finance.yahoo.com) tickers of the assets you are interested in (seperated by comma). Make sure to select at least two.")
 # [link](https://share.streamlit.io/mesmith027/streamlit_webapps/main/MC_pi/streamlit_app.py)
-tickers  = input_tickers.split(",")
-tickers = [x.strip() for x in tickers]
-price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
-price_df.sort_index(ascending=False, inplace=True)   
-montly_adjusted_closing_prices = price_df.dropna()
+if input_tickers:
+    tickers  = input_tickers.split(",")
+    tickers = [x.strip() for x in tickers]
+
+# generate dataframe for Excel template
+template_df = pd.DataFrame(columns=["Yahoo finance ticker",	"Asset class", "Number of shares", "TER"], index=None)
+
+
+custom_p = st.file_uploader("You can also upload a custom portfolio by filling out and uploading the Excel template below.", type="xlsx")
+generate_excel_download_link(template_df)
+
+if custom_p:
+    custom_p_df = pd.read_excel(custom_p)
+    tickers_template = list(custom_p_df["Yahoo finance ticker"])
+    tickers += tickers_template
 
 download_sucess = False
-if input_tickers:
-    if len(montly_adjusted_closing_prices) < 1:
+if input_tickers or custom_p:
+    tickers = [x.upper() for x in tickers]
+    price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
+    price_df.sort_index(ascending=False, inplace=True)   
+    price_df = price_df.dropna()
+
+    eurusd = yf.download(["EURUSD=X","EUR=X"], period='max', interval='1mo')["Adj Close"]
+    eurusd.sort_index(ascending=False, inplace=True)
+    
+    
+
+
+    if len(price_df) < 1:
         st.error("(Some) assets could not be found.")
     elif len(tickers) == 1:
         st.error("Make sure to select at least two assets.")
@@ -314,6 +349,9 @@ if input_tickers:
         download_sucess = True
 
 st.write("Disclaimer: This is not financial advice.")
+
+
+currency = st.selectbox("Select a currency.", ["EUR", "USD"])
 
 rf_l = st.slider("What is your risk-free interest rate for lending money?",
                 min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
@@ -330,6 +368,33 @@ A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, l
 
 
 if download_sucess:
+
+    # Currency conversion and long name dictionary creation
+    curr_conv_tabl = pd.DataFrame(index=price_df.index, columns=price_df.columns)
+    curr_conv_tabl.fillna(1, inplace=True)
+
+    long_name_dict = {}
+    for col in curr_conv_tabl.columns:
+        try:
+            long_name_dict[col] = yf.Ticker(col).info["longName"]
+            curr = yf.Ticker(col).info["currency"]
+            if curr != currency:
+                if currency == "EUR":
+                    curr_conv_tabl[col] = curr_conv_tabl[col] * eurusd["EUR=X"]
+                elif currency == "USD":
+                    curr_conv_tabl[col] = curr_conv_tabl[col] * eurusd["EURUSD=X"] 
+        except:
+            pass
+    
+    #Paste down last avalible EUR/USD rate (Dec 2003) for datapoints before that date
+    col_names = list(curr_conv_tabl.columns)
+    last_exch_rates = curr_conv_tabl.dropna().iloc[-1,:].tolist()
+    last_exch_rate_dict = dict(zip(col_names, last_exch_rates))
+    curr_conv_tabl.fillna(last_exch_rate_dict, inplace=True)
+
+    price_df = price_df * curr_conv_tabl
+
+    montly_adjusted_closing_prices = price_df
     now = price_df.index[0]
     end_prev_y = price_df.index[price_df.index.year<now.year][0]
     start_date = montly_adjusted_closing_prices.index.min().date()
@@ -342,18 +407,17 @@ if download_sucess:
     montly_adjusted_closing_prices = montly_adjusted_closing_prices.loc[end_date_from_index:start_date_from_index]
 
     montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
-    
-    monthly_log_retruns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(-1))
+    monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(-1))
 
-    annualized_mean_retruns = monthly_log_retruns.mean() * 12
-    annualized_std_retruns = monthly_log_retruns.std() * 12**0.5
-    annualized_cov_retruns = monthly_log_retruns.cov() * 12
-    corr_retruns = monthly_log_retruns.corr()
+    annualized_mean_returns = monthly_log_returns.mean() * 12
+    annualized_std_returns = monthly_log_returns.std() * 12**0.5
+    annualized_cov_returns = monthly_log_returns.cov() * 12
+    corr_returns = monthly_log_returns.corr()
 
     summary = pd.DataFrame()
 
-    summary["mean retrun"] = annualized_mean_retruns
-    summary["standard deviation"] = annualized_std_retruns
+    summary["mean return"] = annualized_mean_returns
+    summary["standard deviation"] = annualized_std_returns
     summary["weight"] = 1/len(summary)
     
     mvp_summary = summary.copy()
@@ -366,11 +430,11 @@ if download_sucess:
     KPIs_mvp = create_KPI_report("MVP",
                              mvp_summary["weight"],
                              rf_l,
-                             mvp_summary["mean retrun"])
+                             mvp_summary["mean return"])
 
     orp_l_summary = summary.copy()
     orp_l = minimize(negative_portfolio_SR, x0=orp_l_summary["weight"].values, 
-                 args=(rf_l, summary["mean retrun"] ), 
+                 args=(rf_l, summary["mean return"] ), 
                  bounds=Bounds(0,1), 
                  constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
     orp_l_summary["weight"] = orp_l.x
@@ -379,11 +443,11 @@ if download_sucess:
     KPIs_orp_l = create_KPI_report("ORP",
                              orp_l_summary["weight"],
                              rf_l,
-                             orp_l_summary["mean retrun"])
+                             orp_l_summary["mean return"])
 
     orp_b_summary = summary.copy()
     orp_b = minimize(negative_portfolio_SR, x0=orp_b_summary["weight"].values, 
-                 args=(rf_b, summary["mean retrun"]), 
+                 args=(rf_b, summary["mean return"]), 
                  bounds=Bounds(0,1), 
                  constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
     orp_b_summary["weight"] = orp_b.x
@@ -392,11 +456,11 @@ if download_sucess:
     KPIs_orp_b = create_KPI_report("ORP",
                              orp_b_summary["weight"],
                              rf_b,
-                             orp_b_summary["mean retrun"])
+                             orp_b_summary["mean return"])
 
     orp_indiff_summary = summary.copy()
     orp_indiff = minimize(negative_portfolio_utility, x0=orp_indiff_summary["weight"].values, 
-                      args=(summary["mean retrun"]), 
+                      args=(summary["mean return"]), 
                       bounds=Bounds(0,1), 
                       constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
     orp_indiff_summary["weight"] = orp_indiff.x
@@ -405,16 +469,16 @@ if download_sucess:
     KPIs_orp_indiff = create_KPI_report("ORP",
                              orp_indiff_summary["weight"],
                              rf_l,
-                             orp_indiff_summary["mean retrun"])
+                             orp_indiff_summary["mean return"])
     
     # OCP is defined
-    weight_risky_l = (float(KPIs_orp_l["portfolio retrun"]) - rf_l) / (A * float(KPIs_orp_l["protfolio std"])**2)
-    weight_risky_b = (float(KPIs_orp_b["portfolio retrun"]) - rf_b) / (A * float(KPIs_orp_b["protfolio std"])**2)
+    weight_risky_l = (float(KPIs_orp_l["portfolio return"]) - rf_l) / (A * float(KPIs_orp_l["protfolio std"])**2)
+    weight_risky_b = (float(KPIs_orp_b["portfolio return"]) - rf_b) / (A * float(KPIs_orp_b["protfolio std"])**2)
 
     if weight_risky_l <= 1:
         orp_summary = orp_l_summary
         weight_orp = weight_risky_l
-        retrun_orp = float(KPIs_orp_l["portfolio retrun"])
+        return_orp = float(KPIs_orp_l["portfolio return"])
         std_orp = float(KPIs_orp_l["protfolio std"])
         KPIs_orp = KPIs_orp_l
         weight_rf = 1 - weight_orp
@@ -423,7 +487,7 @@ if download_sucess:
     elif weight_risky_b > 1:
         orp_summary = orp_b_summary
         weight_orp = weight_risky_b
-        retrun_orp = float(KPIs_orp_b["portfolio retrun"])
+        return_orp = float(KPIs_orp_b["portfolio return"])
         std_orp = float(KPIs_orp_b["protfolio std"])
         KPIs_orp = KPIs_orp_b
         weight_rf = 1 - weight_orp
@@ -433,13 +497,13 @@ if download_sucess:
         orp_summary = orp_indiff_summary
         weight_orp = 1
         KPIs_orp = KPIs_orp_indiff
-        retrun_orp = float(KPIs_orp_indiff["portfolio retrun"])
+        return_orp = float(KPIs_orp_indiff["portfolio return"])
         std_orp = float(KPIs_orp_indiff["protfolio std"])
         weight_rf = 0
         rf = 0
         rf_summary = pd.DataFrame()
 
-    rf_summary["mean retrun"] = rf    
+    rf_summary["mean return"] = rf    
     rf_summary["standard deviation"] = 0
     rf_summary["weight"] = weight_rf    
 
@@ -452,42 +516,43 @@ if download_sucess:
 
 
     KPIs_ocp = pd.DataFrame(index=["OCP"])
-    KPIs_ocp["portfolio retrun"] = weight_orp*retrun_orp + weight_rf*rf
+    KPIs_ocp["portfolio return"] = weight_orp*return_orp + weight_rf*rf
     KPIs_ocp["protfolio std"] = weight_orp*std_orp
-    KPIs_ocp["sharpe ratio"] = (KPIs_ocp["portfolio retrun"] - rf) / KPIs_ocp["protfolio std"]
-    KPIs_ocp["utility"] = KPIs_ocp["portfolio retrun"] - 0.5*A*KPIs_ocp["protfolio std"]**2
+    KPIs_ocp["sharpe ratio"] = (KPIs_ocp["portfolio return"] - rf) / KPIs_ocp["protfolio std"]
+    KPIs_ocp["utility"] = KPIs_ocp["portfolio return"] - 0.5*A*KPIs_ocp["protfolio std"]**2
 
     summary_p = pd.concat([KPIs_mvp, KPIs_orp, KPIs_ocp])    
 
-    if summary_p["portfolio retrun"]["OCP"] == summary_p["portfolio retrun"]["ORP"]:
+    if summary_p["portfolio return"]["OCP"] == summary_p["portfolio return"]["ORP"]:
         summary_p.rename(index={'OCP':'OCP = ORP'}, inplace=True)
         summary_p.drop("ORP", inplace=True)
 
     # Get data for minimum varriance frontier plot
     step = 0.001
-    acheivable_retruns = np.arange(summary["mean retrun"].min(), summary["mean retrun"].max()+ step, step)
+    acheivable_returns = np.arange(summary["mean return"].min(), summary["mean return"].max()+ step, step)
 
     min_var_list = []
-    for r in acheivable_retruns:
+    for r in acheivable_returns:
         min_var = minimize(portfolio_std, x0=summary["weight"].values, 
                        bounds=Bounds(0,1), 
                        constraints=({'type': 'eq','fun' : lambda weights: np.sum(weights) - 1},
-                                    {'type': 'eq','fun' : lambda weights: np.sum(weights*summary["mean retrun"]) - r}))
+                                    {'type': 'eq','fun' : lambda weights: np.sum(weights*summary["mean return"]) - r}))
         min_var_list.append(min_var.fun)
 
     mvf_plot_data = pd.DataFrame()
-    mvf_plot_data["retrun"] = acheivable_retruns
+    mvf_plot_data["return"] = acheivable_returns
     mvf_plot_data["std"] = min_var_list
 
     st.subheader(option)
     if option == "Past performance":
         display_summary = pd.DataFrame()
-        display_summary["Mean return p.a."] = summary["mean retrun"]
-        display_summary["Standard deviation"] = summary["standard deviation"]
+        display_summary["Full name"] = pd.Series(long_name_dict)
+        display_summary["Mean return p.a."] = summary["mean return"]
+        display_summary["Volatility p.a."] = summary["standard deviation"]
         display_summary["YTD return"] = price_df.loc[now] / price_df.loc[end_prev_y] - 1
-        display_summary["Sharpe ratio"] = (summary["mean retrun"]- rf_l) / summary['standard deviation']
+        display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
         display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
-        display_summary["Standard deviation"] = display_summary["Standard deviation"].map('{:.2%}'.format)
+        display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
         display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
         st.dataframe(display_summary)
@@ -499,24 +564,49 @@ if download_sucess:
         visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
         st.pyplot()
 
+    if option == "Custom portfolio":
+        if custom_p:
+            custom_p_df = custom_p_df.join(price_df.loc[now, tickers_template].rename("Current price"), on="Yahoo finance ticker")
+            custom_p_df["Current value"] = custom_p_df["Number of shares"] * custom_p_df["Current price"]
+            custom_p_df["weight"] = custom_p_df["Current value"] / sum(custom_p_df["Current value"])
+            custom_p_df.set_index(keys="Yahoo finance ticker", inplace=True)
+            custom_p_df.index.name = None
+            custom_p_df["Full name"] = pd.Series(long_name_dict)
+            st.dataframe(custom_p_df)
+
+            custom_p_summary = summary.loc[tickers_template].copy()
+            custom_p_summary["weight"] = custom_p_df["weight"]
+
+            KPIs_custom_p = create_KPI_report("Custom portfolio",
+                             custom_p_summary["weight"],
+                             rf_l,
+                             custom_p_summary["mean return"])
+
+            custom_p_summary["Full name"] = custom_p_df["Full name"]
+            custom_p_summary_long_name = custom_p_summary.set_index(keys="Full name")
+            custom_p_summary_long_name.index.name = None
+
+            create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
+            st.pyplot()
+
+            
+        else:
+            st.write("Upload a filled out Excel template to view your custom portfolio.")    
         
-        # visualize_summary(summary)
-        # st.pyplot()
 
     if option == "Return correlation":
-        visualize_correlation(corr_retruns)
+        visualize_correlation(corr_returns)
         st.pyplot()
     
     if option == "MVP, ORP and OCP":
         # Show MVP
         st.write("""
-                 In the **minimum variance portfolio (MVP)**, assets are weighted in such a way as to achieve the 
-                 lowest possible portfolio variance, given the historical standard deviations of each asset and 
-                 the correlation of the assets' returns with each other. In general, combining assets with a low 
-                 to negative correlation of returns results in a lower portfolio standard deviation. This is 
-                 because strong price movements of one asset are dampened by weaker movements of other assets 
-                 or movements in the opposite direction. For the selected assets, the MVP can be achieved via the 
-                 following combination:
+                 In the **minimum variance portfolio (MVP)**, assets are allocated in such a way as to achieve the lowest possible 
+                 portfolio variance, taking into account each asset's historical standard deviation of returns (volatility) and 
+                 the correlation between the assets' returns. In general, combining assets with a low to negative return correlation 
+                 will result in a lower portfolio variance. This is because price movements in one asset are dampened by weaker 
+                 movements in other assets, or movements in the opposite direction. For the selected assets, the MVP can be achieved 
+                 via the following allocation:
                 """)
         create_portfolio_visual("MVP", mvp_summary_abrev, KPIs_mvp)
         st.pyplot()
@@ -526,14 +616,14 @@ if download_sucess:
                  The **optimal risky portfolio (ORP)** is achieved by combining the (risky) assets such that the Sharpe ratio 
                  — i.e., the risk-return trade-off — is maximized. The Sharpe ratio defines the slope of the capital allocation 
                  line (CAL). Therefore, the ORP is the point of tangency between the CAL and the minimum variance frontier. 
-                 For this reason, the ORP is sometimes referred to as the " tangency portfolio." In general, the ORP is 
+                 For this reason, the ORP is sometimes referred to as the " tangency portfolio." In theory, the ORP is 
                  always chosen by rational investors as the risky portion of their investment. Therefore, the ORP should 
                  be independent of your risk aversion parameter. However, if your risk-free lending rate differs from your 
                  risk-free borrowing rate, two different Sharpe ratios arise, resulting in two potential ORPs. One for when 
                  you lend out money as part of your investment, and one for when you borrow money to increase your stake in 
                  the ORP. Depending on your risk appetite, you may also be indifferent between borrowing and lending. In 
                  this case, the ORP is determined by maximizing your utility function given a 100% stake in the risky assets. 
-                 For the selected assets, the ORP can be obtained via the following combination:
+                 For the selected assets, the ORP can be obtained via the following allocation:
                 """)
         create_portfolio_visual("ORP", orp_summary_abrev, KPIs_orp)
         st.pyplot()
@@ -558,7 +648,7 @@ if download_sucess:
             st.write(f"""
             For the selected assets, the OCP can be obtained by investing {weight_orp:.2%} of 
             your money in the ORP i.e., borrowing the missing {(weight_orp-1):.2%} at the risk-free rate. 
-            In this case the OCP would be expected to generate a return of {float(KPIs_ocp['portfolio retrun']):.2%} 
+            In this case the OCP would be expected to generate a return of {float(KPIs_ocp['portfolio return']):.2%} 
             p.a. at a standard deviation of {float(KPIs_ocp['protfolio std']):.2%}.
             """)
 
@@ -605,8 +695,8 @@ if download_sucess:
             CAPM_returns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
             CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
 
-            for asset in monthly_log_retruns.columns:
-                CAPM_returns[f"{asset}-rf"] = monthly_log_retruns[asset] - CAPM_returns["risk-free"]
+            for asset in monthly_log_returns.columns:
+                CAPM_returns[f"{asset}-rf"] = monthly_log_returns[asset] - CAPM_returns["risk-free"]
             
             CAPM_returns.dropna(inplace=True)
 
@@ -614,7 +704,7 @@ if download_sucess:
             mean_MRP = CAPM_returns["MRP"].mean()*12
             
             CAPM_summary = pd.DataFrame()
-            for asset in monthly_log_retruns.columns:
+            for asset in monthly_log_returns.columns:
                 Y=CAPM_returns[f"{asset}-rf"]
                 X= sm.add_constant(CAPM_returns["MRP"])
                 regress = sm.OLS(Y, X)
@@ -665,8 +755,8 @@ if download_sucess:
             endpoint_sml = plt.gca().get_xlim()[1] 
 
             betas_sml = np.arange(min(min(CAPM_summary["Beta"])*1.5,0), endpoint_sml, step)
-            retrun_sml = mean_rf + betas_sml*mean_MRP
-            plt.plot(betas_sml ,retrun_sml, color=color1, label='Security market line')
+            return_sml = mean_rf + betas_sml*mean_MRP
+            plt.plot(betas_sml ,return_sml, color=color1, label='Security market line')
 
 
             plt.legend(fontsize=12)
@@ -688,15 +778,14 @@ if download_sucess:
 
     if option == "Savings plan simulation":
         num_trials = 10000
-        currency_symbols = ["€","$"]
 
-        r_ocp = float(KPIs_ocp["portfolio retrun"])
+        r_ocp = float(KPIs_ocp["portfolio return"])
         std_ocp = float(KPIs_ocp["protfolio std"])
 
-        r_orp = float(KPIs_orp["portfolio retrun"])
+        r_orp = float(KPIs_orp["portfolio return"])
         std_orp = float(KPIs_orp["protfolio std"])
 
-        r_mvp = float(KPIs_mvp["portfolio retrun"])
+        r_mvp = float(KPIs_mvp["portfolio return"])
         std_mvp = float(KPIs_mvp["protfolio std"])
 
         # portfolios = [f"OCP (E(r) = {r_ocp:.2%} Std = {std_ocp:.2%})",
@@ -704,9 +793,6 @@ if download_sucess:
         #               f"OCP (E(r) = {r_mvp:.2%} Std = {std_mvp:.2%})"]
 
         portfolios = ["OCP", "ORP", "MVP"]
-
-        # Ask the user to select a currency symbol from the list
-        currency = st.selectbox("Select a currency:", currency_symbols)
         
         val_today = st.number_input("What is your starting capital i.e. the ammount of money you can invest today?",min_value=1.0, value=1000.00)
 
@@ -724,25 +810,25 @@ if download_sucess:
         
         # Here the "abrev" version of the summary must be used. Just the sumamry is not correct anymore at this point for some reason.
         if selected_p == "MVP":
-            col1.metric("Expected Retrun p.a.", f"{r_mvp:.2%}")
+            col1.metric("Expected return p.a.", f"{r_mvp:.2%}")
             col2.metric("Standard Deviation", f"{std_mvp:.2%}")
 
             sim_summary = mvp_summary_abrev.copy()
-            sim_summary["mean retrun"] = mvp_summary_abrev["mean retrun"] / 12
+            sim_summary["mean return"] = mvp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = mvp_summary_abrev["standard deviation"] / (12**0.5)
         elif selected_p == "ORP":
-            col1.metric("Expected Retrun p.a.", f"{r_orp:.2%}")
+            col1.metric("Expected return p.a.", f"{r_orp:.2%}")
             col2.metric("Standard Deviation", f"{std_orp:.2%}")
 
             sim_summary = orp_summary_abrev.copy()
-            sim_summary["mean retrun"] = orp_summary_abrev["mean retrun"] / 12
+            sim_summary["mean return"] = orp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = orp_summary_abrev["standard deviation"] / (12**0.5)
         elif selected_p == "OCP":
-            col1.metric("Expected Retrun p.a.", f"{r_ocp:.2%}")
+            col1.metric("Expected return p.a.", f"{r_ocp:.2%}")
             col2.metric("Standard Deviation", f"{std_ocp:.2%}")
 
             sim_summary = ocp_summary_abrev.copy()
-            sim_summary["mean retrun"] = ocp_summary_abrev["mean retrun"] / 12
+            sim_summary["mean return"] = ocp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = ocp_summary_abrev["standard deviation"] / (12**0.5)
         
 
@@ -764,16 +850,16 @@ if download_sucess:
             # Generate the random trials
             sim_list = []
             for index, row in sim_summary.iterrows():
-                sim_list.append(np.random.normal(row["mean retrun"], row["standard deviation"], size=(num_trials, num_months)) * row["weight"])
+                sim_list.append(np.random.normal(row["mean return"], row["standard deviation"], size=(num_trials, num_months)) * row["weight"])
 
-            simulated_retruns = np.array(sim_list).sum(axis=0)
+            simulated_returns = np.array(sim_list).sum(axis=0)
 
             # Calculate the potential future values of the investment
             val_future = np.zeros((num_trials, num_months+1))
             val_future[:,0] = val_today
 
             for i in range(1, num_months+1):
-                val_future[:,i] = val_future[:,i-1] * np.exp(simulated_retruns[:,i-1]) + additional_investment_per_month
+                val_future[:,i] = val_future[:,i-1] * np.exp(simulated_returns[:,i-1]) + additional_investment_per_month
         
             simulated_performance = pd.DataFrame(val_future).transpose()
             simulated_performance_annual = simulated_performance[simulated_performance.index % 12 == 0]
@@ -804,12 +890,12 @@ if download_sucess:
             # IRR / money weighted retun
             irr_monthly = npf.irr(cash_flow)
             irr_annual = (1 + irr_monthly)**12 - 1
-            # Time weighted retrun
-            avg_log_TWR = simulated_retruns.mean(axis=0).sum() / num_years
+            # Time weighted return
+            avg_log_TWR = simulated_returns.mean(axis=0).sum() / num_years
 
 
             sim_text = (
-                    f"Based on each asset's historic annual mean retrun and standard deviation and their respective weight in "
+                    f"Based on each asset's historic annual mean return and standard deviation and their respective weight in "
                     f"the {selected_p} the simulation predicts the investor's capital to reach **{currency_formatter(expected_capital, currency=currency)}** "
                     f"in {current_year+num_years} based on the above specified savings plan. "
                     f"This corresponds to an expected time-weighted return of {avg_log_TWR:.2%} p.a. "
@@ -839,13 +925,13 @@ if download_sucess:
             lower_bound = expected_capital - moe
             upper_bound = expected_capital + moe
 
-            if currency == "$":
+            if currency == "USD":
                 st.markdown(
                             f"""
                             It is important to note that {currency_formatter(expected_capital, currency=currency)} is just the simulation mean and not a guaranteed outcome:
-                            - {percent_in_interval:.0%} of simulation outcomes lie between \{currency_formatter(lower_bound, currency=currency)} and {currency_formatter(upper_bound, currency=currency)}
-                            - {p_below_mean:.0%} of simulation outcomes lie between \{currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.min(), currency=currency)} (the lowest simulation outcome)
-                            - {p_above_mean:.0%} of simulation outcomes lie between \{currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.max(), currency=currency)} (the highest simulation outcome)
+                            - {percent_in_interval:.0%} of simulation outcomes lie between {currency_formatter(lower_bound, currency=currency)} and {currency_formatter(upper_bound, currency=currency)}
+                            - {p_below_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.min(), currency=currency)} (the lowest simulation outcome)
+                            - {p_above_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.max(), currency=currency)} (the highest simulation outcome)
                             """
                             )
             else:
@@ -863,6 +949,7 @@ if download_sucess:
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
         st.dataframe(montly_adjusted_closing_prices)
-        st.write("Monthly log retruns:")
-        st.dataframe(monthly_log_retruns)
+        st.write("Monthly log returns:")
+        st.dataframe(monthly_log_returns)
+
 
