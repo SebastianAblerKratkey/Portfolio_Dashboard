@@ -547,29 +547,8 @@ if download_sucess:
     mvf_plot_data["return"] = acheivable_returns
     mvf_plot_data["std"] = min_var_list
 
-    st.subheader(option)
-    if option == "Past performance":
-        display_summary = pd.DataFrame()
-        display_summary["Full name"] = pd.Series(long_name_dict)
-        display_summary["Mean return p.a."] = summary["mean return"]
-        display_summary["Volatility p.a."] = summary["standard deviation"]
-        display_summary["YTD return"] = ytd_returns
-        display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
-        display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
-        display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
-        display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
-        display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
-        st.dataframe(display_summary)
-
-        visualize_summary(summary)
-        st.pyplot()
-
-        tickers_chosen = st.multiselect("Select the assets you want to compare:", tickers)
-        visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
-        st.pyplot()
-
-    if option == "Custom portfolio":
-        if custom_p:
+    # Custom portfolio dataframe and metrics
+    if custom_p:
             custom_p_df = custom_p_df.join(price_df.loc[now, tickers_template].rename("Current price"), on="Yahoo finance ticker")
             custom_p_df["Current value"] = custom_p_df["Number of shares"] * custom_p_df["Current price"]
             custom_p_df["weight"] = custom_p_df["Current value"] / sum(custom_p_df["Current value"])
@@ -592,11 +571,36 @@ if download_sucess:
             custom_p_summary["Full name"] = custom_p_df["Full name"]
             custom_p_summary_long_name = custom_p_summary.set_index(keys="Full name")
             custom_p_summary_long_name.index.name = None
-                      
             r_custom_p = float(KPIs_custom_p["portfolio return"])
             std_custom_p = float(KPIs_custom_p["protfolio std"])
             weight_avg_TER = sum(custom_p_df["TER"] * custom_p_df["weight"])
             ytd_return_custom_p = sum(custom_p_df["YTD return"] * custom_p_df["weight"])
+            custom_p_worth = sum(custom_p_df["Current value"])
+
+
+    st.subheader(option)
+    if option == "Past performance":
+        display_summary = pd.DataFrame()
+        display_summary["Full name"] = pd.Series(long_name_dict)
+        display_summary["Mean return p.a."] = summary["mean return"]
+        display_summary["Volatility p.a."] = summary["standard deviation"]
+        display_summary["YTD return"] = ytd_returns
+        display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
+        display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
+        display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
+        display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
+        display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
+        st.dataframe(display_summary)
+
+        visualize_summary(summary)
+        st.pyplot()
+
+        tickers_chosen = st.multiselect("Select the assets you want to compare:", tickers)
+        visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
+        st.pyplot()
+
+    if option == "Custom portfolio":
+        if custom_p: 
             
             colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
             colmn_1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
@@ -606,10 +610,10 @@ if download_sucess:
 
             display_option = st.selectbox("Select a view setting for the portfolio visualization.", ["Individual asset view", "Asset class view"])
             if display_option == "Individual asset view":
-                create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
+                create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
                 st.pyplot()
             elif display_option == "Asset class view": 
-                create_portfolio_visual(f'{currency_formatter_signs(sum(custom_p_df["Current value"]), currency=currency)}', asset_class_df, KPIs_custom_p)
+                create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
 
             
@@ -682,8 +686,8 @@ if download_sucess:
 
     if option == "CAPM":
         
-        market_proxy_input = st.text_input("As per default, the S&P 500 index is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker here:")
-        riskfree_proxy_input = st.text_input("As per default, 10-year U.S. Treasury yields are used as a proxy for the risk-free rate. You may enter the ticker of a different proxy here (make sure the proxy is quoted in yields, not prices):")
+        market_proxy_input = st.text_input("As per default, the S&P 500 Index (^GSPC) is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker below (E.g. STOXX Europe 600: ^STOXX, Dax-Performance-Index: ^GDAXI, FTSE 100 Index: ^FTSE)")
+        riskfree_proxy_input = st.text_input("As per default, 10-year U.S. Treasury yields (^TNX) are used as a proxy for the risk-free rate. You may enter the ticker of a different proxy below (make sure the proxy is quoted in yields, not prices; e.g. 13-week U.S. Treasury yields: ^IRX, 5-year U.S. Treasury yields: ^FVX, 30-year U.S. Treasury yields: ^TYX)")
 
         if market_proxy_input:
             market_proxy = market_proxy_input
@@ -811,13 +815,15 @@ if download_sucess:
         r_mvp = float(KPIs_mvp["portfolio return"])
         std_mvp = float(KPIs_mvp["protfolio std"])
 
-        # portfolios = [f"OCP (E(r) = {r_ocp:.2%} Std = {std_ocp:.2%})",
-        #               f"OCP (E(r) = {r_orp:.2%} Std = {std_orp:.2%})", 
-        #               f"OCP (E(r) = {r_mvp:.2%} Std = {std_mvp:.2%})"]
-
-        portfolios = ["OCP", "ORP", "MVP"]
+       
+        if custom_p:
+            portfolios = ["Custom portfolio","OCP", "ORP", "MVP"]
+            val_today_assume = custom_p_worth
+        else:
+            portfolios = ["OCP", "ORP", "MVP"]
+            val_today_assume = 1000.00
         
-        val_today = st.number_input("What is your starting capital i.e. the ammount of money you can invest today?",min_value=1.0, value=1000.00)
+        val_today = st.number_input("What is your starting capital i.e. the ammount of money you can invest today?",min_value=1.0, value=val_today_assume)
 
         #Ask user to enter amount of money they want to save each year
         additional_investment_per_month = st.number_input("How much money do you want to save each month?",min_value=0.0, value=100.0)
@@ -832,24 +838,30 @@ if download_sucess:
         col1, col2 = st.columns([1,3])
         
         # Here the "abrev" version of the summary must be used. Just the sumamry is not correct anymore at this point for some reason.
-        if selected_p == "MVP":
+        if selected_p == "Custom portfolio":
+            col1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
+            col2.metric("Volatility p.a.", f"{std_custom_p:.2%}")
+            sim_summary = custom_p_summary.copy()
+            sim_summary["mean return"] = custom_p_summary["mean return"] / 12
+            sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
+        
+        elif selected_p == "MVP":
             col1.metric("Expected return p.a.", f"{r_mvp:.2%}")
             col2.metric("Volatility p.a.", f"{std_mvp:.2%}")
-
             sim_summary = mvp_summary_abrev.copy()
             sim_summary["mean return"] = mvp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = mvp_summary_abrev["standard deviation"] / (12**0.5)
+
         elif selected_p == "ORP":
             col1.metric("Expected return p.a.", f"{r_orp:.2%}")
             col2.metric("Volatility p.a.", f"{std_orp:.2%}")
-
             sim_summary = orp_summary_abrev.copy()
             sim_summary["mean return"] = orp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = orp_summary_abrev["standard deviation"] / (12**0.5)
+
         elif selected_p == "OCP":
             col1.metric("Expected return p.a.", f"{r_ocp:.2%}")
             col2.metric("Volatility p.a.", f"{std_ocp:.2%}")
-
             sim_summary = ocp_summary_abrev.copy()
             sim_summary["mean return"] = ocp_summary_abrev["mean return"] / 12
             sim_summary["standard deviation"] = ocp_summary_abrev["standard deviation"] / (12**0.5)
