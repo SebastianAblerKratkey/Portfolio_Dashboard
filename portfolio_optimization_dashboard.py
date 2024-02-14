@@ -313,8 +313,9 @@ def maximum_drawdowns(price_df):
     Returns:
     pd.Series: Series of asset names and corresponding maximum drawdowns.
     """
-    max_price_df = price_df.rolling(window=len(price_df),min_periods=1).max()
-    dd_price_df = price_df / max_price_df -1
+    price_df_sorted = price_df.sort_index(ascending=True)
+    max_price_df = price_df_sorted.rolling(window=len(price_df_sorted),min_periods=1).max()
+    dd_price_df = price_df_sorted / max_price_df -1
     max_dd_series = dd_price_df.min()
 
     return max_dd_series
@@ -347,10 +348,6 @@ download_sucess = False
 if input_tickers or custom_p:
     tickers = [x.upper() for x in tickers]
     price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
-    
-    # calculate maximum drawdown (must be done before sorting by descending)
-    max_dds = maximum_drawdowns(price_df=price_df)
-
     price_df.sort_index(ascending=False, inplace=True)   
     price_df = price_df.dropna()
 
@@ -429,6 +426,9 @@ if download_sucess:
     start_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[0].month) & (montly_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
     end_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[1].month) & (montly_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
     montly_adjusted_closing_prices = montly_adjusted_closing_prices.loc[end_date_from_index:start_date_from_index]
+
+     # calculate maximum drawdown
+    max_dds = maximum_drawdowns(price_df=montly_adjusted_closing_prices)
 
     montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
     monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(-1))
