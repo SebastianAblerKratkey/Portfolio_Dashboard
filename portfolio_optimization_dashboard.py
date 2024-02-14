@@ -302,6 +302,22 @@ def generate_excel_download_link(df):
     href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="template.xlsx">Excel template'
     return st.markdown(href, unsafe_allow_html=True)
 
+def maximum_drawdowns(price_df):
+    """
+    Calculate the maximum drawdowns of a dataframe of asset prices.
+
+    Parameters:
+    price_df (pd.DataFrame): A pandas DataFrame containing asset prices.
+    (date index must be sorted ascending)
+
+    Returns:
+    pd.Series: Series of asset names and corresponding maximum drawdowns.
+    """
+    max_price_df = price_df.rolling(window=len(price_df),min_periods=1).max()
+    dd_price_df = price_df / max_price_df -1
+    max_dd_series = dd_price_df.min()
+
+    return max_dd_series
 
 
 option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Data"))
@@ -331,6 +347,10 @@ download_sucess = False
 if input_tickers or custom_p:
     tickers = [x.upper() for x in tickers]
     price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
+    
+    # calculate maximum drawdown (must be done before sorting by descending)
+    max_dds = maximum_drawdowns(price_df=price_df)
+
     price_df.sort_index(ascending=False, inplace=True)   
     price_df = price_df.dropna()
 
@@ -582,13 +602,14 @@ if download_sucess:
     if option == "Past performance":
         display_summary = pd.DataFrame()
         display_summary["Full name"] = pd.Series(long_name_dict)
-        display_summary["Mean return p.a."] = summary["mean return"]
-        display_summary["Volatility p.a."] = summary["standard deviation"]
-        display_summary["YTD return"] = ytd_returns
+        display_summary["Mean return p.a."] = summary["mean return"].map('{:.2%}'.format)
+        display_summary["Volatility p.a."] = summary["standard deviation"].map('{:.2%}'.format)
         display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
-        display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
-        display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
-        display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
+        display_summary["YTD return"] = ytd_returns.map('{:.2%}'.format)
+        display_summary["Maximum drawdown"] = max_dds.map('{:.2%}'.format)
+        #display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
+        #display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
+        #display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
         st.dataframe(display_summary)
 
