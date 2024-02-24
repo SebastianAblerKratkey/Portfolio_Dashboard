@@ -69,6 +69,12 @@ def visualize_performance(prices, list_of_names):
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
     plt.gca().xaxis.set_major_locator(MaxNLocator())
     plt.gca().set_xlim(left=benchmarking_data.head(1).index.max())
+
+    # Calculate the number of days to add
+    num_days = (benchmarking_data_filtered.index.max() - benchmarking_data_filtered.index.min()).days
+    days_to_add = num_days / 14
+
+    plt.xlim(right=benchmarking_data.index.max() + pd.Timedelta(days=days_to_add))  # Extend x-axis limit by number of days
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
     plt.grid('on', ls="--")
     plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max().strftime('%d.%m.%Y')} = 100)", fontsize=12)
