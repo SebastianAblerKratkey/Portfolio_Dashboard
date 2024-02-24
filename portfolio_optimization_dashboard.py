@@ -320,6 +320,10 @@ def maximum_drawdowns(price_df):
 
     return max_dd_series
 
+def get_monthly_closing_prices(price_df_daily): 
+    price_df_monthly = price_df_daily.loc[price_df_daily.groupby(price_df_daily.index.to_period('M')).apply(lambda x: x.index.max())]
+    return price_df_monthly
+
 
 option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Data"))
 
@@ -347,16 +351,11 @@ if custom_p:
 download_sucess = False
 if input_tickers or custom_p:
     tickers = [x.upper() for x in tickers]
-    price_df = yf.download(tickers, period='max', interval='1mo')["Adj Close"]
-    price_df.sort_index(ascending=False, inplace=True)   
+    price_df = yf.download(tickers, period='max')["Adj Close"]
     price_df = price_df.dropna()
 
     eurusd = yf.download(["EURUSD=X","EUR=X"], period='max', interval='1mo')["Adj Close"]
-    eurusd.sort_index(ascending=False, inplace=True)
     
-    
-
-
     if len(price_df) < 1:
         st.error("(Some) assets could not be found.")
     elif len(tickers) == 1:
@@ -405,33 +404,34 @@ if download_sucess:
     
     #Paste down last avalible EUR/USD rate (Dec 2003) for datapoints before that date
     col_names = list(curr_conv_tabl.columns)
-    last_exch_rates = curr_conv_tabl.dropna().iloc[-1,:].tolist()
+    last_exch_rates = curr_conv_tabl.dropna().iloc[0,:].tolist()
     last_exch_rate_dict = dict(zip(col_names, last_exch_rates))
     curr_conv_tabl.fillna(last_exch_rate_dict, inplace=True)
 
     price_df = price_df * curr_conv_tabl
-
-    montly_adjusted_closing_prices = price_df
+    
+    daily_adjusted_closing_prices = price_df
 
     #Calculate YTD returns
-    now = price_df.index[0]
-    end_prev_y = price_df.index[price_df.index.year<now.year][0]
+    now = price_df.index[-1]
+    end_prev_y = price_df.index[price_df.index.year<now.year][-1]
     ytd_returns = price_df.loc[now] / price_df.loc[end_prev_y] - 1
 
-    start_date = montly_adjusted_closing_prices.index.min().date()
-    end_date = montly_adjusted_closing_prices.index.max().date()
-    start_date = montly_adjusted_closing_prices.index.min().date()
-    end_date = montly_adjusted_closing_prices.index.max().date()
-    date_range = st.slider("Define the timeframe to be considered for the analysis.", value=[start_date, end_date], min_value=start_date, max_value=end_date, format ='MMM YYYY')
-    start_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[0].month) & (montly_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
-    end_date_from_index = montly_adjusted_closing_prices.index[(montly_adjusted_closing_prices.index.month==date_range[1].month) & (montly_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
-    montly_adjusted_closing_prices = montly_adjusted_closing_prices.loc[end_date_from_index:start_date_from_index]
+    start_date = daily_adjusted_closing_prices.index.min().date()
+    end_date = daily_adjusted_closing_prices.index.max().date()
+    
+    date_range = st.slider("Define the timeframe to be considered for the analysis.", value=[start_date, end_date], min_value=start_date, max_value=end_date, format ='DD MM YYYY')
+    start_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.month==date_range[0].month) & (daily_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
+    end_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.month==date_range[1].month) & (daily_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
+    daily_adjusted_closing_prices = daily_adjusted_closing_prices.loc[start_date_from_index:end_date_from_index]
+
+    montly_adjusted_closing_prices = get_monthly_closing_prices(price_df_daily=daily_adjusted_closing_prices)
 
      # calculate maximum drawdown
     max_dds = maximum_drawdowns(price_df=montly_adjusted_closing_prices)
 
     montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
-    monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(-1))
+    monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(1))
 
     annualized_mean_returns = monthly_log_returns.mean() * 12
     annualized_std_returns = monthly_log_returns.std() * 12**0.5
@@ -721,8 +721,9 @@ if download_sucess:
 
         proxys_M_rf = [market_proxy, riskfree_proxy]
 
-        CAPM_data = yf.download(proxys_M_rf, period='max', interval='1mo')["Adj Close"]
-        CAPM_data.dropna(inplace=True)       
+        CAPM_data = yf.download(proxys_M_rf, period='max')["Adj Close"]
+        CAPM_data.dropna(inplace=True) 
+        CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
 
         download_sucess2 = False
         if len(CAPM_data) < 1:
@@ -733,14 +734,13 @@ if download_sucess:
             download_sucess2 = True
 
         if download_sucess2:
-            CAPM_data.sort_index(ascending=False, inplace=True)
             CAPM_quotes = pd.DataFrame()
             CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
             CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
             CAPM_quotes = convert_date_index(CAPM_quotes)
             CAPM_returns = pd.DataFrame()
-            CAPM_returns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(-1))
-            CAPM_returns["risk-free"] = (1+CAPM_quotes["risk-free"])**(1/12)-1
+            CAPM_returns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(1))
+            CAPM_returns["risk-free"] = CAPM_quotes["risk-free"]*(1/12)
             CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
 
             for asset in monthly_log_returns.columns:
@@ -748,7 +748,7 @@ if download_sucess:
             
             CAPM_returns.dropna(inplace=True)
 
-            mean_rf = (1+CAPM_returns["risk-free"].mean())**12 - 1
+            mean_rf = CAPM_returns["risk-free"].mean()*12
             mean_MRP = CAPM_returns["MRP"].mean()*12
             
             CAPM_summary = pd.DataFrame()
