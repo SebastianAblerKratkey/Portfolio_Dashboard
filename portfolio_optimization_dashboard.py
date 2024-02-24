@@ -45,7 +45,7 @@ def create_performance_index(price_df):
     return index
 
 def visualize_performance(prices, list_of_names):
-    benchmarking_data_ = create_performance_index(prices)
+    benchmarking_data = create_performance_index(prices)
     individual_prices_list = []
     for n in list_of_names:
         individual_prices_list.append(benchmarking_data[n])
