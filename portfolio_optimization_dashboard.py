@@ -37,9 +37,15 @@ def convert_date_index(df):
     df.index = df.index.strftime("%b %Y")
     return df
 
+def create_performance_index(price_df):
+    returns = price_df.pct_change()
+    growth = returns+1
+    growth = growth.fillna(100) # set starting value for index
+    index = index.cumprod()
+    return index
+
 def visualize_performance(prices, list_of_names):
-    benchmarking_data_ = prices / prices.iloc[-1]
-    benchmarking_data = benchmarking_data_[::-1]*100
+    benchmarking_data_ = create_performance_index(prices)
     individual_prices_list = []
     for n in list_of_names:
         individual_prices_list.append(benchmarking_data[n])
