@@ -623,7 +623,7 @@ if download_sucess:
         st.pyplot()
 
         tickers_chosen = st.multiselect("Select the assets you want to compare:", tickers)
-        visualize_performance(daily_adjusted_closing_prices, tickers_chosen)
+        visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
         st.pyplot()
 
     if option == "Custom portfolio":
