@@ -64,7 +64,8 @@ def visualize_performance(prices, list_of_names):
     # Plot scatter points at the end of each line
     for col in benchmarking_data_filtered.columns:
         plt.scatter(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], color=color_list[list_of_names.index(col)], zorder=5)
-        plt.text(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1], 2)),color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
+        #text lablel is offset by 10 days to the right
+        plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=10), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1], 2)),color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
 
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
     plt.gca().xaxis.set_major_locator(MaxNLocator())
