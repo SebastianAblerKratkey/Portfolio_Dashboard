@@ -428,7 +428,7 @@ if download_sucess:
     montly_adjusted_closing_prices = get_monthly_closing_prices(price_df_daily=daily_adjusted_closing_prices)
 
      # calculate maximum drawdown
-    max_dds = maximum_drawdowns(price_df=montly_adjusted_closing_prices)
+    max_dds = maximum_drawdowns(price_df=daily_adjusted_closing_prices)
 
     montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
     monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(1))
