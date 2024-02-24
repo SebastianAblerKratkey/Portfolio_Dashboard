@@ -354,7 +354,7 @@ if input_tickers or custom_p:
     price_df = yf.download(tickers, period='max')["Adj Close"]
     price_df = price_df.dropna()
 
-    eurusd = yf.download(["EURUSD=X","EUR=X"], period='max', interval='1mo')["Adj Close"]
+    eurusd = yf.download(["EURUSD=X","EUR=X"], period='max')["Adj Close"]
     
     if len(price_df) < 1:
         st.error("(Some) assets could not be found.")
