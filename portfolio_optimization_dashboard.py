@@ -3,6 +3,7 @@ import numpy_financial as npf
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors
+import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FuncFormatter
@@ -46,27 +47,39 @@ def create_performance_index(price_df):
 
 def visualize_performance(prices, list_of_names):
     benchmarking_data = create_performance_index(prices)
-    individual_prices_list = []
-    for n in list_of_names:
-        individual_prices_list.append(benchmarking_data[n])
-    plt.figure(figsize=(15, 10))
+   
+    color_list = ['deepskyblue', 'steelblue', 'mediumslateblue', 'cornflowerblue', 'lightsteelblue', 
+                    'mediumslateblue', 'lightblue']
+
+    benchmarking_data_filtered = benchmarking_data.filter(list_of_names)
+    if len(list_of_names) > 0:
+        benchmarking_data_filtered.plot(figsize=(15, 10), color=color_list)
+    else:
+        plt.figure(figsize=(15, 10))
+
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
     plt.fill_between(benchmarking_data.index, benchmarking_data.max(axis=1), benchmarking_data.min(axis=1),
-                     color='grey', alpha=0.17, label="Range of all assets")
-    color_list = ['deepskyblue', 'steelblue', 'mediumslateblue', 'cornflowerblue', 'lightsteelblue', 
-                  'mediumslateblue', 'lightblue']
-    
-    for p, c in zip(individual_prices_list, color_list):
-        plt.plot(p.index, p, color=c, label = p.name)
-        plt.scatter(p.tail(1).index.max(), p[p.tail(1).index.max()], color=c)
-        plt.text(len(benchmarking_data), p[p.tail(1).index.max()], '{:,.2f}'.format(p[p.tail(1).index.max()]),color=c, size=12)
+                        color='grey', alpha=0.17, label="Range of all assets")
 
+    # Plot scatter points at the end of each line
+    for col in benchmarking_data_filtered.columns:
+        plt.scatter(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], color=color_list[list_of_names.index(col)], zorder=5)
+        plt.text(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1], 2)),color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
+
+    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
     plt.gca().xaxis.set_major_locator(MaxNLocator())
-    #plt.gca().set_xlim(left=benchmarking_data.head(1).index.max(), right=benchmarking_data.tail(1).index.max())
-    plt.gca().set_xlim(left=benchmarking_data.head(1).index.max(), right=len(benchmarking_data)*1.1)
+    plt.gca().set_xlim(left=benchmarking_data.head(1).index.max())
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
     plt.grid('on', ls="--")
-    plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max()} = 100)", fontsize=12)
+    plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max().strftime('%d.%m.%Y')} = 100)", fontsize=12)
     plt.legend(fontsize=12)
+
+    # Rotate x-axis labels to be horizontal
+    plt.xticks(rotation=0, ha='center')
+
+    # Remove x-axis label
+    plt.gca().set_xlabel('')
+
     plt.show()
 
 def visualize_summary(summary):
@@ -623,7 +636,7 @@ if download_sucess:
         st.pyplot()
 
         tickers_chosen = st.multiselect("Select the assets you want to compare:", tickers)
-        visualize_performance(montly_adjusted_closing_prices, tickers_chosen)
+        visualize_performance(daily_adjusted_closing_prices, tickers_chosen)
         st.pyplot()
 
     if option == "Custom portfolio":
