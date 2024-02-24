@@ -41,7 +41,7 @@ def create_performance_index(price_df):
     returns = price_df.pct_change()
     growth = returns+1
     growth = growth.fillna(100) # set starting value for index
-    index = index.cumprod()
+    index = growth.cumprod()
     return index
 
 def visualize_performance(prices, list_of_names):
