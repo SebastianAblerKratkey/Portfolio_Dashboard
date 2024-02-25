@@ -1,6 +1,7 @@
 import numpy as np
 import numpy_financial as npf
 import pandas as pd
+from pandas_datareader.data import DataReader as dr
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import matplotlib.dates as mdates
