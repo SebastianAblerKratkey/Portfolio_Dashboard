@@ -1087,7 +1087,7 @@ if download_sucess:
         reference_rate = st.number_input("Insert a reference rate", value=0.00)
         expense_ratio = st.number_input("Insert the expense ratio", value=0.00)
         assumed_trading_days = 252
-        sim_runs = st.number_input("Choose a number of simulation runs", value=80000, step=int)
+        sim_runs = st.number_input("Choose a number of simulation runs", value=80000)
 
         # Define leverage levels
         step_ = 0.1
