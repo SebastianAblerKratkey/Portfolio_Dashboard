@@ -1129,12 +1129,12 @@ if download_sucess:
             
             # Concatenate all DataFrames in the list along the rows axis
             results_df = pd.concat(dfs, ignore_index=True)
-
-            # Remove progress bar once completed
-            progress_bar.empty()
             
             create_leverage_sim_visual(results_df)
             st.pyplot()
+
+            # Remove progress bar once completed
+            progress_bar.empty()
 
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
