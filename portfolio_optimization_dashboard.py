@@ -451,8 +451,8 @@ if download_sucess:
     end_date = daily_adjusted_closing_prices.index.max().date()
     
     date_range = st.slider("Define the timeframe to be considered for the analysis.", value=[start_date, end_date], min_value=start_date, max_value=end_date, format ='DD.MM.YYYY')
-    start_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.month==date_range[0].month) & (daily_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
-    end_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.month==date_range[1].month) & (daily_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
+    start_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.day==date_range[0].day) & (daily_adjusted_closing_prices.index.month==date_range[0].month) & (daily_adjusted_closing_prices.index.year==date_range[0].year)].min().date()
+    end_date_from_index = daily_adjusted_closing_prices.index[(daily_adjusted_closing_prices.index.day==date_range[1].day) & (daily_adjusted_closing_prices.index.month==date_range[1].month) & (daily_adjusted_closing_prices.index.year==date_range[1].year)].max().date()
     daily_adjusted_closing_prices = daily_adjusted_closing_prices.loc[start_date_from_index:end_date_from_index]
 
     montly_adjusted_closing_prices = get_monthly_closing_prices(price_df_daily=daily_adjusted_closing_prices)
