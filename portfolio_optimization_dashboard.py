@@ -1091,7 +1091,7 @@ if download_sucess:
         
         reference_rate = st.number_input("Enter a reference interest rate in percent p.a. The default value is the current 90-day average Secured Overnight Financing Rate (SOFR).", value=SOFR_90_day)
         reference_rate = reference_rate/100
-        expense_ratio = st.number_input("If applicable, enter an expense ratio in percent p.a. This is appropriate for leveraged ETFs, that are more expensive than their unleveraged equivalents.", value=0.00)
+        expense_ratio = st.number_input("If applicable, enter an expense ratio in percent p.a. This is appropriate when comparing leveraged ETFs to their unleveraged equivalents, as leveraged ETFs are typically more expensive.", value=0.00)
         expense_ratio = expense_ratio/100
         assumed_trading_days = 252
         sim_runs = st.number_input("Choose a number of simulation runs", value=80000)
