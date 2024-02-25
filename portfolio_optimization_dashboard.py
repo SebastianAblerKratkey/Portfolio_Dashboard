@@ -41,8 +41,9 @@ def convert_date_index(df):
 def create_performance_index(price_df):
     returns = price_df.pct_change()
     growth = returns+1
-    growth = growth.fillna(100) # set starting value for index
+    growth = growth.fillna(1) # set starting value for index
     index = growth.cumprod()
+    index = index - 1 # deduct starting value to get the percentage change
     return index
 
 def visualize_performance(prices, list_of_names):
@@ -57,28 +58,31 @@ def visualize_performance(prices, list_of_names):
     else:
         plt.figure(figsize=(15, 10))
 
-    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
+    
     plt.fill_between(benchmarking_data.index, benchmarking_data.max(axis=1), benchmarking_data.min(axis=1),
                         color='grey', alpha=0.17, label="Range of all assets")
+
+    # Calculate the number of days to add
+    num_days = (benchmarking_data_filtered.index.max() - benchmarking_data_filtered.index.min()).days
+    days_to_add1 = num_days / 100
+    days_to_add2 = num_days / 13
 
     # Plot scatter points at the end of each line
     for col in benchmarking_data_filtered.columns:
         plt.scatter(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], color=color_list[list_of_names.index(col)], zorder=5)
-        #text lablel is offset by 10 days to the right
-        plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=10), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1], 2)),color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
+        #text lablel is offset by a number of days to the right
+        plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=days_to_add1), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1]*100, 2))+"%",color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
 
-    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
+    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
     plt.gca().xaxis.set_major_locator(MaxNLocator())
     plt.gca().set_xlim(left=benchmarking_data.head(1).index.max())
 
-    # Calculate the number of days to add
-    num_days = (benchmarking_data_filtered.index.max() - benchmarking_data_filtered.index.min()).days
-    days_to_add = num_days / 14
+    
 
-    plt.xlim(right=benchmarking_data.index.max() + pd.Timedelta(days=days_to_add))  # Extend x-axis limit by number of days
+    plt.xlim(right=benchmarking_data.index.max() + pd.Timedelta(days=days_to_add2))  # Extend x-axis limit by number of days
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
     plt.grid('on', ls="--")
-    plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max().strftime('%d.%m.%Y')} = 100)", fontsize=12)
+    plt.ylabel(f"Performance (indexed: {benchmarking_data.head(1).index.max().strftime('%d.%m.%Y')} = 0%)", fontsize=12)
     plt.legend(fontsize=12)
 
     # Rotate x-axis labels to be horizontal
