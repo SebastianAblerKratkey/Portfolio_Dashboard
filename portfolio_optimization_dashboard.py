@@ -1083,8 +1083,13 @@ if download_sucess:
         asset_name = st.selectbox("Select the asset you want to lever:", tickers)
         daily_return = daily_mean_returns[asset_name]
         daily_vola = daily_std_returns[asset_name]
+
+        # get SOFR data
+        SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
+        SOFR_90_day.dropna(inplace=True)
+        SOFR_90_day = float(SOFR_90_day.iloc[-1])
         
-        reference_rate = st.number_input("Insert a reference rate in percent p.a.", value=0.00)
+        reference_rate = st.number_input("Enter a reference interest rate in percent p.a. The default value is the current 90-day average Secured Overnight Financing Rate (SOFR).", value=SOFR_90_day)
         reference_rate = reference_rate/100
         expense_ratio = st.number_input("Insert the expense ratio in percent p.a.", value=0.00)
         expense_ratio = expense_ratio/100
