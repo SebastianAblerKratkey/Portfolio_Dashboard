@@ -369,7 +369,6 @@ def simulate_leveraged_daily_compounded_annual_return(daily_return,
     daily_return_sim = np.log(1 + leverage*(daily_return + daily_vola*np.random.normal(0, 1, size=(sim_runs, assumed_trading_days))) - daily_leverage_cost)
 
     daily_compounded_annual_returns = np.sum(daily_return_sim, axis=1)
-    daily_compounded_annual_returns
 
     mean_daily_compounded_annual_return = daily_compounded_annual_returns.mean()
     std_daily_compounded_annual_return = daily_compounded_annual_returns.std()
