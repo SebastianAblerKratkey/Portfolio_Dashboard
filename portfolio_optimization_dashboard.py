@@ -1093,8 +1093,8 @@ if download_sucess:
         step_ = 0.1
         leverage_levels = np.arange(1, 4 + step_, step_)
         
-        # Initialize a DataFrame to store the results
-        results_df = pd.DataFrame(columns=['Leverage', 'Mean_Return', 'Std_Return'])
+        # Initialize an empty list to store DataFrames
+        dfs = []
         
         # Iterate over each leverage level
         for leverage in leverage_levels:
@@ -1106,12 +1106,17 @@ if download_sucess:
                                                                                         expense_ratio, 
                                                                                         assumed_trading_days,
                                                                                         sim_runs)
-            # Append results to the DataFrame
-            results_df = results_df.append({'Leverage': leverage, 
-                                            'Mean_Return': mean_return, 
-                                            'Std_Return': std_return}, 
-                                           ignore_index=True)
-            #create_leverage_sim_visual(results_df)
+            # Create a DataFrame for current leverage level
+            df = pd.DataFrame({'Leverage': [leverage], 
+                               'Mean_Return': [mean_return], 
+                               'Std_Return': [std_return]})
+            
+            # Append the DataFrame to the list
+            dfs.append(df)
+        
+        # Concatenate all DataFrames in the list along the rows axis
+        results_df = pd.concat(dfs, ignore_index=True)
+            
         
         create_leverage_sim_visual(results_df)
         st.pyplot()
