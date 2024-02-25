@@ -460,7 +460,7 @@ if download_sucess:
      # calculate maximum drawdown
     max_dds = maximum_drawdowns(price_df=daily_adjusted_closing_prices)
 
-    montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
+    #montly_adjusted_closing_prices = convert_date_index(montly_adjusted_closing_prices)
     monthly_log_returns = np.log(montly_adjusted_closing_prices / montly_adjusted_closing_prices.shift(1))
 
     annualized_mean_returns = monthly_log_returns.mean() * 12
@@ -764,18 +764,17 @@ if download_sucess:
             download_sucess2 = True
 
         if download_sucess2:
-            CAPM_quotes = pd.DataFrame()
+           CAPM_quotes = pd.DataFrame()
             CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
             CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
-            CAPM_quotes = convert_date_index(CAPM_quotes)
-            CAPM_returns = pd.DataFrame()
-            CAPM_returns["Market"] = np.log(CAPM_quotes["Market"] / CAPM_quotes["Market"].shift(1))
+            CAPM_quotes = CAPM_quotes.merge(montly_adjusted_closing_prices, left_index=True, right_index=True, how="inner")
+            CAPM_returns = np.log(CAPM_quotes / CAPM_quotes.shift(1))
             CAPM_returns["risk-free"] = CAPM_quotes["risk-free"]*(1/12)
             CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
-
-            for asset in monthly_log_returns.columns:
-                CAPM_returns[f"{asset}-rf"] = monthly_log_returns[asset] - CAPM_returns["risk-free"]
             
+            for asset in monthly_log_returns.columns:
+                CAPM_returns[f"{asset}-rf"] = CAPM_returns[asset] - CAPM_returns["risk-free"]
+        
             CAPM_returns.dropna(inplace=True)
 
             mean_rf = CAPM_returns["risk-free"].mean()*12
