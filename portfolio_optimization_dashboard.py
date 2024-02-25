@@ -764,7 +764,7 @@ if download_sucess:
             download_sucess2 = True
 
         if download_sucess2:
-           CAPM_quotes = pd.DataFrame()
+            CAPM_quotes = pd.DataFrame()
             CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
             CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
             CAPM_quotes = CAPM_quotes.merge(montly_adjusted_closing_prices, left_index=True, right_index=True, how="inner")
