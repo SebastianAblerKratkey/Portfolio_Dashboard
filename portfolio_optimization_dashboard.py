@@ -1099,7 +1099,8 @@ if download_sucess:
 
         if st.button("Run simulation"):
 
-            progress_text = "Simulation in progress"
+            # Initialize progress bar
+            progress_text = "Simulation in progress..."
             progress_bar = st.progress(0, text=progress_text)
             
             # Iterate over each leverage level
@@ -1120,10 +1121,15 @@ if download_sucess:
                 # Append the DataFrame to the list
                 dfs.append(df)
 
-                progress_bar.progress(percent_complete + 1, text=progress_text)
+                # Update progress bar
+                progress_percent = i / len(leverage_levels)
+                progress_bar.progress(progress_percent, text=progress_text)
             
             # Concatenate all DataFrames in the list along the rows axis
             results_df = pd.concat(dfs, ignore_index=True)
+
+            # Remove progress bar once completed
+            progress_bar.empty()
             
             create_leverage_sim_visual(results_df)
             st.pyplot()
