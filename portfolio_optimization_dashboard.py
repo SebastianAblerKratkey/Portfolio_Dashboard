@@ -816,11 +816,11 @@ if download_sucess:
             plt.gca().set_xlim(left=min(min(CAPM_summary["Beta"])*1.5,0))
             plt.gca().set_xlim(right=max(CAPM_summary["Beta"])*1.5)
 
-            plt.scatter(CAPM_summary["Beta"], CAPM_summary["Expected return"], color=color2, label="Expected return")
+            plt.scatter(CAPM_summary["Beta"], CAPM_summary["Mean return"], color=color2, label="Mean return")
 
             for i in summary.index:
-                alpha_y = np.arange(min(CAPM_summary["Fair return"][i],CAPM_summary["Expected return"][i]), 
-                                    max(CAPM_summary["Fair return"][i],CAPM_summary["Expected return"][i]), step)
+                alpha_y = np.arange(min(CAPM_summary["Fair return"][i],CAPM_summary["Mean return"][i]), 
+                                    max(CAPM_summary["Fair return"][i],CAPM_summary["Mean return"][i]), step)
                 alpha_x = np.ones((len(alpha_y),1))*CAPM_summary["Beta"][i]
                 if i == summary.index[0]:
                     plt.plot(alpha_x ,alpha_y, color=color2, linestyle='--', label="Alpha")
@@ -844,7 +844,7 @@ if download_sucess:
 
             labels = []
             for i in summary.index:
-                labels.append(plt.text(CAPM_summary["Beta"][i], CAPM_summary["Expected return"][i], i, size=8))
+                labels.append(plt.text(CAPM_summary["Beta"][i], CAPM_summary["Mean return"][i], i, size=8))
             adjust_text(labels) 
             
             plt.show()
