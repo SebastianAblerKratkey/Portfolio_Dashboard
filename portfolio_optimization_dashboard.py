@@ -1102,6 +1102,7 @@ if download_sucess:
             # Initialize progress bar
             progress_text = "Simulation in progress..."
             progress_bar = st.progress(0, text=progress_text)
+            i = 0
             
             # Iterate over each leverage level
             for leverage in leverage_levels:
@@ -1124,6 +1125,7 @@ if download_sucess:
                 # Update progress bar
                 progress_percent = i / len(leverage_levels)
                 progress_bar.progress(progress_percent, text=progress_text)
+                i += 1
             
             # Concatenate all DataFrames in the list along the rows axis
             results_df = pd.concat(dfs, ignore_index=True)
