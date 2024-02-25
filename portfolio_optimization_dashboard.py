@@ -1083,8 +1083,10 @@ if download_sucess:
         daily_return = daily_mean_returns[asset_name]
         daily_vola = daily_std_returns[asset_name]
         
-        reference_rate = st.number_input("Insert a reference rate", value=0.00)
-        expense_ratio = st.number_input("Insert the expense ratio", value=0.00)
+        reference_rate = st.number_input("Insert a reference rate in percent p.a.", value=0.00)
+        reference_rate = reference_rate/100
+        expense_ratio = st.number_input("Insert the expense ratio in percent p.a.", value=0.00)
+        expense_ratio = expense_ratio/100
         assumed_trading_days = 252
         sim_runs = st.number_input("Choose a number of simulation runs", value=80000)
 
