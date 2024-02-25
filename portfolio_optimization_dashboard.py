@@ -792,7 +792,7 @@ if download_sucess:
                 CAPM_summary.loc[asset,"Mean MRP"] = mean_MRP
                 CAPM_summary.loc[asset,"Fair return"] = CAPM_summary.loc[asset,"Mean rf"] + CAPM_summary.loc[asset,"Beta"]*CAPM_summary.loc[asset,"Mean MRP"]
                 CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
-                CAPM_summary.loc[asset,"Expected return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
+                CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
 
             display_CAPM_summary = pd.DataFrame()
             display_CAPM_summary["Mean rf"] = CAPM_summary["Mean rf"].map('{:.2%}'.format)
@@ -800,7 +800,7 @@ if download_sucess:
             display_CAPM_summary["Mean MRP"] = CAPM_summary["Mean MRP"].map('{:.2%}'.format)
             display_CAPM_summary["Fair Return"] = CAPM_summary["Fair return"].map('{:.2%}'.format)
             display_CAPM_summary["Alpha"] = CAPM_summary["Alpha"].map('{:.2%}'.format)
-            display_CAPM_summary["Expected Return"] = CAPM_summary["Expected return"].map('{:.2%}'.format)
+            display_CAPM_summary["Mean Return"] = CAPM_summary["Mean return"].map('{:.2%}'.format)
             st.dataframe(display_CAPM_summary)
 
             #Visualize SML
