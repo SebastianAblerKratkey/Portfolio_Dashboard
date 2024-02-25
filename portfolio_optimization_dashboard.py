@@ -355,7 +355,53 @@ def get_monthly_closing_prices(price_df_daily):
     return price_df_monthly
 
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Data"))
+def simulate_leveraged_daily_compounded_annual_return(daily_return, 
+                                                      daily_vola, 
+                                                      leverage, 
+                                                      reference_rate, 
+                                                      expense_ratio, 
+                                                      assumed_trading_days,
+                                                      sim_runs):
+    delta_t = 1/assumed_trading_days
+    daily_leverage_cost = ((leverage-1)*reference_rate + expense_ratio)*delta_t
+    
+    # run monte carlo simmulation
+    daily_return_sim = np.log(1 + leverage*(daily_return + daily_vola*np.random.normal(0, 1, size=(sim_runs, assumed_trading_days))) - daily_leverage_cost)
+
+    daily_compounded_annual_returns = np.sum(daily_return_sim, axis=1)
+    daily_compounded_annual_returns
+
+    mean_daily_compounded_annual_return = daily_compounded_annual_returns.mean()
+    std_daily_compounded_annual_return = daily_compounded_annual_returns.std()
+    
+    return mean_daily_compounded_annual_return, std_daily_compounded_annual_return
+
+def create_leverage_sim_visual(results_df):
+    # Create figure and axis objects
+    fig, ax1 = plt.subplots(figsize=(10, 6))
+
+    # Plot mean return on primary y-axis
+    ax1.scatter(results_df['Leverage'], results_df['Mean_Return'], label='Simulated return', color='cornflowerblue')
+    ax1.set_xlabel('Leverage')
+    ax1.set_ylabel('Daily compounded annual return')
+    ax1.yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+
+    plt.grid('on', ls="--")
+    # Create secondary y-axis for standard deviation
+    ax2 = ax1.twinx()
+    ax2.scatter(results_df['Leverage'], results_df['Std_Return'], label='Simulated volatility', color='darkmagenta')
+    ax2.set_ylabel('Volatility of annual returns')
+    ax2.yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+
+    # ask matplotlib for the plotted objects and their labels
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    plt.legend(lines + lines2, labels + labels2, loc=0)
+
+    # Display the plot
+    plt.show()
+
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -1029,7 +1075,13 @@ if download_sucess:
                             """
                             )
 
+    if option == "Daily leverage simulation":
+        daily_log_returns = np.log(daily_adjusted_closing_prices / daily_adjusted_closing_prices.shift(1))
+        daily_mean_returns = daily_log_returns.mean() 
+        daily_std_returns = daily_log_returns.std() 
 
+        asset_name = st.selectbox("Select the asset you want to lever:", tickers)
+        
 
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
