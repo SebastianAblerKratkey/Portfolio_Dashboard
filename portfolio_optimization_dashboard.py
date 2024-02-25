@@ -1094,31 +1094,33 @@ if download_sucess:
         
         # Initialize an empty list to store DataFrames
         dfs = []
-        
-        # Iterate over each leverage level
-        for leverage in leverage_levels:
-            # Call the function for each leverage level
-            mean_return, std_return = simulate_leveraged_daily_compounded_annual_return(daily_return, 
-                                                                                        daily_vola, 
-                                                                                        leverage, 
-                                                                                        reference_rate, 
-                                                                                        expense_ratio, 
-                                                                                        assumed_trading_days,
-                                                                                        sim_runs)
-            # Create a DataFrame for current leverage level
-            df = pd.DataFrame({'Leverage': [leverage], 
-                               'Mean_Return': [mean_return], 
-                               'Std_Return': [std_return]})
+
+        if st.button("Run simulation"):
+            # Iterate over each leverage level
+            for leverage in leverage_levels:
+                # Call the function for each leverage level
+                mean_return, std_return = simulate_leveraged_daily_compounded_annual_return(daily_return, 
+                                                                                            daily_vola, 
+                                                                                            leverage, 
+                                                                                            reference_rate, 
+                                                                                            expense_ratio, 
+                                                                                            assumed_trading_days,
+                                                                                            sim_runs)
+                # Create a DataFrame for current leverage level
+                df = pd.DataFrame({'Leverage': [leverage], 
+                                   'Mean_Return': [mean_return], 
+                                   'Std_Return': [std_return]})
+                
+                # Append the DataFrame to the list
+                dfs.append(df)
             
-            # Append the DataFrame to the list
-            dfs.append(df)
-        
-        # Concatenate all DataFrames in the list along the rows axis
-        results_df = pd.concat(dfs, ignore_index=True)
+                # Concatenate all DataFrames in the list along the rows axis
+                results_df = pd.concat(dfs, ignore_index=True)
+                create_leverage_sim_visual(results_df)
+                st.pyplot()
             
-        
-        create_leverage_sim_visual(results_df)
-        st.pyplot()
+            create_leverage_sim_visual(results_df)
+            st.pyplot()
 
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
