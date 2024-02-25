@@ -1085,6 +1085,7 @@ if download_sucess:
         
         reference_rate = st.number_input("Insert a reference rate in percent p.a.", value=0.00)
         reference_rate = reference_rate/100
+        st.write('The current number is ', reference_rate)
         expense_ratio = st.number_input("Insert the expense ratio in percent p.a.", value=0.00)
         expense_ratio = expense_ratio/100
         assumed_trading_days = 252
