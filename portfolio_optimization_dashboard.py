@@ -1123,7 +1123,7 @@ if download_sucess:
                 dfs.append(df)
 
                 # Update progress bar
-                progress_percent = i / len(leverage_levels)
+                progress_percent = i / (len(leverage_levels)-1)
                 progress_bar.progress(progress_percent, text=progress_text)
                 i += 1
             
