@@ -1116,10 +1116,8 @@ if download_sucess:
                 # Append the DataFrame to the list
                 dfs.append(df)
             
-                # Concatenate all DataFrames in the list along the rows axis
-                results_df = pd.concat(dfs, ignore_index=True)
-                create_leverage_sim_visual(results_df)
-                st.pyplot()
+            # Concatenate all DataFrames in the list along the rows axis
+            results_df = pd.concat(dfs, ignore_index=True)
             
             create_leverage_sim_visual(results_df)
             st.pyplot()
