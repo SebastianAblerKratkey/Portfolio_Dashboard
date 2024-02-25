@@ -1081,7 +1081,40 @@ if download_sucess:
         daily_std_returns = daily_log_returns.std() 
 
         asset_name = st.selectbox("Select the asset you want to lever:", tickers)
+        daily_return = daily_mean_returns[asset_name]
+        daily_vola = daily_std_returns[asset_name]
         
+        reference_rate = st.number_input("Insert a reference rate", value=0.00)
+        expense_ratio = st.number_input("Insert the expense ratio", value=0.00)
+        assumed_trading_days = 252
+        sim_runs = st.number_input("Choose a number of simulation runs", value=80000, step=int)
+
+        # Define leverage levels
+        step_ = 0.1
+        leverage_levels = np.arange(1, 4 + step_, step_)
+        
+        # Initialize a DataFrame to store the results
+        results_df = pd.DataFrame(columns=['Leverage', 'Mean_Return', 'Std_Return'])
+        
+        # Iterate over each leverage level
+        for leverage in leverage_levels:
+            # Call the function for each leverage level
+            mean_return, std_return = simulate_leveraged_daily_compounded_annual_return(daily_return, 
+                                                                                        daily_vola, 
+                                                                                        leverage, 
+                                                                                        reference_rate, 
+                                                                                        expense_ratio, 
+                                                                                        assumed_trading_days,
+                                                                                        sim_runs)
+            # Append results to the DataFrame
+            results_df = results_df.append({'Leverage': leverage, 
+                                            'Mean_Return': mean_return, 
+                                            'Std_Return': std_return}, 
+                                           ignore_index=True)
+            #create_leverage_sim_visual(results_df)
+        
+        create_leverage_sim_visual(results_df)
+        st.pyplot()
 
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
