@@ -1148,10 +1148,10 @@ if download_sucess:
             optimal_leverage = row_highest_return["Leverage"]
 
             st.write("Highest simulated daily compounded annual returns (levered)")
-            col1, col2, col3 = st.columns([1,1,1])
+            col1, col2, col3 = st.columns(3)
             col1.metric("Mean return p.a.", f"{sim_mean_daily_compounded_leveraged_annual_return:.2%}")
             col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
-            col3.metric("Optimal leverage", f"{optimal_leverage:.2%}")
+            col3.metric("Optimal leverage", f"{optimal_leverage:.1f}")
 
         mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
         std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
