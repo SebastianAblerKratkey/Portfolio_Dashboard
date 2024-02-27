@@ -1142,13 +1142,26 @@ if download_sucess:
             # Remove progress bar once completed
             progress_bar.empty()
 
+            row_highest_return = results_df.loc[results_df['Mean_Return'].idxmax()]
+            sim_mean_daily_compounded_leveraged_annual_return = row_highest_return["Mean_Return"]
+            sim_std_daily_compounded_leveraged_annual_returns = row_highest_return["Std_Return"]
+            optimal_leverage = row_highest_return["Leverage"]
+
+            st.write("Highest simulated daily compounded annual returns (levered)")
+            col1, col2, col3 = st.columns([1,1,1])
+            col1.metric("Mean return p.a.", f"{sim_mean_daily_compounded_leveraged_annual_return:.2%}")
+            col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
+            col3.metric("Optimal leverage", f"{optimal_leverage:.2%}")
+
         mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
         std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
 
         st.write("Historic daily compounded annual returns (unlevered)")
-        col1, col2 = st.columns([1,3])
-        col1.metric("Mean return p.a.", f"{mean_daily_compounded_unleveraged_annual_return:.2%}")
-        col2.metric("Volatility p.a.", f"{std_daily_compounded_unleveraged_annual_returns:.2%}")
+        col4, col5 = st.columns([1,3])
+        col4.metric("Mean return p.a.", f"{mean_daily_compounded_unleveraged_annual_return:.2%}")
+        col5.metric("Volatility p.a.", f"{std_daily_compounded_unleveraged_annual_returns:.2%}")
+
+         
 
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
