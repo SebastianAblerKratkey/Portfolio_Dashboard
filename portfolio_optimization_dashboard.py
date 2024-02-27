@@ -1142,6 +1142,14 @@ if download_sucess:
             # Remove progress bar once completed
             progress_bar.empty()
 
+            mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
+            std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
+            
+            col1, col2 = st.columns([1,3])
+        
+            col1.metric("Historic mean daily compounded annual return", f"{mean_daily_compounded_unleveraged_annual_return:.2%}")
+            col2.metric("Historic Volatility of daily compounded annual returns", f"{std_daily_compounded_unleveraged_annual_returns:.2%}")
+
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
         st.dataframe(montly_adjusted_closing_prices)
