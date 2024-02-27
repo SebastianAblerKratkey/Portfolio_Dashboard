@@ -1145,14 +1145,14 @@ if download_sucess:
             progress_bar.empty()
 
             row_highest_return = results_df.loc[results_df['Mean_Return'].idxmax()]
-            sim_mean_daily_compounded_leveraged_annual_return = row_highest_return["Mean_Return"]
-            sim_std_daily_compounded_leveraged_annual_returns = row_highest_return["Std_Return"]
-            optimal_leverage = row_highest_return["Leverage"]
+            sim_mean_daily_compounded_leveraged_annual_return = float(row_highest_return["Mean_Return"])
+            sim_std_daily_compounded_leveraged_annual_returns = float(row_highest_return["Std_Return"])
+            optimal_leverage = float(row_highest_return["Leverage"])
 
             row_lev_1 = results_df.loc[results_df['Leverage']==1]
-            sim_mean_daily_compounded_unleveraged_annual_return = row_lev_1["Mean_Return"]
-            sim_std_daily_compounded_unleveraged_annual_returns = row_lev_1["Std_Return"]
-            leverage = row_lev_1["Leverage"]
+            sim_mean_daily_compounded_unleveraged_annual_return = float(row_lev_1["Mean_Return"])
+            sim_std_daily_compounded_unleveraged_annual_returns = float(row_lev_1["Std_Return"])
+            leverage = float(row_lev_1["Leverage"])
 
             delta_returns = sim_mean_daily_compounded_leveraged_annual_return - sim_mean_daily_compounded_unleveraged_annual_return
 
