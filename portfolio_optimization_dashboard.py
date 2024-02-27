@@ -1154,7 +1154,7 @@ if download_sucess:
             sim_std_daily_compounded_unleveraged_annual_returns = row_lev_1["Std_Return"]
             leverage = row_lev_1["Leverage"]
 
-            delta_returns = sim_mean_daily_compounded_leveraged_annual_return - mean_daily_compounded_unleveraged_annual_return
+            delta_returns = sim_mean_daily_compounded_leveraged_annual_return - sim_mean_daily_compounded_unleveraged_annual_return
 
             st.write("Highest simulated daily compounded annual return (levered)")
             col1, col2, col3 = st.columns(3)
