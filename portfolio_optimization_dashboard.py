@@ -1084,6 +1084,9 @@ if download_sucess:
         daily_return = daily_mean_returns[asset_name]
         daily_vola = daily_std_returns[asset_name]
 
+        mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
+        std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
+
         # get SOFR data
         SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
         SOFR_90_day.dropna(inplace=True)
@@ -1095,6 +1098,7 @@ if download_sucess:
         expense_ratio = expense_ratio/100
         assumed_trading_days = 252
         sim_runs = st.number_input("Choose a number of simulation runs", value=80000)
+
 
         # Define leverage levels
         step_ = 0.1
@@ -1147,14 +1151,14 @@ if download_sucess:
             sim_std_daily_compounded_leveraged_annual_returns = row_highest_return["Std_Return"]
             optimal_leverage = row_highest_return["Leverage"]
 
-            st.write("Highest simulated daily compounded annual returns (levered)")
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Mean return p.a.", f"{sim_mean_daily_compounded_leveraged_annual_return:.2%}")
-            col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
-            col3.metric("Optimal leverage", f"{optimal_leverage:.1f}")
+            delta_returns = sim_mean_daily_compounded_leveraged_annual_return - mean_daily_compounded_unleveraged_annual_return
 
-        mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
-        std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
+            st.write("Highest simulated daily compounded annual returns (levered)")
+            col1, col2, col3 = st.columns([0.5, 0.5, 0.5])
+            col1.metric("Mean return p.a.", f"{sim_mean_daily_compounded_leveraged_annual_return:.2%}", f"{delta_returns:.2%}")
+            col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
+            col3.metric("Optimal leverage", f"{optimal_leverage:.1f}x")
+
 
         st.write("Historic daily compounded annual returns (unlevered)")
         col4, col5 = st.columns([1,3])
