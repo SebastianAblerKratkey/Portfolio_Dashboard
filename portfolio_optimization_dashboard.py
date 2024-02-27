@@ -1162,13 +1162,11 @@ if download_sucess:
             col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
             col3.metric("Optimal leverage", f"{optimal_leverage:.1f}x")
 
-
             st.write("Simulated daily compounded annual return (unlevered)")
             col4, col5, col6 = st.columns(3)
             col4.metric("Mean return p.a.", f"{sim_mean_daily_compounded_unleveraged_annual_return:.2%}")
             col5.metric("Volatility p.a.", f"{sim_std_daily_compounded_unleveraged_annual_returns:.2%}")
-            col3.metric("Leverage", f"{leverage:.1f}x")
-            col6.metric("","")
+            col6.metric("Leverage", f"{leverage:.1f}x")
          
 
     if option == "Data":
