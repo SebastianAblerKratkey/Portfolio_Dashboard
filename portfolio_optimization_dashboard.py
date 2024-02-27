@@ -1085,8 +1085,6 @@ if download_sucess:
         daily_vola = daily_std_returns[asset_name]
         
         assumed_trading_days = 252
-        mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
-        std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
 
         # get SOFR data
         SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
@@ -1151,20 +1149,26 @@ if download_sucess:
             sim_std_daily_compounded_leveraged_annual_returns = row_highest_return["Std_Return"]
             optimal_leverage = row_highest_return["Leverage"]
 
+            row_lev_1 = results_df.loc[results_df['Leverage']==1]
+            sim_mean_daily_compounded_unleveraged_annual_return = row_lev_1["Mean_Return"]
+            sim_std_daily_compounded_unleveraged_annual_returns = row_lev_1["Std_Return"]
+            leverage = row_lev_1["Leverage"]
+
             delta_returns = sim_mean_daily_compounded_leveraged_annual_return - mean_daily_compounded_unleveraged_annual_return
 
-            st.write("Highest simulated daily compounded annual returns (levered)")
+            st.write("Highest simulated daily compounded annual return (levered)")
             col1, col2, col3 = st.columns(3)
             col1.metric("Mean return p.a.", f"{sim_mean_daily_compounded_leveraged_annual_return:.2%}", f"{delta_returns:.2%}")
             col2.metric("Volatility p.a.", f"{sim_std_daily_compounded_leveraged_annual_returns:.2%}")
             col3.metric("Optimal leverage", f"{optimal_leverage:.1f}x")
 
 
-        st.write("Historic daily compounded annual returns (unlevered)")
-        col4, col5, col6 = st.columns(3)
-        col4.metric("Mean return p.a.", f"{mean_daily_compounded_unleveraged_annual_return:.2%}")
-        col5.metric("Volatility p.a.", f"{std_daily_compounded_unleveraged_annual_returns:.2%}")
-        col6.metric("","")
+            st.write("Simulated daily compounded annual return (unlevered)")
+            col4, col5, col6 = st.columns(3)
+            col4.metric("Mean return p.a.", f"{sim_mean_daily_compounded_unleveraged_annual_return:.2%}")
+            col5.metric("Volatility p.a.", f"{sim_std_daily_compounded_unleveraged_annual_returns:.2%}")
+            col3.metric("Leverage", f"{leverage:.1f}x")
+            col6.metric("","")
          
 
     if option == "Data":
