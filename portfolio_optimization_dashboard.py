@@ -1083,7 +1083,8 @@ if download_sucess:
         asset_name = st.selectbox("Select the asset you want to lever:", tickers)
         daily_return = daily_mean_returns[asset_name]
         daily_vola = daily_std_returns[asset_name]
-
+        
+        assumed_trading_days = 252
         mean_daily_compounded_unleveraged_annual_return = daily_return * assumed_trading_days
         std_daily_compounded_unleveraged_annual_returns = daily_vola * assumed_trading_days**0.5
 
@@ -1096,7 +1097,6 @@ if download_sucess:
         reference_rate = reference_rate/100
         expense_ratio = st.number_input("If applicable, enter an expense ratio in percent p.a. This is appropriate when comparing leveraged ETFs to their unleveraged equivalents, as leveraged ETFs are typically more expensive.", value=0.00)
         expense_ratio = expense_ratio/100
-        assumed_trading_days = 252
         sim_runs = st.number_input("Choose a number of simulation runs", value=80000)
 
 
