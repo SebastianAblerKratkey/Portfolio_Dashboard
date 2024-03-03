@@ -1241,7 +1241,6 @@ if download_sucess:
         asset_data = yf.download(asset_name)
 
         days_back_period = st.number_input("Days back window", value=int(min(200,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
-        days_back_period = days_back_period + int(len(asset_data)/10)
         
         days_ema = st.number_input("Days exponential moving average (EMA)", value=int(min(200, len(asset_data)/10)), max_value=int(len(asset_data)/10))
 
