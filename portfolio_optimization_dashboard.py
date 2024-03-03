@@ -1254,6 +1254,13 @@ if download_sucess:
         asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
 
         asset_data = asset_data.dropna()
+
+        #date formating
+        if days_back_period <= 100:
+            date_format = '%b %d %Y'
+        else:
+            date_format = '%b %Y'
+        
         
         #plot candlesticks
         fig, ax = plt.subplots(figsize=(15, 10))
@@ -1268,7 +1275,7 @@ if download_sucess:
         
         mpf.plot(
                 asset_data,
-                datetime_format='%b %Y',
+                datetime_format=date_format,
                 type="candle",
                 ylabel='Price',
                 ylabel_lower='Shares\nTraded',
@@ -1306,7 +1313,7 @@ if download_sucess:
         
         plt.gca().set_ylabel('RSI')
         
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))  # Format dates to show month and year
         plt.grid('on', ls="--")
         plt.legend(fontsize=12)
         
