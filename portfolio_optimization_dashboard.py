@@ -1327,6 +1327,7 @@ if download_sucess:
         
         # Adjust y-axis ticks
         plt.yticks(list(plt.yticks()[0]) + [30, 70])
+        plt.minorticks_off()
         
         plt.show()
         txt2 = "Relative Strength Index"
