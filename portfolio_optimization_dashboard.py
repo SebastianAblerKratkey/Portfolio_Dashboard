@@ -1251,7 +1251,7 @@ if download_sucess:
         asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
 
         # calculate addplot data
-        asset_data["mav"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
+        asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
 
         asset_data = asset_data.dropna()
         
@@ -1260,7 +1260,7 @@ if download_sucess:
         ax.xaxis.set_major_locator(MaxNLocator())
         
         # addplots
-        ap = [mpf.make_addplot(data=asset_data["mav"], type="line", ax=ax),
+        ap = [mpf.make_addplot(data=asset_data["ema"], type="line", width=1.5, color="cornflowerblue", ax=ax),
               #mpf.make_addplot(data=asset_data["mav2"], type="line", ax=ax1)
               ]
               
