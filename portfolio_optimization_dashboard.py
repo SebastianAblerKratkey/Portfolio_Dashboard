@@ -1260,7 +1260,7 @@ if download_sucess:
         ax.xaxis.set_major_locator(MaxNLocator())
         
         # addplots
-        ap = [mpf.make_addplot(data=asset_data["ema"], type="line", width=1.5, color="cornflowerblue", ax=ax),
+        ap = [mpf.make_addplot(data=asset_data["ema"], type="line", width=1.5, color="cornflowerblue", label=f"{days_ema}-day EMA", ax=ax),
               #mpf.make_addplot(data=asset_data["mav2"], type="line", ax=ax1)
               ]
               
