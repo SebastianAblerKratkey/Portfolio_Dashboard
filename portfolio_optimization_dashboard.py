@@ -1237,10 +1237,11 @@ if download_sucess:
 
     if option == "Technical Analysis":
 
-        asset_name = st.selectbox("Select the asset you want to analyze:", tickers)
+        asset_name = st.selectbox("Select the asset you want to analyze", tickers)
         asset_data = yf.download(asset_name)
 
         days_back_period = st.number_input("Days back window", value=200)
+        days_ema = st.number_input("Days exponential moving average (EMA)", value=200)
 
         asset_data = asset_data.tail(days_back_period)
 
@@ -1248,6 +1249,11 @@ if download_sucess:
         asset_data = pandas_rsi(df=asset_data, window_length=period_RSI, price="Close")
         asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
 
+        # calculate addplot data
+        asset_data["mav"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
+
+        asset_data = asset_data.dropna()
+        
         #plot candlesticks
         fig, ax = plt.subplots(figsize=(15, 10))
         ax.xaxis.set_major_locator(MaxNLocator())
