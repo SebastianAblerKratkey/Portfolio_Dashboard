@@ -1285,7 +1285,7 @@ if download_sucess:
         plt.xticks(rotation=0, ha='center')
         
         # Add legend
-        plt.legend(fontsize=12)
+        plt.legend(fontsize=12, loc=2)
         
         # Adjust layout
         plt.style.use("default")
@@ -1323,7 +1323,7 @@ if download_sucess:
         plt.axhline(y=30, color='g', linestyle='--', linewidth=1, label='Oversold')
         
         # Add legend
-        plt.legend(fontsize=12)
+        plt.legend(fontsize=12, loc=2)
         
         # Adjust y-axis ticks
         plt.yticks(list(plt.yticks()[0]) + [30, 70])
