@@ -1291,7 +1291,7 @@ if download_sucess:
         plt.style.use("default")
         
         plt.show()
-        txt = "Chart"
+        txt = "Candlestick Chart"
         st.write(f"**{txt}**")
         st.pyplot()
 
@@ -1330,7 +1330,7 @@ if download_sucess:
         plt.minorticks_off()
         
         plt.show()
-        txt2 = "Relative Strength Index"
+        txt2 = "Relative Strength Index (RSI)"
         st.write(f"**{txt2}**")
         st.pyplot()
 
