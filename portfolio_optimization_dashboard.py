@@ -1292,7 +1292,7 @@ if download_sucess:
         
         plt.show()
         txt = "Chart"
-        st.write(f**{txt}**)
+        st.write(f"**{txt}**")
         st.pyplot()
 
         # plot rsi
