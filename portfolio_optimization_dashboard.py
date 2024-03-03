@@ -401,7 +401,73 @@ def create_leverage_sim_visual(results_df):
     # Display the plot
     plt.show()
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Data"))
+#Technical Analysis functions
+def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
+    short_ema = data[price].ewm(span=days_fast, adjust=False).mean()
+    long_ema = data[price].ewm(span=days_slow, adjust=False).mean()
+    macd = short_ema - long_ema
+    signal = macd.ewm(span=days_signal, adjust=False).mean()
+    return short_ema, long_ema, macd, signal
+
+def pandas_rsi(df: pd.DataFrame, window_length: int = 14, output: str = None, price: str = 'Close'):
+    """
+    An implementation of Wells Wilder's RSI calculation as outlined in
+    his 1978 book "New Concepts in Technical Trading Systems" which makes
+    use of the α-1 Wilder Smoothing Method of calculating the average
+    gains and losses across trading periods and the Pandas library.
+
+    @author: https://github.com/alphazwest
+    Args:
+        df: pandas.DataFrame - a Pandas Dataframe object
+        window_length: int - the period over which the RSI is calculated. Default is 14
+        output: str or None - optional output path to save data as CSV
+        price: str - the column name from which the RSI values are calcuated. Default is 'Close'
+
+    Returns:
+        DataFrame object with columns as such, where xxx denotes an inconsequential
+        name of the provided first column:
+            ['xxx', 'diff', 'gain', 'loss', 'avg_gain', 'avg_loss', 'rs', 'rsi']
+    """
+    # Calculate Price Differences using the column specified as price.
+    df['diff1'] = df[price].diff(1)
+
+    # Calculate Avg. Gains/Losses
+    df['gain'] = df['diff1'].clip(lower=0).round(2)
+    df['loss'] = df['diff1'].clip(upper=0).abs().round(2)
+
+    # Get initial Averages
+    df['avg_gain'] = df['gain'].rolling(window=window_length, min_periods=window_length).mean()[:window_length+1]
+    df['avg_loss'] = df['loss'].rolling(window=window_length, min_periods=window_length).mean()[:window_length+1]
+
+    # Calculate Average Gains
+    for i, row in enumerate(df['avg_gain'].iloc[window_length+1:]):
+        df['avg_gain'].iloc[i + window_length + 1] =\
+            (df['avg_gain'].iloc[i + window_length] *
+             (window_length - 1) +
+             df['gain'].iloc[i + window_length + 1])\
+            / window_length
+
+    # Calculate Average Losses
+    for i, row in enumerate(df['avg_loss'].iloc[window_length+1:]):
+        df['avg_loss'].iloc[i + window_length + 1] =\
+            (df['avg_loss'].iloc[i + window_length] *
+             (window_length - 1) +
+             df['loss'].iloc[i + window_length + 1])\
+            / window_length
+
+    # Calculate RS Values
+    df['rs'] = df['avg_gain'] / df['avg_loss']
+
+    # Calculate RSI
+    df['rsi'] = 100 - (100 / (1.0 + df['rs']))
+
+    # Save if specified
+    if output is not None:
+        df.to_csv(output)
+
+    return df
+
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Technical Analysis", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -1167,8 +1233,59 @@ if download_sucess:
             col4.metric("Mean return p.a.", f"{sim_mean_daily_compounded_unleveraged_annual_return:.2%}")
             col5.metric("Volatility p.a.", f"{sim_std_daily_compounded_unleveraged_annual_returns:.2%}")
             col6.metric("Leverage", f"{leverage:.1f}x")
-         
 
+    if option == "Technical Analysis":
+
+        asset_name = st.selectbox("Select the asset you want to analyze:", tickers)
+        asset_data = yf.download(asset_name)
+
+        days_back_period = st.number_input("Days back window", value=200)
+
+        asset_data = asset_data.tail(days_back_period)
+
+        period_RSI=14
+        asset_data = pandas_rsi(df=asset_data, window_length=period_RSI, price="Close")
+        asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
+
+        #plot candlesticks
+        fig, ax = plt.subplots(figsize=(15, 10))
+        ax.xaxis.set_major_locator(MaxNLocator())
+        
+        # addplots
+        ap = [mpf.make_addplot(data=asset_data["mav"], type="line", ax=ax),
+              #mpf.make_addplot(data=asset_data["mav2"], type="line", ax=ax1)
+              ]
+              
+        s  = mpf.make_mpf_style(base_mpf_style="charles", y_on_right=False)
+        
+        mpf.plot(
+                asset_data,
+                datetime_format='%b %Y',
+                type="candle",
+                ylabel='Price',
+                ylabel_lower='Shares\nTraded',
+                style=s,
+                ax=ax,
+                show_nontrading=True,
+                addplot=ap,
+                xlim=(asset_data.head(1).index.max() - pd.Timedelta(days=1), asset_data.tail(1).index.max()+ pd.Timedelta(days=1))
+            )
+        
+        ax.grid('on', ls="--")
+        
+        # Rotate x-axis labels to be horizontal
+        plt.xticks(rotation=0, ha='center')
+        
+        # Add legend
+        plt.legend(fontsize=12)
+        
+        # Adjust layout
+        plt.style.use("default")
+        
+        plt.show()
+        st.pyplot()
+
+    
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
         st.dataframe(montly_adjusted_closing_prices)
