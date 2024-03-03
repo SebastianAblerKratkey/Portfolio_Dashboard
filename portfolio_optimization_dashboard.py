@@ -1296,7 +1296,6 @@ if download_sucess:
         # plot rsi
         asset_data["rsi"].plot(figsize=(15, 5), color="cornflowerblue", label="")
 
-        plt.gca().set_xlim(left=asset_data.head(1).index.max()- pd.Timedelta(days=1), right=asset_data.tail(1).index.max()+ pd.Timedelta(days=1))
         plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
         plt.gca().xaxis.set_major_locator(MaxNLocator())
         
@@ -1314,6 +1313,8 @@ if download_sucess:
         
         # Remove x-axis label
         plt.gca().set_xlabel('')
+
+        plt.gca().set_xlim(left=asset_data.head(1).index.max()- pd.Timedelta(days=1), right=asset_data.tail(1).index.max()+ pd.Timedelta(days=1))
         
         # Add horizontal lines
         plt.axhline(y=70, color='r', linestyle='--', linewidth=1, label='Overbought')
