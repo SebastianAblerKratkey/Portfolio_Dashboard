@@ -1291,7 +1291,7 @@ if download_sucess:
         plt.style.use("default")
         
         plt.show()
-        st.title("Chart")
+        st.subheader("Chart")
         st.pyplot()
 
         # plot rsi
@@ -1328,7 +1328,7 @@ if download_sucess:
         plt.yticks(list(plt.yticks()[0]) + [30, 70])
         
         plt.show()
-        st.title("Relative Strength Index")
+        st.subheader("Relative Strength Index")
         st.pyplot()
 
     
