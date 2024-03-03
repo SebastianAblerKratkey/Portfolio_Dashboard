@@ -1329,7 +1329,8 @@ if download_sucess:
         plt.yticks(list(plt.yticks()[0]) + [30, 70])
         
         plt.show()
-        st.write("Relative Strength Index")
+        txt2 = "Relative Strength Index"
+        st.write(f"**{txt2}**")
         st.pyplot()
 
     
