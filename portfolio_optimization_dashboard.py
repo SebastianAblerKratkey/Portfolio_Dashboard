@@ -1242,7 +1242,7 @@ if download_sucess:
 
         days_back_period = st.number_input("Days back window", value=int(min(100,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
         
-        days_ema = st.number_input("Days exponential moving average (EMA)", value=int(min(200, len(asset_data)/10)), max_value=int(len(asset_data)/10))
+        days_ema = st.number_input("Days exponential moving average (EMA)", value=int(min(200, len(asset_data)/10)), min_value=1, max_value=int(len(asset_data)/10))
 
         asset_data = asset_data.tail(days_back_period)
 
