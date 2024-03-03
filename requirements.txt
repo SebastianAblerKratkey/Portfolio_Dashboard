@@ -1,5 +1,6 @@
 adjustText==0.8
 matplotlib==3.8.2
+mplfinance==0.12.10b0
 numpy==1.26.2
 numpy_financial==1.0.0
 pandas==2.1.4
