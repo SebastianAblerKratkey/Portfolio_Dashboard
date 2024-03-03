@@ -1256,7 +1256,7 @@ if download_sucess:
         asset_data = asset_data.dropna()
 
         #date formating
-        if days_back_period <= 100:
+        if days_back_period <= 270:
             date_format = '%b %d %Y'
         else:
             date_format = '%b %Y'
