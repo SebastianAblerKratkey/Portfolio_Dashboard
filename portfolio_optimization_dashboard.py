@@ -1240,7 +1240,7 @@ if download_sucess:
         asset_name = st.selectbox("Select the asset you want to analyze", tickers)
         asset_data = yf.download(asset_name)
 
-        days_back_period = st.number_input("Days back window", value=int(min(200,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
+        days_back_period = st.number_input("Days back window", value=int(min(100,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
         
         days_ema = st.number_input("Days exponential moving average (EMA)", value=int(min(200, len(asset_data)/10)), max_value=int(len(asset_data)/10))
 
@@ -1289,6 +1289,40 @@ if download_sucess:
         
         # Adjust layout
         plt.style.use("default")
+        
+        plt.show()
+        st.pyplot()
+
+        # plot rsi
+        asset_data["rsi"].plot(figsize=(15, 5), color="cornflowerblue", label="")
+
+        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
+        plt.gca().xaxis.set_major_locator(MaxNLocator())
+        
+        plt.gca().set_ylim(0,100)
+        plt.gca().set_xlim(left=asset_data.head(1).index.max(), right=asset_data.tail(1).index.max())
+        
+        plt.gca().set_ylabel('RSI')
+        
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
+        plt.grid('on', ls="--")
+        plt.legend(fontsize=12)
+        
+        # Rotate x-axis labels to be horizontal
+        plt.xticks(rotation=0, ha='center')
+        
+        # Remove x-axis label
+        plt.gca().set_xlabel('')
+        
+        # Add horizontal lines
+        plt.axhline(y=70, color='r', linestyle='--', linewidth=1, label='Overbought')
+        plt.axhline(y=30, color='g', linestyle='--', linewidth=1, label='Oversold')
+        
+        # Add legend
+        plt.legend(fontsize=12)
+        
+        # Adjust y-axis ticks
+        plt.yticks(list(plt.yticks()[0]) + [30, 70])
         
         plt.show()
         st.pyplot()
