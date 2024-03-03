@@ -8,6 +8,7 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FuncFormatter
+import mplfinance as mpf
 import seaborn as sns
 import scipy.stats as stats
 from scipy.optimize import minimize
