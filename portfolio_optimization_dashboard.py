@@ -8,6 +8,7 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FuncFormatter
+from matplotlib import gridspec
 import mplfinance as mpf
 import seaborn as sns
 import scipy.stats as stats
@@ -401,6 +402,34 @@ def create_leverage_sim_visual(results_df):
 
     # Display the plot
     plt.show()
+
+def create_binary_colormap_for_plt_charts(data_values, two_color_list):
+
+    cmap = matplotlib.colors.ListedColormap(two_color_list)
+
+    # scale data
+    denominator = max(data_values) - min(data_values)
+    scaled_data = [(datum-min(data_values))/denominator for datum in data_values]
+
+    colors = []
+    for decimal in scaled_data:
+        colors.append(cmap(decimal))
+
+    return colors
+
+def create_colormap_for_plt_charts(data_values, color_list):
+    
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", color_list)
+
+    # scale data
+    denominator = max(data_values) - min(data_values)
+    scaled_data = [(datum-min(data_values))/denominator for datum in data_values]
+
+    colors = []
+    for decimal in scaled_data:
+        colors.append(cmap(decimal))
+
+    return colors
 
 #Technical Analysis functions
 def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
@@ -1249,7 +1278,9 @@ if download_sucess:
         period_RSI=14
         asset_data = pandas_rsi(df=asset_data, window_length=period_RSI, price="Close")
         asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
-
+        asset_data["70_line"] = 70
+        asset_data["30_line"] = 30
+        
         # calculate addplot data
         asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
 
@@ -1261,84 +1292,66 @@ if download_sucess:
         else:
             date_format = '%b %Y'
         
+        # binary red green colormap
+        rg_scaled_colors = create_binary_colormap_for_plt_charts(asset_data["macd_hist"], ["#fd6b6c","#4dc790"])
+
+        #plot mpf charts
+        fig = plt.figure(figsize=(15, 15))
+        gs = gridspec.GridSpec(4, 1, height_ratios=[4,1,2,2])
         
-        #plot candlesticks
-        fig, ax = plt.subplots(figsize=(15, 10))
-        ax.xaxis.set_major_locator(MaxNLocator())
+        ax4 = plt.subplot(gs[3])
+        ax1 = plt.subplot(gs[0], sharex=ax4)
+        ax2 = plt.subplot(gs[1], sharex=ax4)
+        ax3 = plt.subplot(gs[2], sharex=ax4)
         
-        # addplots
-        ap = [mpf.make_addplot(data=asset_data["ema"], type="line", width=1.5, color="cornflowerblue", label=f"{days_ema}-day EMA", ax=ax),
-              #mpf.make_addplot(data=asset_data["mav2"], type="line", ax=ax1)
-              ]
-              
-        s  = mpf.make_mpf_style(base_mpf_style="charles", y_on_right=False)
+        ap0 = [
+            # ema
+            mpf.make_addplot(data=asset_data["ema"], type="line", width=1.0, color="cornflowerblue", label="test", ax=ax1),
         
-        mpf.plot(
-                asset_data,
-                datetime_format=date_format,
-                type="candle",
-                ylabel='Price',
-                ylabel_lower='Shares\nTraded',
-                style=s,
-                ax=ax,
-                show_nontrading=True,
-                addplot=ap,
-                xlim=(asset_data.head(1).index.max() - pd.Timedelta(days=1), asset_data.tail(1).index.max()+ pd.Timedelta(days=1))
-            )
+            # macd
+            mpf.make_addplot((asset_data['macd']), type="line", width=1.0, color='cornflowerblue', ylabel='MACD', label="MACD", ax=ax3),
+            mpf.make_addplot((asset_data['macd_signal']), type="line", width=1.0, color='#FFBF00', label="Signal Line", ax=ax3),
+            mpf.make_addplot((asset_data['macd_hist']), type='bar', color=rg_scaled_colors, ax=ax3),
         
-        ax.grid('on', ls="--")
+            # rsi
+            mpf.make_addplot(asset_data['rsi'], type="line", width=1.0, ylim=[0, 100], color='cornflowerblue', ylabel='RSI', ax=ax4),
+            mpf.make_addplot(asset_data['70_line'], type="line", linestyle='--', width=1.0, color="#fd6b6c", label='Overbought (70)', ax=ax4),
+            mpf.make_addplot(asset_data['30_line'], type="line", linestyle='--', width=1.0, color="#4dc790", label='Oversold (30)', ax=ax4)
+        ]
         
-        # Rotate x-axis labels to be horizontal
-        plt.xticks(rotation=0, ha='center')
+        s = mpf.make_mpf_style(base_mpf_style="yahoo", y_on_right=False)
         
-        # Add legend
-        plt.legend(fontsize=12, loc=2)
+        mpf.plot(asset_data,
+                 ax=ax1,
+                 style=s,
+                 addplot=ap0,
+                 volume=ax2,
+                 datetime_format=date_format,
+                 xlim=(asset_data.head(1).index.max() - pd.Timedelta(days=1), asset_data.tail(1).index.max() + pd.Timedelta(days=1)),
+                 type="candle")
+        fig.subplots_adjust(hspace=0.1)
+        ax1.tick_params(labelbottom=False, bottom=False, top=False)
+        ax1.grid('on', ls="--")
+        ax1.legend(fontsize=10, loc=2)
+        ax2.tick_params(labelbottom=False, bottom=False, top=False)
+        ax2.grid('on', ls="--")
+        ax3.tick_params(labelbottom=False, bottom=False, top=False)
+        ax3.grid('on', ls="--")
+        ax3.legend(fontsize=10, loc=2)
+        ax3.yaxis.set_label_position('left')
+        ax3.yaxis.tick_left()
+        ax4.grid('on', ls="--")
+        ax4.legend(fontsize=10, loc=2)
         
-        # Adjust layout
         plt.style.use("default")
-        
-        plt.show()
-        txt = "Candlestick Chart"
-        st.write(f"**{txt}**")
-        st.pyplot()
-
-        # plot rsi
-        asset_data["rsi"].plot(figsize=(15, 5), color="cornflowerblue", label="")
-
-        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0f}'.format))
-        plt.gca().xaxis.set_major_locator(MaxNLocator())
-        
-        plt.gca().set_ylim(0,100)
-        plt.gca().set_xlim(left=asset_data.head(1).index.max(), right=asset_data.tail(1).index.max())
-        
-        plt.gca().set_ylabel('RSI')
-        
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter(date_format))  # Format dates to show month and year
-        plt.grid('on', ls="--")
-        plt.legend(fontsize=12)
-        
-        # Rotate x-axis labels to be horizontal
-        plt.xticks(rotation=0, ha='center')
-        
-        # Remove x-axis label
-        plt.gca().set_xlabel('')
-
-        plt.gca().set_xlim(left=asset_data.head(1).index.max()- pd.Timedelta(days=1), right=asset_data.tail(1).index.max()+ pd.Timedelta(days=1))
-        
-        # Add horizontal lines
-        plt.axhline(y=70, color='r', linestyle='--', linewidth=1, label='Overbought')
-        plt.axhline(y=30, color='g', linestyle='--', linewidth=1, label='Oversold')
-        
-        # Add legend
-        plt.legend(fontsize=12, loc=2)
-        
-        # Adjust y-axis ticks
-        plt.yticks(list(plt.yticks()[0]) + [30, 70])
         plt.minorticks_off()
         
+        # Rotate x-axis labels to be horizontal
+        plt.xticks(rotation=0, ha='center')
+        
         plt.show()
-        txt2 = "Relative Strength Index (RSI)"
-        st.write(f"**{txt2}**")
+        txt = "Chart"
+        st.write(f"**{txt}**")
         st.pyplot()
 
     
