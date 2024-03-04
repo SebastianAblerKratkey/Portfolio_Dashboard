@@ -437,7 +437,8 @@ def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=
     long_ema = data[price].ewm(span=days_slow, adjust=False).mean()
     macd = short_ema - long_ema
     signal = macd.ewm(span=days_signal, adjust=False).mean()
-    return short_ema, long_ema, macd, signal
+    macd_hist = macd - signal
+    return short_ema, long_ema, macd, signal, macd_hist
 
 def pandas_rsi(df: pd.DataFrame, window_length: int = 14, output: str = None, price: str = 'Close'):
     """
@@ -1277,7 +1278,7 @@ if download_sucess:
 
         period_RSI=14
         asset_data = pandas_rsi(df=asset_data, window_length=period_RSI, price="Close")
-        asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
+        asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"], asset_data["macd_hist"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
         asset_data["70_line"] = 70
         asset_data["30_line"] = 30
         
