@@ -1307,7 +1307,7 @@ if download_sucess:
         
         ap0 = [
             # ema
-            mpf.make_addplot(data=asset_data["ema"], type="line", width=1.0, color="cornflowerblue", label="test", ax=ax1),
+            mpf.make_addplot(data=asset_data["ema"], type="line", width=1.0, color="cornflowerblue", label=f"{days_ema}-day EMA", ax=ax1),
         
             # macd
             mpf.make_addplot((asset_data['macd']), type="line", width=1.0, color='cornflowerblue', ylabel='MACD', label="MACD", ax=ax3),
