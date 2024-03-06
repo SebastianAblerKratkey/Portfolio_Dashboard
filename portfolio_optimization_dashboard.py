@@ -498,6 +498,33 @@ def pandas_rsi(df: pd.DataFrame, window_length: int = 14, output: str = None, pr
 
     return df
 
+def get_cumulatieve_investment_values(returns, payments):
+  sum_cum_values = pd.Series(0, index=payments.index, dtype=float)
+
+  for i in payments[payments > 0].index:
+    returns_i = returns.loc[i:]
+    growth_i = 1 + returns_i
+    growth_i[0] = payments[i]
+    cum_value_i = growth_i.cumprod()
+
+    sum_cum_values = sum_cum_values.add(cum_value_i, fill_value=0)
+
+  return sum_cum_values
+
+
+def apply_investment_signal(returns, starting_value, signal):
+  date_index = signal.index
+  values = pd.Series(starting_value, index=date_index, dtype=float)
+
+  for i in range(1, len(date_index)):
+    if signal.iloc[i] == 1:
+      values.iloc[i] = values.iloc[i-1] * (1+returns.iloc[i])
+    else:
+      values.iloc[i] = values.iloc[i-1]
+
+  return values
+
+
 option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Technical Analysis", "Data"))
 
 st.header("Portfolio Analysis")
@@ -1353,6 +1380,61 @@ if download_sucess:
         plt.show()
         txt = "Chart"
         st.write(f"**{txt}**")
+        st.pyplot()
+
+        #backtest
+        end_of_month_dates = get_monthly_closing_prices(asset_data).index
+        asset_data["monthly_payments"] = 0
+        asset_data.loc[asset_data.index.isin(end_of_month_dates), "monthly_payments"] = 100 / len(end_of_month_dates)
+        asset_data["start_100"] = 0
+        asset_data["start_100"][0] = 100
+        
+        
+        asset_data["benchmark_monthly_payments"] = get_cumulatieve_investment_values(asset_data["daily_return"], asset_data["monthly_payments"])
+        asset_data["benchmark_payment_t0"] = get_cumulatieve_investment_values(asset_data["daily_return"], asset_data["start_100"])
+        
+        # MACD trigger and signal
+        asset_data["macd_trigger"] = np.where((asset_data['macd_hist'] > 0) & (asset_data['macd_hist'].shift(1) <= 0), 1, np.where((asset_data['macd_hist'] < 0) & (asset_data['macd_hist'].shift(1) >= 0), -1,0))
+        asset_data["macd_signal"] = asset_data["macd_trigger"].cumsum().shift(1)
+        # Normalize the signals to 0,1 format
+        if asset_data["macd_signal"].min(skipna=True) < 0:
+          asset_data["macd_signal"] = asset_data["macd_signal"] + 1
+        
+        asset_data["macd_backtest"] = apply_investment_signal(asset_data["daily_return"], 100, asset_data["macd_signal"])
+        
+        # RSI trigger and signal
+        # Initialize the trigger column with zeros
+        asset_data["rsi_trigger"] = 0
+        
+        # Identify the conditions for trigger changes
+        cross_70 = (asset_data['rsi'] <= 70) & (asset_data['rsi'].shift(1) > 70)
+        cross_30 = (asset_data['rsi'] >= 30) & (asset_data['rsi'].shift(1) < 30)
+        
+        # Loop through the rows and update the trigger column
+        prev_trigger = 0  # Initialize previous trigger value
+        for index, row in asset_data.iterrows():
+            if cross_70[index]:
+                if prev_trigger != -1:  # Check if previous trigger was not -1
+                    asset_data.at[index, "rsi_trigger"] = -1
+                    prev_trigger = -1
+            elif cross_30[index]:
+                if prev_trigger != 1:  # Check if previous trigger was not +1
+                    asset_data.at[index, "rsi_trigger"] = 1
+                    prev_trigger = 1
+        
+        asset_data["rsi_signal"] = asset_data["rsi_trigger"].cumsum().shift(1)
+        # Normalize the signals to 0,1 format
+        if asset_data["rsi_signal"].min(skipna=True) < 0:
+          asset_data["rsi_signal"] = asset_data["rsi_signal"] + 1
+        
+        asset_data["rsi_backtest"] = apply_investment_signal(asset_data["daily_return"], 100, asset_data["rsi_signal"])
+        
+        asset_data_visual = pd.DataFrame()
+        asset_data_visual[["Benchmark", "MACD Backtest", "RSI Backtest"]] = asset_data[["benchmark_payment_t0", "macd_backtest", "rsi_backtest"]]
+        
+        visualize_performance(asset_data_visual, ["Benchmark", "MACD Backtest", "RSI Backtest"])
+        txt_ = "Backtest"
+        st.write(f"**{txt_}**")
         st.pyplot()
 
     
