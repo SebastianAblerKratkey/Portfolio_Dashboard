@@ -63,7 +63,7 @@ def visualize_performance(prices, list_of_names):
 
     
     plt.fill_between(benchmarking_data.index, benchmarking_data.max(axis=1), benchmarking_data.min(axis=1),
-                        color='grey', alpha=0.17, label="Range of all assets")
+                        color='grey', alpha=0.17, label="Range")
 
     # Calculate the number of days to add
     num_days = (benchmarking_data_filtered.index.max() - benchmarking_data_filtered.index.min()).days
@@ -93,7 +93,7 @@ def visualize_performance(prices, list_of_names):
 
     # Remove x-axis label
     plt.gca().set_xlabel('')
-
+    plt.minorticks_off()
     plt.show()
 
 def visualize_summary(summary):
