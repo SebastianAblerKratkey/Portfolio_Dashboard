@@ -1311,7 +1311,8 @@ if download_sucess:
         
         # calculate addplot data
         asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
-
+        
+        asset_data["daily_return"] = asset_data["Close"].pct_change()
         asset_data = asset_data.dropna()
 
         #date formating
