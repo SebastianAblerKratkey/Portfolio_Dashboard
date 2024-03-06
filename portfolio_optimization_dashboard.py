@@ -1341,7 +1341,7 @@ if download_sucess:
             mpf.make_addplot((asset_data['macd']), type="line", width=1.0, color='cornflowerblue', ylabel='MACD', label="MACD", ax=ax3),
             mpf.make_addplot((asset_data['macd_signal']), type="line", width=1.0, color='#FFBF00', label="Signal Line", ax=ax3),
             mpf.make_addplot((asset_data['macd_hist'])*(asset_data['macd_hist']>=0), type='bar', color="#4dc790", ax=ax3),
-            mpf.make_addplot((asset_data['macd_hist'])*(asset_data['macd_hist']<0), type='bar', color="#fd6b6c", ax=ax3)
+            mpf.make_addplot((asset_data['macd_hist'])*(asset_data['macd_hist']<0), type='bar', color="#fd6b6c", ax=ax3),
         
             # rsi
             mpf.make_addplot(asset_data['rsi'], type="line", width=1.0, ylim=[0, 100], color='cornflowerblue', ylabel='RSI', ax=ax4),
