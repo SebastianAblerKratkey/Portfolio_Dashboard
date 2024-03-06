@@ -403,28 +403,17 @@ def create_leverage_sim_visual(results_df):
     # Display the plot
     plt.show()
 
-#def create_binary_colormap_for_plt_charts(data_values, two_color_list):
-
- #   cmap = matplotlib.colors.ListedColormap(two_color_list)
-
-    # scale data
-  #  denominator = max(data_values) - min(data_values)
-   # scaled_data = [(datum-min(data_values))/denominator for datum in data_values]
-
-    #colors = []
-    #for decimal in scaled_data:
-     #   colors.append(cmap(decimal))
-
-    #return colors
-
 def create_binary_colormap_for_plt_charts(data_values, two_color_list):
-    cmap = mcolors.LinearSegmentedColormap.from_list("custom_colormap", two_color_list)
+
+    cmap = matplotlib.colors.ListedColormap(two_color_list)
 
     # scale data
     denominator = max(data_values) - min(data_values)
-    scaled_data = [(datum - min(data_values)) / denominator for datum in data_values]
+    scaled_data = [(datum-min(data_values))/denominator for datum in data_values]
 
-    colors = [cmap(datum) for datum in scaled_data]
+    colors = []
+    for decimal in scaled_data:
+        colors.append(cmap(decimal))
 
     return colors
 
