@@ -725,7 +725,7 @@ if download_sucess:
         visualize_correlation(corr_returns)
         st.pyplot()
     
-    if option == "MVP, ORP and OCP":
+    #if option == "MVP, ORP and OCP":
         
 
 
