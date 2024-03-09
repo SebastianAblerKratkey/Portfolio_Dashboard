@@ -645,129 +645,7 @@ if download_sucess:
     summary["standard deviation"] = annualized_std_returns
     summary["weight"] = 1/len(summary)
     
-    mvp_summary = summary.copy()
-    mvp = minimize(portfolio_std, x0=mvp_summary["weight"].values,  
-               bounds=Bounds(0,1), 
-               constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
-    mvp_summary["weight"] = mvp.x
-    mvp_summary_abrev = mvp_summary[mvp_summary["weight"] > 0.00001]
-
-    KPIs_mvp = create_KPI_report("MVP",
-                             mvp_summary["weight"],
-                             rf_l,
-                             mvp_summary["mean return"])
-
-    orp_l_summary = summary.copy()
-    orp_l = minimize(negative_portfolio_SR, x0=orp_l_summary["weight"].values, 
-                 args=(rf_l, summary["mean return"] ), 
-                 bounds=Bounds(0,1), 
-                 constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
-    orp_l_summary["weight"] = orp_l.x
-    orp_l_summary_abrev = orp_l_summary[orp_l_summary["weight"] > 0.00001]
-
-    KPIs_orp_l = create_KPI_report("ORP",
-                             orp_l_summary["weight"],
-                             rf_l,
-                             orp_l_summary["mean return"])
-
-    orp_b_summary = summary.copy()
-    orp_b = minimize(negative_portfolio_SR, x0=orp_b_summary["weight"].values, 
-                 args=(rf_b, summary["mean return"]), 
-                 bounds=Bounds(0,1), 
-                 constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
-    orp_b_summary["weight"] = orp_b.x
-    orp_b_summary_abrev = orp_b_summary[orp_b_summary["weight"] > 0.00001]
-
-    KPIs_orp_b = create_KPI_report("ORP",
-                             orp_b_summary["weight"],
-                             rf_b,
-                             orp_b_summary["mean return"])
-
-    orp_indiff_summary = summary.copy()
-    orp_indiff = minimize(negative_portfolio_utility, x0=orp_indiff_summary["weight"].values, 
-                      args=(summary["mean return"]), 
-                      bounds=Bounds(0,1), 
-                      constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
-    orp_indiff_summary["weight"] = orp_indiff.x
-    orp_indiff_summary_abrev = orp_indiff_summary[orp_indiff_summary["weight"] > 0.00001]
-
-    KPIs_orp_indiff = create_KPI_report("ORP",
-                             orp_indiff_summary["weight"],
-                             rf_l,
-                             orp_indiff_summary["mean return"])
     
-    # OCP is defined
-    weight_risky_l = (float(KPIs_orp_l["portfolio return"]) - rf_l) / (A * float(KPIs_orp_l["protfolio std"])**2)
-    weight_risky_b = (float(KPIs_orp_b["portfolio return"]) - rf_b) / (A * float(KPIs_orp_b["protfolio std"])**2)
-
-    if weight_risky_l <= 1:
-        orp_summary = orp_l_summary
-        weight_orp = weight_risky_l
-        return_orp = float(KPIs_orp_l["portfolio return"])
-        std_orp = float(KPIs_orp_l["protfolio std"])
-        KPIs_orp = KPIs_orp_l
-        weight_rf = 1 - weight_orp
-        rf = rf_l
-        rf_summary = pd.DataFrame(index=["risk-free lending"])
-    elif weight_risky_b > 1:
-        orp_summary = orp_b_summary
-        weight_orp = weight_risky_b
-        return_orp = float(KPIs_orp_b["portfolio return"])
-        std_orp = float(KPIs_orp_b["protfolio std"])
-        KPIs_orp = KPIs_orp_b
-        weight_rf = 1 - weight_orp
-        rf = rf_b
-        rf_summary = pd.DataFrame(index=["risk-free borrowing"]) 
-    else:
-        orp_summary = orp_indiff_summary
-        weight_orp = 1
-        KPIs_orp = KPIs_orp_indiff
-        return_orp = float(KPIs_orp_indiff["portfolio return"])
-        std_orp = float(KPIs_orp_indiff["protfolio std"])
-        weight_rf = 0
-        rf = 0
-        rf_summary = pd.DataFrame()
-
-    rf_summary["mean return"] = rf    
-    rf_summary["standard deviation"] = 0
-    rf_summary["weight"] = weight_rf    
-
-    orp_summary_abrev = orp_summary[(orp_summary["weight"] > 0.00001)]
-
-    temp = orp_summary
-    temp["weight"] = orp_summary["weight"] * weight_orp
-    ocp_summary = pd.concat([temp, rf_summary])
-    ocp_summary_abrev = ocp_summary[(ocp_summary["weight"] > 0.00001) | (ocp_summary["weight"] < -0.00001)]
-
-
-    KPIs_ocp = pd.DataFrame(index=["OCP"])
-    KPIs_ocp["portfolio return"] = weight_orp*return_orp + weight_rf*rf
-    KPIs_ocp["protfolio std"] = weight_orp*std_orp
-    KPIs_ocp["sharpe ratio"] = (KPIs_ocp["portfolio return"] - rf) / KPIs_ocp["protfolio std"]
-    KPIs_ocp["utility"] = KPIs_ocp["portfolio return"] - 0.5*A*KPIs_ocp["protfolio std"]**2
-
-    summary_p = pd.concat([KPIs_mvp, KPIs_orp, KPIs_ocp])    
-
-    if summary_p["portfolio return"]["OCP"] == summary_p["portfolio return"]["ORP"]:
-        summary_p.rename(index={'OCP':'OCP = ORP'}, inplace=True)
-        summary_p.drop("ORP", inplace=True)
-
-    # Get data for minimum varriance frontier plot
-    step = 0.001
-    acheivable_returns = np.arange(summary["mean return"].min(), summary["mean return"].max()+ step, step)
-
-    min_var_list = []
-    for r in acheivable_returns:
-        min_var = minimize(portfolio_std, x0=summary["weight"].values, 
-                       bounds=Bounds(0,1), 
-                       constraints=({'type': 'eq','fun' : lambda weights: np.sum(weights) - 1},
-                                    {'type': 'eq','fun' : lambda weights: np.sum(weights*summary["mean return"]) - r}))
-        min_var_list.append(min_var.fun)
-
-    mvf_plot_data = pd.DataFrame()
-    mvf_plot_data["return"] = acheivable_returns
-    mvf_plot_data["std"] = min_var_list
-
     # Custom portfolio dataframe and metrics
     if custom_p:
             custom_p_df = custom_p_df.join(price_df.loc[now, tickers_template].rename("Current price"), on="Yahoo finance ticker")
@@ -903,6 +781,129 @@ if download_sucess:
 
 
     if option == "Minimum varriance frontier and Capital allocation line":
+        mvp_summary = summary.copy()
+        mvp = minimize(portfolio_std, x0=mvp_summary["weight"].values,  
+                   bounds=Bounds(0,1), 
+                   constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
+        mvp_summary["weight"] = mvp.x
+        mvp_summary_abrev = mvp_summary[mvp_summary["weight"] > 0.00001]
+        
+        KPIs_mvp = create_KPI_report("MVP",
+                                 mvp_summary["weight"],
+                                 rf_l,
+                                 mvp_summary["mean return"])
+        
+        orp_l_summary = summary.copy()
+        orp_l = minimize(negative_portfolio_SR, x0=orp_l_summary["weight"].values, 
+                     args=(rf_l, summary["mean return"] ), 
+                     bounds=Bounds(0,1), 
+                     constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
+        orp_l_summary["weight"] = orp_l.x
+        orp_l_summary_abrev = orp_l_summary[orp_l_summary["weight"] > 0.00001]
+        
+        KPIs_orp_l = create_KPI_report("ORP",
+                                 orp_l_summary["weight"],
+                                 rf_l,
+                                 orp_l_summary["mean return"])
+        
+        orp_b_summary = summary.copy()
+        orp_b = minimize(negative_portfolio_SR, x0=orp_b_summary["weight"].values, 
+                     args=(rf_b, summary["mean return"]), 
+                     bounds=Bounds(0,1), 
+                     constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
+        orp_b_summary["weight"] = orp_b.x
+        orp_b_summary_abrev = orp_b_summary[orp_b_summary["weight"] > 0.00001]
+        
+        KPIs_orp_b = create_KPI_report("ORP",
+                                 orp_b_summary["weight"],
+                                 rf_b,
+                                 orp_b_summary["mean return"])
+        
+        orp_indiff_summary = summary.copy()
+        orp_indiff = minimize(negative_portfolio_utility, x0=orp_indiff_summary["weight"].values, 
+                          args=(summary["mean return"]), 
+                          bounds=Bounds(0,1), 
+                          constraints={'type': 'eq','fun' : lambda weights: np.sum(weights) - 1})
+        orp_indiff_summary["weight"] = orp_indiff.x
+        orp_indiff_summary_abrev = orp_indiff_summary[orp_indiff_summary["weight"] > 0.00001]
+        
+        KPIs_orp_indiff = create_KPI_report("ORP",
+                                 orp_indiff_summary["weight"],
+                                 rf_l,
+                                 orp_indiff_summary["mean return"])
+        
+        # OCP is defined
+        weight_risky_l = (float(KPIs_orp_l["portfolio return"]) - rf_l) / (A * float(KPIs_orp_l["protfolio std"])**2)
+        weight_risky_b = (float(KPIs_orp_b["portfolio return"]) - rf_b) / (A * float(KPIs_orp_b["protfolio std"])**2)
+        
+        if weight_risky_l <= 1:
+            orp_summary = orp_l_summary
+            weight_orp = weight_risky_l
+            return_orp = float(KPIs_orp_l["portfolio return"])
+            std_orp = float(KPIs_orp_l["protfolio std"])
+            KPIs_orp = KPIs_orp_l
+            weight_rf = 1 - weight_orp
+            rf = rf_l
+            rf_summary = pd.DataFrame(index=["risk-free lending"])
+        elif weight_risky_b > 1:
+            orp_summary = orp_b_summary
+            weight_orp = weight_risky_b
+            return_orp = float(KPIs_orp_b["portfolio return"])
+            std_orp = float(KPIs_orp_b["protfolio std"])
+            KPIs_orp = KPIs_orp_b
+            weight_rf = 1 - weight_orp
+            rf = rf_b
+            rf_summary = pd.DataFrame(index=["risk-free borrowing"]) 
+        else:
+            orp_summary = orp_indiff_summary
+            weight_orp = 1
+            KPIs_orp = KPIs_orp_indiff
+            return_orp = float(KPIs_orp_indiff["portfolio return"])
+            std_orp = float(KPIs_orp_indiff["protfolio std"])
+            weight_rf = 0
+            rf = 0
+            rf_summary = pd.DataFrame()
+        
+        rf_summary["mean return"] = rf    
+        rf_summary["standard deviation"] = 0
+        rf_summary["weight"] = weight_rf    
+        
+        orp_summary_abrev = orp_summary[(orp_summary["weight"] > 0.00001)]
+        
+        temp = orp_summary
+        temp["weight"] = orp_summary["weight"] * weight_orp
+        ocp_summary = pd.concat([temp, rf_summary])
+        ocp_summary_abrev = ocp_summary[(ocp_summary["weight"] > 0.00001) | (ocp_summary["weight"] < -0.00001)]
+        
+        
+        KPIs_ocp = pd.DataFrame(index=["OCP"])
+        KPIs_ocp["portfolio return"] = weight_orp*return_orp + weight_rf*rf
+        KPIs_ocp["protfolio std"] = weight_orp*std_orp
+        KPIs_ocp["sharpe ratio"] = (KPIs_ocp["portfolio return"] - rf) / KPIs_ocp["protfolio std"]
+        KPIs_ocp["utility"] = KPIs_ocp["portfolio return"] - 0.5*A*KPIs_ocp["protfolio std"]**2
+        
+        summary_p = pd.concat([KPIs_mvp, KPIs_orp, KPIs_ocp])    
+        
+        if summary_p["portfolio return"]["OCP"] == summary_p["portfolio return"]["ORP"]:
+            summary_p.rename(index={'OCP':'OCP = ORP'}, inplace=True)
+            summary_p.drop("ORP", inplace=True)
+        
+        # Get data for minimum varriance frontier plot
+        step = 0.001
+        acheivable_returns = np.arange(summary["mean return"].min(), summary["mean return"].max()+ step, step)
+        
+        min_var_list = []
+        for r in acheivable_returns:
+            min_var = minimize(portfolio_std, x0=summary["weight"].values, 
+                           bounds=Bounds(0,1), 
+                           constraints=({'type': 'eq','fun' : lambda weights: np.sum(weights) - 1},
+                                        {'type': 'eq','fun' : lambda weights: np.sum(weights*summary["mean return"]) - r}))
+            min_var_list.append(min_var.fun)
+        
+        mvf_plot_data = pd.DataFrame()
+        mvf_plot_data["return"] = acheivable_returns
+        mvf_plot_data["std"] = min_var_list
+    
         create_mvf_cal_visual()
         st.pyplot()
 
