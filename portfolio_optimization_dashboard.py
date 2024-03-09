@@ -570,19 +570,6 @@ st.write("Disclaimer: This is not financial advice.")
 
 currency = st.selectbox("Select a currency.", ["EUR", "USD"])
 
-rf_l = st.slider("What is your risk-free interest rate for lending money?",
-                min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
-rf_l = rf_l/100
-
-rf_b = st.slider("What is your risk-free interest rate for borrowing money?",
-                min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
-rf_b = rf_b/100
-
-A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, lower = less risk averse).",
-                min_value=0.1, max_value=15.0, step=0.1, value=10.0)
-
-
-
 
 if download_sucess:
 
@@ -730,6 +717,17 @@ if download_sucess:
 
 
     if option == "Minimum varriance frontier and Capital allocation line":
+        rf_l = st.slider("What is your risk-free interest rate for lending money?",
+                min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
+        rf_l = rf_l/100
+        
+        rf_b = st.slider("What is your risk-free interest rate for borrowing money?",
+                        min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
+        rf_b = rf_b/100
+        
+        A = st.slider("Adjust your risk aversion parameter (higher = more risk averse, lower = less risk averse).",
+                        min_value=0.1, max_value=15.0, step=0.1, value=10.0)
+        
         mvp_summary = summary.copy()
         mvp = minimize(portfolio_std, x0=mvp_summary["weight"].values,  
                    bounds=Bounds(0,1), 
