@@ -1301,7 +1301,8 @@ if download_sucess:
         days_back_period = st.number_input("Days back window", value=int(min(100,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
         
         days_ema = st.number_input("Days exponential moving average (EMA)", value=int(min(200, len(asset_data)/10)), min_value=1, max_value=int(len(asset_data)/10))
-
+        asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
+        
         asset_data = asset_data.tail(days_back_period)
 
         period_RSI=14
@@ -1309,9 +1310,6 @@ if download_sucess:
         asset_data["macd_short_ema"], asset_data["macd_long_ema"], asset_data["macd"], asset_data["macd_signal"], asset_data["macd_hist"] = calculate_macd(asset_data, price="Close", days_fast=12, days_slow=26, days_signal=9)
         asset_data["70_line"] = 70
         asset_data["30_line"] = 30
-        
-        # calculate addplot data
-        asset_data["ema"] = asset_data["Close"].ewm(span=days_ema, adjust=False).mean()
         
         asset_data["daily_return"] = asset_data["Close"].pct_change()
         asset_data = asset_data.dropna()
