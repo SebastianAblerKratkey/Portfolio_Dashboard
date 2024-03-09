@@ -726,58 +726,7 @@ if download_sucess:
         st.pyplot()
     
     if option == "MVP, ORP and OCP":
-        # Show MVP
-        st.write("""
-                 In the **minimum variance portfolio (MVP)**, assets are allocated in such a way as to achieve the lowest possible 
-                 portfolio variance, taking into account each asset's historical standard deviation of returns (volatility) and 
-                 the correlation between the assets' returns. In general, combining assets with a low to negative return correlation 
-                 will result in a lower portfolio variance. This is because price movements in one asset are dampened by weaker 
-                 movements in other assets, or movements in the opposite direction. For the selected assets, the MVP can be achieved 
-                 via the following allocation:
-                """)
-        create_portfolio_visual("MVP", mvp_summary_abrev, KPIs_mvp)
-        st.pyplot()
         
-        # Show ORP
-        st.write("""
-                 The **optimal risky portfolio (ORP)** is achieved by combining the (risky) assets such that the Sharpe ratio 
-                 — i.e., the risk-return trade-off — is maximized. The Sharpe ratio defines the slope of the capital allocation 
-                 line (CAL). Therefore, the ORP is the point of tangency between the CAL and the minimum variance frontier. 
-                 For this reason, the ORP is sometimes referred to as the " tangency portfolio." In theory, the ORP is 
-                 always chosen by rational investors as the risky portion of their investment. Therefore, the ORP should 
-                 be independent of your risk aversion parameter. However, if your risk-free lending rate differs from your 
-                 risk-free borrowing rate, two different Sharpe ratios arise, resulting in two potential ORPs. One for when 
-                 you lend out money as part of your investment, and one for when you borrow money to increase your stake in 
-                 the ORP. Depending on your risk appetite, you may also be indifferent between borrowing and lending. In 
-                 this case, the ORP is determined by maximizing your utility function given a 100% stake in the risky assets. 
-                 For the selected assets, the ORP can be obtained via the following allocation:
-                """)
-        create_portfolio_visual("ORP", orp_summary_abrev, KPIs_orp)
-        st.pyplot()
-        
-
-        # Show OCP (not finished)
-        st.write("""
-                The **optimal complete portfolio (OCP)** is created by combining the ORP with a risk-free instrument. Depending on 
-                your risk appetite you will either lend out money at the risk-free rate — i.e., invest less than 100% in the ORP 
-                 — or borrow money at the risk-free rate to increase your stake in the ORP beyond 100%. Since the risk-free borrowing 
-                 rate, you are facing will most likely be different (higher) from your risk-free lending rate, there is a range of 
-                 risk aversion parameters for which you will be indifferent between lending and borrowing. Here the CAL will follow 
-                 the minimum variance frontier and your OCP will be the same as your ORP.
-                 """)
-        if weight_rf > 0:
-            st.write("For the selected assets and risk aversion parameter, the OCP is obtained by combining the ORP with risk-free lending:")
-            create_portfolio_visual("OCP", ocp_summary_abrev, KPIs_ocp)
-            st.pyplot()
-        elif weight_rf == 0:
-            st.write("For the selected assets and risk aversion parameter, you are indifferent between lending and borrwing. Therefore, the OCP is equal to the ORP.")
-        else:
-            st.write(f"""
-            For the selected assets, the OCP can be obtained by investing {weight_orp:.2%} of 
-            your money in the ORP i.e., borrowing the missing {(weight_orp-1):.2%} at the risk-free rate. 
-            In this case the OCP would be expected to generate a return of {float(KPIs_ocp['portfolio return']):.2%} 
-            p.a. at a standard deviation of {float(KPIs_ocp['protfolio std']):.2%}.
-            """)
 
 
     if option == "Minimum varriance frontier and Capital allocation line":
@@ -906,6 +855,59 @@ if download_sucess:
     
         create_mvf_cal_visual()
         st.pyplot()
+
+        # Show MVP
+        st.write("""
+                 In the **minimum variance portfolio (MVP)**, assets are allocated in such a way as to achieve the lowest possible 
+                 portfolio variance, taking into account each asset's historical standard deviation of returns (volatility) and 
+                 the correlation between the assets' returns. In general, combining assets with a low to negative return correlation 
+                 will result in a lower portfolio variance. This is because price movements in one asset are dampened by weaker 
+                 movements in other assets, or movements in the opposite direction. For the selected assets, the MVP can be achieved 
+                 via the following allocation:
+                """)
+        create_portfolio_visual("MVP", mvp_summary_abrev, KPIs_mvp)
+        st.pyplot()
+        
+        # Show ORP
+        st.write("""
+                 The **optimal risky portfolio (ORP)** is achieved by combining the (risky) assets such that the Sharpe ratio 
+                 — i.e., the risk-return trade-off — is maximized. The Sharpe ratio defines the slope of the capital allocation 
+                 line (CAL). Therefore, the ORP is the point of tangency between the CAL and the minimum variance frontier. 
+                 For this reason, the ORP is sometimes referred to as the " tangency portfolio." In theory, the ORP is 
+                 always chosen by rational investors as the risky portion of their investment. Therefore, the ORP should 
+                 be independent of your risk aversion parameter. However, if your risk-free lending rate differs from your 
+                 risk-free borrowing rate, two different Sharpe ratios arise, resulting in two potential ORPs. One for when 
+                 you lend out money as part of your investment, and one for when you borrow money to increase your stake in 
+                 the ORP. Depending on your risk appetite, you may also be indifferent between borrowing and lending. In 
+                 this case, the ORP is determined by maximizing your utility function given a 100% stake in the risky assets. 
+                 For the selected assets, the ORP can be obtained via the following allocation:
+                """)
+        create_portfolio_visual("ORP", orp_summary_abrev, KPIs_orp)
+        st.pyplot()
+        
+
+        # Show OCP (not finished)
+        st.write("""
+                The **optimal complete portfolio (OCP)** is created by combining the ORP with a risk-free instrument. Depending on 
+                your risk appetite you will either lend out money at the risk-free rate — i.e., invest less than 100% in the ORP 
+                 — or borrow money at the risk-free rate to increase your stake in the ORP beyond 100%. Since the risk-free borrowing 
+                 rate, you are facing will most likely be different (higher) from your risk-free lending rate, there is a range of 
+                 risk aversion parameters for which you will be indifferent between lending and borrowing. Here the CAL will follow 
+                 the minimum variance frontier and your OCP will be the same as your ORP.
+                 """)
+        if weight_rf > 0:
+            st.write("For the selected assets and risk aversion parameter, the OCP is obtained by combining the ORP with risk-free lending:")
+            create_portfolio_visual("OCP", ocp_summary_abrev, KPIs_ocp)
+            st.pyplot()
+        elif weight_rf == 0:
+            st.write("For the selected assets and risk aversion parameter, you are indifferent between lending and borrwing. Therefore, the OCP is equal to the ORP.")
+        else:
+            st.write(f"""
+            For the selected assets, the OCP can be obtained by investing {weight_orp:.2%} of 
+            your money in the ORP i.e., borrowing the missing {(weight_orp-1):.2%} at the risk-free rate. 
+            In this case the OCP would be expected to generate a return of {float(KPIs_ocp['portfolio return']):.2%} 
+            p.a. at a standard deviation of {float(KPIs_ocp['protfolio std']):.2%}.
+            """)
 
     if option == "CAPM":
         
