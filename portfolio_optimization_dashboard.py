@@ -526,7 +526,7 @@ def apply_investment_signal(returns, starting_value, signal):
   return values
 
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Minimum varriance frontier and Capital allocation line", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Technical Analysis", "Data"))
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Portfolio optimization (Markowitz model)", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Technical Analysis", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -716,7 +716,7 @@ if download_sucess:
         
 
 
-    if option == "Minimum varriance frontier and Capital allocation line":
+    if option == "Portfolio optimization (Markowitz model)":
         rf_l = st.slider("What is your risk-free interest rate for lending money?",
                 min_value=0.0, max_value=10.0, step=0.01, format='%.2f%%')
         rf_l = rf_l/100
