@@ -68,7 +68,8 @@ def visualize_performance(prices, list_of_names):
     # Calculate the number of days to add
     num_days = (benchmarking_data_filtered.index.max() - benchmarking_data_filtered.index.min()).days
     days_to_add1 = num_days / 120
-    days_to_add2 = num_days / 12
+    #days_to_add2 = num_days / 12
+    days_to_add2 = 0
 
     # Plot scatter points at the end of each line
     for col in benchmarking_data_filtered.columns:
