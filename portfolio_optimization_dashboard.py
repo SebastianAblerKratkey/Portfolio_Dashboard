@@ -772,6 +772,13 @@ if download_sucess:
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
             custom_p_summary_long_name_adjust = custom_p_summary_long_name_adjust.groupby('index')['weight'].sum().reset_index()
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
+
+            # list minor holdings
+            df_minor_hold = custom_p_summary_long_name[custom_p_summary_long_name["weight"] < 0.03]
+            string_list = []
+            # Iterate through rows and create string format
+            for index, row in df_minor_hold.iterrows():
+                string_list.append(f"{row['weight']} {index}")
             
 
     st.subheader(option)
@@ -822,7 +829,7 @@ if download_sucess:
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
-            st.dataframe(custom_p_summary_long_name_adjust)
+            st.list(string_list)
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
             # Simulate performance
