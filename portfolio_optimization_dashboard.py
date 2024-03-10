@@ -685,15 +685,8 @@ if download_sucess:
         st.dataframe(display_summary)
         st.markdown("""
         <style>
-        [data-testid=column]:nth-of-type(1) [data-testid=stVerticalBlock]{
-            gap: 0rem;
-        }
-        </style>
-        """,unsafe_allow_html=True)
-        st.markdown("""
-        <style>
         .big-font {
-            font-size:20px !important;
+            font-size:15px !important;
         }
         </style>
         """, unsafe_allow_html=True)
