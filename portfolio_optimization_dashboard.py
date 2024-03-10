@@ -831,10 +831,12 @@ if download_sucess:
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
             # display minor holdings
-            s = 'Minor holdings'
+            st.markdown("Minor holdings")
+            s = ''
             for i in string_list:
                 s += "- " + i + "\n"
             st.markdown(s)
+            st.markdown("")
             
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
