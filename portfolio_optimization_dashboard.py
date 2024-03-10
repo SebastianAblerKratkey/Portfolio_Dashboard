@@ -691,7 +691,7 @@ if download_sucess:
         </style>
         """, unsafe_allow_html=True)
         
-        st.markdown('<p class="big-font">* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.<p>', unsafe_allow_html=True)
+        st.markdown('<p class="big-font">* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate in the Sharpe ratio calculation.<p>', unsafe_allow_html=True)
         #st.markdown("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
 
         visualize_summary(summary)
