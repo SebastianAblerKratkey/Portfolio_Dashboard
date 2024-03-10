@@ -768,7 +768,7 @@ if download_sucess:
             # deal with minor holdings
             custom_p_summary_long_name_adjust = custom_p_summary_long_name.copy()
             custom_p_summary_long_name_adjust["index"] = custom_p_summary_long_name.index
-            custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] < 0.03, 'index'] = 'Minor holdings'
+            custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] < 0.03, 'index'] = '*Minor holdings'
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
             custom_p_summary_long_name_adjust = custom_p_summary_long_name_adjust.groupby('index')['weight'].sum().reset_index()
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
@@ -832,17 +832,10 @@ if download_sucess:
                 st.pyplot()
                 
             # display minor holdings
-            #st.markdown("<div style='font-size: 13px;'>Minor holdings</div>", unsafe_allow_html=True)
-            s = ''
-            #for i in string_list:
-             #   s += "- " + i + "<br>"
-            #st.markdown(f"<p style='font-size: 13px;'>{s}</p>", unsafe_allow_html=True)
-            #st.markdown("")
-
             st.markdown("<div style='font-size: 13px;'><b>*Minor holdings:</b></div>", unsafe_allow_html=True)
             s = ''
             for i in string_list:
-                s += f"&nbsp;&nbsp;• {i}<br>"  # Add non-breaking space to maintain indentation 
+                s += f"&nbsp;&nbsp;•  {i}<br>"  # Add non-breaking space to maintain indentation 
             st.markdown(f"<div style='font-size: 13px;'>{s}</div>", unsafe_allow_html=True)
             st.markdown("")
             st.markdown("")
