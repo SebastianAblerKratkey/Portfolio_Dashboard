@@ -778,7 +778,8 @@ if download_sucess:
             string_list = []
             # Iterate through rows and create string format
             for index, row in df_minor_hold.iterrows():
-                string_list.append(f"{row[f'weight:.2%']} {index}")
+                weight_percent = "{:.2%}".format(row['weight'])  # Format weight as percentage with 2 decimal places
+                string_list.append(f"{weight_percent} {index}")
             
 
     st.subheader(option)
