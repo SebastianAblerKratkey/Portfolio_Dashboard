@@ -667,7 +667,7 @@ if download_sucess:
     st.subheader(option)
     if option == "Past performance":
         # get 3-month T-Bill data for Sharpe ratio calculation
-        UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=10))
+        UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
         UST_3_mo.dropna(inplace=True)
         UST_3_mo = float(UST_3_mo.iloc[-1])
         
