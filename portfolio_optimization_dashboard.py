@@ -866,8 +866,8 @@ if download_sucess:
         mvf_plot_data["return"] = acheivable_returns
         mvf_plot_data["std"] = min_var_list
 
-        #txt_ = "Backtest"
-        st.write(f"**{str(Minimum varriance frontier and capital allocation line)}**")
+        txt = "Minimum varriance frontier and capital allocation line"
+        st.write(f"**{txt}**")
         create_mvf_cal_visual()
         st.pyplot()
 
