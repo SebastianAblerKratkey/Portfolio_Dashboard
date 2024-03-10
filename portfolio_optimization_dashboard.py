@@ -687,6 +687,9 @@ if download_sucess:
         <style>
         .big-font {
             font-size:15px !important;
+            [data-testid=column]:nth-of-type(1) [data-testid=stVerticalBlock]{
+        gap: 0rem;
+        }
         }
         </style>
         """, unsafe_allow_html=True)
