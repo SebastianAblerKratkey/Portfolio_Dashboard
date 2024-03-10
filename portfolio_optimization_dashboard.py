@@ -1342,7 +1342,6 @@ if download_sucess:
             st.write("The simulation is based on Equation (21) in the 2009 research paper Path-dependence of Leveraged ETF returns by Marco Avellaneda & Stanley Zhang [Avellaneda & Zhang (2009)](https://doi.org/10.1137/090760805)."
 
     if option == "Technical Analysis":
-
         asset_name = st.selectbox("Select the asset you want to analyze", tickers)
         asset_data = yf.download(asset_name)
 
