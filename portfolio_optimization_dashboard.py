@@ -796,16 +796,17 @@ if download_sucess:
         #display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe ratio*", inplace=True, ascending=False)
         st.dataframe(display_summary)
-        st.markdown("""
-        <style>
-        .big-font {
-            font-size:13px !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+        #st.markdown("""
+        #<style>
+        #.big-font {
+         #   font-size:13px !important;
+        #}
+        #</style>
+        #""", unsafe_allow_html=True)
         
-        st.markdown('<p class="big-font">* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate in the Sharpe ratio calculation.<p>', unsafe_allow_html=True)
+        #st.markdown('<p class="big-font">* The current 3-month U.S. T-bill yield of is used as a proxy for the risk-free rate in the Sharpe ratio calculation.<p>', unsafe_allow_html=True)
         #st.markdown("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
+        st.markdown(f"<div style='font-size: 16px;'>* The current 3-month U.S. T-bill yield of {UST_3_mo*100}% is used as a proxy for the risk-free rate in the Sharpe ratio calculation.</div>", unsafe_allow_html=True)
 
         visualize_summary(summary)
         st.pyplot()
