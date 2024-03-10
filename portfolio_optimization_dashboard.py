@@ -624,7 +624,7 @@ def apply_investment_signal(returns, starting_value, signal):
   return values
 
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "MVP, ORP and OCP", "Portfolio optimization (Markowitz model)", "CAPM", "Savings plan simulation", "Daily leverage simulation", "Technical Analysis", "Data"))
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -856,9 +856,6 @@ if download_sucess:
         visualize_correlation(corr_returns)
         st.pyplot()
     
-    #if option == "MVP, ORP and OCP":
-        
-
 
     if option == "Portfolio optimization (Markowitz model)":
         rf_l = st.slider("What is your risk-free interest rate for lending money?",
@@ -1234,186 +1231,7 @@ if download_sucess:
             plt.show()
             st.pyplot()
 
-
-
-
-
-    if option == "Savings plan simulation":
-        num_trials = 10000
-
-        r_ocp = float(KPIs_ocp["portfolio return"])
-        std_ocp = float(KPIs_ocp["protfolio std"])
-
-        r_orp = float(KPIs_orp["portfolio return"])
-        std_orp = float(KPIs_orp["protfolio std"])
-
-        r_mvp = float(KPIs_mvp["portfolio return"])
-        std_mvp = float(KPIs_mvp["protfolio std"])
-
-       
-        if custom_p:
-            portfolios = ["Custom portfolio","OCP", "ORP", "MVP"]
-            val_today_assume = custom_p_worth
-        else:
-            portfolios = ["OCP", "ORP", "MVP"]
-            val_today_assume = 1000.00
-        
-        val_today = st.number_input("What is your starting capital i.e. the ammount of money you can invest today?",min_value=1.0, value=val_today_assume)
-
-        #Ask user to enter amount of money they want to save each year
-        additional_investment_per_month = st.number_input("How much money do you want to save each month?",min_value=0.0, value=100.0)
-        additional_investment_per_year = additional_investment_per_month*12
-
-
-
-
-        selected_p = st.selectbox("What portfolio do you want to invest in?", portfolios)
-
-
-        col1, col2 = st.columns([1,3])
-        
-        # Here the "abrev" version of the summary must be used. Just the sumamry is not correct anymore at this point for some reason.
-        if selected_p == "Custom portfolio":
-            col1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
-            col2.metric("Volatility p.a.", f"{std_custom_p:.2%}")
-            sim_summary = custom_p_summary.copy()
-            sim_summary["mean return"] = custom_p_summary["mean return"] / 12
-            sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
-        
-        elif selected_p == "MVP":
-            col1.metric("Expected return p.a.", f"{r_mvp:.2%}")
-            col2.metric("Volatility p.a.", f"{std_mvp:.2%}")
-            sim_summary = mvp_summary_abrev.copy()
-            sim_summary["mean return"] = mvp_summary_abrev["mean return"] / 12
-            sim_summary["standard deviation"] = mvp_summary_abrev["standard deviation"] / (12**0.5)
-
-        elif selected_p == "ORP":
-            col1.metric("Expected return p.a.", f"{r_orp:.2%}")
-            col2.metric("Volatility p.a.", f"{std_orp:.2%}")
-            sim_summary = orp_summary_abrev.copy()
-            sim_summary["mean return"] = orp_summary_abrev["mean return"] / 12
-            sim_summary["standard deviation"] = orp_summary_abrev["standard deviation"] / (12**0.5)
-
-        elif selected_p == "OCP":
-            col1.metric("Expected return p.a.", f"{r_ocp:.2%}")
-            col2.metric("Volatility p.a.", f"{std_ocp:.2%}")
-            sim_summary = ocp_summary_abrev.copy()
-            sim_summary["mean return"] = ocp_summary_abrev["mean return"] / 12
-            sim_summary["standard deviation"] = ocp_summary_abrev["standard deviation"] / (12**0.5)
-        
-
-        num_years = st.slider("For how many years do you want to save?",
-                              min_value=1, max_value=100, step=1, value=20)
-        num_months = 12*num_years
-
-        p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
-                      min_value=0.05, max_value=0.95, step=0.05, value=0.8)
-        
-        current_year = now = datetime.datetime.now().year
-
-        
-        total_additional_investments = num_years * additional_investment_per_year
-
-        
-
-        if st.button("Run simulation"):
-            # Generate the random trials
-            sim_list = []
-            for index, row in sim_summary.iterrows():
-                sim_list.append(np.random.normal(row["mean return"], row["standard deviation"], size=(num_trials, num_months)) * row["weight"])
-
-            simulated_returns = np.array(sim_list).sum(axis=0)
-
-            # Calculate the potential future values of the investment
-            val_future = np.zeros((num_trials, num_months+1))
-            val_future[:,0] = val_today
-
-            for i in range(1, num_months+1):
-                val_future[:,i] = val_future[:,i-1] * np.exp(simulated_returns[:,i-1]) + additional_investment_per_month
-        
-            simulated_performance = pd.DataFrame(val_future).transpose()
-            simulated_performance_annual = simulated_performance[simulated_performance.index % 12 == 0]
-
-
-            # Set the index of the DataFrame to a range of years representing the time horizon of the simulation
-            future_years = np.arange(current_year, current_year + num_years + 1, 1)
-            simulated_performance_annual.set_index(pd.Index(future_years), inplace=True)
-
-            # Calculate the average simulated performance across all trials
-            avg_simulated_performance = simulated_performance_annual.mean(axis=1)
-
-            # Calculate the cumulative deposits
-            if additional_investment_per_year > 0:
-                cumulative_depositis = np.arange(val_today, 
-                                    val_today+total_additional_investments+additional_investment_per_year,
-                                    additional_investment_per_year)
-            else:
-                cumulative_depositis = np.array([val_today]*(num_years+1))
     
-            visualize_simulaiton(avg_simulated_performance, cumulative_depositis, currency=currency)
-            st.pyplot()
-
-            expected_capital = float(avg_simulated_performance.iloc[-1])
-
-            # Cash flow of the savings plan
-            cash_flow = [-val_today]+[-additional_investment_per_month]*(num_months-1)+[avg_simulated_performance.iloc[-1]-additional_investment_per_month]
-            # IRR / money weighted retun
-            irr_monthly = npf.irr(cash_flow)
-            irr_annual = (1 + irr_monthly)**12 - 1
-            # Time weighted return
-            avg_log_TWR = simulated_returns.mean(axis=0).sum() / num_years
-
-
-            sim_text = (
-                    f"Based on each asset's historic annual mean return and standard deviation and their respective weight in "
-                    f"the {selected_p} the simulation predicts the investor's capital to reach **{currency_formatter(expected_capital, currency=currency)}** "
-                    f"in {current_year+num_years} based on the above specified savings plan. "
-                    f"This corresponds to an expected time-weighted return of {avg_log_TWR:.2%} p.a. "
-                    f"and an expected money-weighted return (IRR) of {irr_annual:.2%} p.a."
-                    )
-            st.write(sim_text)
-            sim_outcomes = simulated_performance.iloc[-1,:]
-           
-            percent_in_interval = 0.0
-
-            moe = 1.0
-            while percent_in_interval <= 1.0:
-                in_interval = (expected_capital - moe < sim_outcomes) & (sim_outcomes < expected_capital + moe)
-                percent_in_interval = in_interval.mean()
-                if round(percent_in_interval,4) == p:
-                    break
-                if percent_in_interval > p:
-                    moe = moe*0.9999
-                elif percent_in_interval > p-0.05:
-                    moe = moe*1.001
-                else:
-                    moe = moe*1.5
-            
-            p_above_mean = (expected_capital < sim_outcomes).mean()
-            p_below_mean = (expected_capital > sim_outcomes).mean()
-
-            lower_bound = expected_capital - moe
-            upper_bound = expected_capital + moe
-
-            if currency == "USD":
-                st.markdown(
-                            f"""
-                            It is important to note that {currency_formatter(expected_capital, currency=currency)} is just the simulation mean and not a guaranteed outcome:
-                            - {percent_in_interval:.0%} of simulation outcomes lie between {currency_formatter(lower_bound, currency=currency)} and {currency_formatter(upper_bound, currency=currency)}
-                            - {p_below_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.min(), currency=currency)} (the lowest simulation outcome)
-                            - {p_above_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.max(), currency=currency)} (the highest simulation outcome)
-                            """
-                            )
-            else:
-                st.markdown(
-                            f"""
-                            It is important to note that {currency_formatter(expected_capital, currency=currency)} is just the simulation mean and not a guaranteed outcome:
-                            - {percent_in_interval:.0%} of simulation outcomes lie between {currency_formatter(lower_bound, currency=currency)} and {currency_formatter(upper_bound, currency=currency)}
-                            - {p_below_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.min(), currency=currency)} (the lowest simulation outcome)
-                            - {p_above_mean:.0%} of simulation outcomes lie between {currency_formatter(expected_capital, currency=currency)} and {currency_formatter(sim_outcomes.max(), currency=currency)} (the highest simulation outcome)
-                            """
-                            )
-
     if option == "Daily leverage simulation":
         daily_log_returns = np.log(daily_adjusted_closing_prices / daily_adjusted_closing_prices.shift(1))
         daily_mean_returns = daily_log_returns.mean() 
