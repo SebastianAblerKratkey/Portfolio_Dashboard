@@ -829,7 +829,12 @@ if download_sucess:
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
-            st.list(string_list)
+            # display minor holdings
+            s = ''
+            for i in string_list:
+                s += "- " + i + "\n"
+            st.markdown(s)
+            
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
             # Simulate performance
