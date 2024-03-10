@@ -842,7 +842,8 @@ if download_sucess:
             
             current_year = now = datetime.datetime.now().year
             total_additional_investments = num_years * additional_investment_per_year
-    
+            selected_p = "custom portfolio"
+            
             if st.button("Run simulation"):
                 run_and_display_monte_carlo_sim()
 
