@@ -681,7 +681,7 @@ if download_sucess:
         #display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
         #display_summary["Volatility p.a."] = display_summary["Volatility p.a."].map('{:.2%}'.format)
         #display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
-        display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
+        display_summary.sort_values("Sharpe ratio*", inplace=True, ascending=False)
         st.dataframe(display_summary)
         st.text("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
 
