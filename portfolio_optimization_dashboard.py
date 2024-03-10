@@ -830,20 +830,20 @@ if download_sucess:
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
+                
             # display minor holdings
-            #st.markdown("Minor holdings")
-            #s = ''
+            #st.markdown("<div style='font-size: 13px;'>Minor holdings</div>", unsafe_allow_html=True)
+            s = ''
             #for i in string_list:
-             #   s += "- " + i + "\n"
-            #st.markdown(s)
+             #   s += "- " + i + "<br>"
+            #st.markdown(f"<p style='font-size: 13px;'>{s}</p>", unsafe_allow_html=True)
             #st.markdown("")
 
-            # display minor holdings
-            st.markdown("<div style='font-size: 13px;'>Minor holdings</div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size: 13px;'><b>Minor holdings:</b></div>", unsafe_allow_html=True)
             s = ''
             for i in string_list:
-                s += "- " + i + "<br>"
-            st.markdown(f"<p style='font-size: 13px;'>{s}</p>", unsafe_allow_html=True)
+                s += f"&nbsp;&nbsp;- {i}<br>"  # Add non-breaking space to maintain indentation
+            st.markdown(f"<div style='font-size: 13px;'>{s}</div>", unsafe_allow_html=True)
             st.markdown("")
             
             headline = "Savings plan simulation"
