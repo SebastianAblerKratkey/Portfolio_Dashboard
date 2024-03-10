@@ -778,7 +778,7 @@ if download_sucess:
             string_list = []
             # Iterate through rows and create string format
             for index, row in df_minor_hold.iterrows():
-                string_list.append(f"{row['weight']} {index}")
+                string_list.append(f"{row[f'weight:.2%']} {index}")
             
 
     st.subheader(option)
@@ -830,7 +830,7 @@ if download_sucess:
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
             # display minor holdings
-            s = ''
+            s = 'Minor holdings'
             for i in string_list:
                 s += "- " + i + "\n"
             st.markdown(s)
