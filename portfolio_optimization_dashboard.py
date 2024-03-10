@@ -729,7 +729,11 @@ if download_sucess:
     summary["mean return"] = annualized_mean_returns
     summary["standard deviation"] = annualized_std_returns
     summary["weight"] = 1/len(summary)
-    
+
+    # get 3-month T-Bill data for Sharpe ratio calculation
+    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
+    UST_3_mo.dropna(inplace=True)
+    UST_3_mo = float(UST_3_mo.iloc[-1])/100
     
     # Custom portfolio dataframe and metrics
     if custom_p:
@@ -749,7 +753,7 @@ if download_sucess:
 
             KPIs_custom_p = create_KPI_report("Custom portfolio",
                              custom_p_summary["weight"],
-                             rf_l,
+                             UST_3_mo,
                              custom_p_summary["mean return"])
 
             custom_p_summary["Full name"] = custom_p_df["Full name"]
@@ -764,11 +768,6 @@ if download_sucess:
 
     st.subheader(option)
     if option == "Past performance":
-        # get 3-month T-Bill data for Sharpe ratio calculation
-        UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
-        UST_3_mo.dropna(inplace=True)
-        UST_3_mo = float(UST_3_mo.iloc[-1])/100
-        
         display_summary = pd.DataFrame()
         display_summary["Full name"] = pd.Series(long_name_dict)
         display_summary["Mean return p.a."] = summary["mean return"].map('{:.2%}'.format)
