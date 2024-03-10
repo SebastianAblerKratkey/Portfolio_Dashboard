@@ -750,7 +750,7 @@ if download_sucess:
 
             custom_p_summary = summary.loc[tickers_template].copy()
             custom_p_summary["weight"] = custom_p_df["weight"]
-
+            A=10
             KPIs_custom_p = create_KPI_report("Custom portfolio",
                              custom_p_summary["weight"],
                              UST_3_mo,
