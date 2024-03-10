@@ -1206,7 +1206,7 @@ if download_sucess:
 
             plt.figure(figsize=(15, 10))
 
-            plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.2%}'.format))
+            plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
             plt.gca().xaxis.set_major_formatter(plt.FuncFormatter('{:,.2}'.format))
             plt.gca().set_xlim(left=min(min(CAPM_summary["Beta"])*1.5,0))
             plt.gca().set_xlim(right=max(CAPM_summary["Beta"])*1.5)
