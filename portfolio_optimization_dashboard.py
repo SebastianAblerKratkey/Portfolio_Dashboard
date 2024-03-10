@@ -675,7 +675,7 @@ if download_sucess:
         display_summary["Full name"] = pd.Series(long_name_dict)
         display_summary["Mean return p.a."] = summary["mean return"].map('{:.2%}'.format)
         display_summary["Volatility p.a."] = summary["standard deviation"].map('{:.2%}'.format)
-        display_summary["Sharpe ratio"] = (summary["mean return"]- UST_3_mo) / summary['standard deviation']
+        display_summary["Sharpe ratio*"] = (summary["mean return"]- UST_3_mo) / summary['standard deviation']
         display_summary["YTD return"] = ytd_returns.map('{:.2%}'.format)
         display_summary["Maximum drawdown"] = max_dds.map('{:.2%}'.format)
         #display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
@@ -683,6 +683,7 @@ if download_sucess:
         #display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe ratio", inplace=True, ascending=False)
         st.dataframe(display_summary)
+        st.text("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
 
         visualize_summary(summary)
         st.pyplot()
