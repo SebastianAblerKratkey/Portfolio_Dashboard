@@ -206,8 +206,8 @@ def create_mvf_cal_visual():
 
     plt.figure(figsize=(15, 10))
 
-    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.2%}'.format))
-    plt.gca().xaxis.set_major_formatter(plt.FuncFormatter('{:,.2%}'.format))
+    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+    plt.gca().xaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
     plt.gca().set_xlim(left=0)
     plt.gca().set_xlim(right=max(max(summary["standard deviation"]),float(KPIs_ocp["protfolio std"]))*1.05)
 
@@ -243,7 +243,7 @@ def create_mvf_cal_visual():
 
     plt.legend(fontsize=12)
     plt.xlabel("Volatility", fontsize=12)
-    plt.ylabel("Mean return", fontsize=12)
+    plt.ylabel("Expected return", fontsize=12)
     plt.grid('on', ls="--")
 
     # labeling
