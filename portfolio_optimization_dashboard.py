@@ -767,8 +767,8 @@ if download_sucess:
 
             # deal with minor holdings
             custom_p_summary_long_name_adjust = custom_p_summary_long_name
+            custom_p_summary_long_name_adjust["index"] = custom_p_summary_long_name.index
             custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] < 0.03, 'index'] = 'Minor holdings'
-            custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] >= 0.03, 'index'] = custom_p_summary_long_name.index
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
             
 
