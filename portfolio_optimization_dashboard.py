@@ -797,7 +797,8 @@ if download_sucess:
         display_summary.sort_values("Sharpe ratio*", inplace=True, ascending=False)
         st.dataframe(display_summary)
         st.markdown(f"<div style='font-size: 13px;'>* The current 3-month U.S. T-bill yield of {UST_3_mo*100}% is used as a proxy for the risk-free rate in the Sharpe ratio calculation.</div>", unsafe_allow_html=True)
-
+        st.markdown("")
+        
         visualize_summary(summary)
         st.pyplot()
 
