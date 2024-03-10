@@ -870,7 +870,9 @@ if download_sucess:
         st.write(f"**{txt}**")
         create_mvf_cal_visual()
         st.pyplot()
-
+        
+        txt_ = "Output portfolios"
+        st.write(f"**{txt_}**")
         # Show MVP
         st.write("""
                  In the **minimum variance portfolio (MVP)**, assets are allocated in such a way as to achieve the lowest possible 
