@@ -766,7 +766,7 @@ if download_sucess:
             custom_p_worth = sum(custom_p_df["Current value"])
 
             # deal with minor holdings
-            custom_p_summary_long_name_adjust = custom_p_summary_long_name
+            custom_p_summary_long_name_adjust = custom_p_summary_long_name.copy()
             custom_p_summary_long_name_adjust["index"] = custom_p_summary_long_name.index
             custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] < 0.03, 'index'] = 'Minor holdings'
             custom_p_summary_long_name_adjust.set_index('index', inplace=True)
