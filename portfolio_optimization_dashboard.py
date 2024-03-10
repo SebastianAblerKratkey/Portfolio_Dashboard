@@ -839,11 +839,12 @@ if download_sucess:
             #st.markdown(f"<p style='font-size: 13px;'>{s}</p>", unsafe_allow_html=True)
             #st.markdown("")
 
-            st.markdown("<div style='font-size: 13px;'><b>Minor holdings:</b></div>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size: 13px;'><b>*Minor holdings:</b></div>", unsafe_allow_html=True)
             s = ''
             for i in string_list:
-                s += f"&nbsp;&nbsp;- {i}<br>"  # Add non-breaking space to maintain indentation
+                s += "- " + i + "\n"  
             st.markdown(f"<div style='font-size: 13px;'>{s}</div>", unsafe_allow_html=True)
+            st.markdown("")
             st.markdown("")
             
             headline = "Savings plan simulation"
