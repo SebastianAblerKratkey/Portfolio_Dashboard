@@ -814,6 +814,37 @@ if download_sucess:
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
+            
+            headline = "Savings plan simulation"
+            st.write(f"**{headline}**")
+            # Simulate performance
+            num_trials = 10000
+           
+            val_today_assume = custom_p_worth
+            val_today = st.number_input("What is your starting capital i.e. the ammount of money you can invest today?",min_value=1.0, value=val_today_assume)
+    
+            #Ask user to enter amount of money they want to save each year
+            additional_investment_per_month = st.number_input("How much money do you want to save each month?",min_value=0.0, value=100.0)
+            additional_investment_per_year = additional_investment_per_month*12
+    
+            col1, col2 = st.columns([1,3])
+            col1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
+            col2.metric("Volatility p.a.", f"{std_custom_p:.2%}")
+            sim_summary = custom_p_summary.copy()
+            sim_summary["mean return"] = custom_p_summary["mean return"] / 12
+            sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
+            num_years = st.slider("For how many years do you want to save?",
+                              min_value=1, max_value=100, step=1, value=20)
+            num_months = 12*num_years
+    
+            p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
+                          min_value=0.05, max_value=0.95, step=0.05, value=0.8)
+            
+            current_year = now = datetime.datetime.now().year
+            total_additional_investments = num_years * additional_investment_per_year
+    
+            if st.button("Run simulation"):
+                run_and_display_monte_carlo_sim()
 
             
         else:
