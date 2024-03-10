@@ -839,7 +839,7 @@ if download_sucess:
             #st.markdown("")
 
             # display minor holdings
-            st.markdown("<h2 style='margin-top: 13px;'>Minor holdings</h2>", unsafe_allow_html=True)
+            st.markdown("<div style='font-size: 13px;'>Minor holdings</div>", unsafe_allow_html=True)
             s = ''
             for i in string_list:
                 s += "- " + i + "<br>"
