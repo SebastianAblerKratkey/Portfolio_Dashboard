@@ -8,6 +8,6 @@ scipy==1.11.4
 seaborn==0.13.1
 statsmodels==0.14.1
 streamlit==1.29.0
-yfinance==0.2.33
+yfinance==0.2.37
 openpyxl==3.0.10
 pandas_datareader==0.10.0
