@@ -686,12 +686,12 @@ if download_sucess:
         st.markdown("""
         <style>
         .big-font {
-            font-size:12px !important;
+            font-size:13px !important;
         }
         </style>
         """, unsafe_allow_html=True)
         
-        st.markdown('<p class="big-font">* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.</p>', unsafe_allow_html=True)
+        st.markdown('<ul> <p class="big-font">* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.</p>', unsafe_allow_html=True)
         #st.markdown("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
 
         visualize_summary(summary)
