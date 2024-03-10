@@ -686,10 +686,7 @@ if download_sucess:
         st.markdown("""
         <style>
         .big-font {
-            font-size:15px !important;
-            [data-testid=column]:nth-of-type(1) [data-testid=stVerticalBlock]{
-        gap: 0rem;
-        }
+            font-size:12px !important;
         }
         </style>
         """, unsafe_allow_html=True)
