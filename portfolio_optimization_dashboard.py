@@ -377,7 +377,7 @@ def run_and_display_monte_carlo_sim():
 
 
     sim_text = (
-            f"Based on each asset's historic annual mean return and standard deviation and their respective weight in "
+            f"Based on each asset's historic mean return and standard deviation and their respective weight in "
             f"the {selected_p} the simulation predicts the investor's capital to reach **{currency_formatter(expected_capital, currency=currency)}** "
             f"in {current_year+num_years} based on the above specified savings plan. "
             f"This corresponds to an expected time-weighted return of {avg_log_TWR:.2%} p.a. "
