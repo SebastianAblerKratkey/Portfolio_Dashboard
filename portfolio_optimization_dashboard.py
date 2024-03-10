@@ -765,6 +765,10 @@ if download_sucess:
             ytd_return_custom_p = sum(custom_p_df["YTD return"] * custom_p_df["weight"])
             custom_p_worth = sum(custom_p_df["Current value"])
 
+            # deal with minor holdings
+            custom_p_summary_long_name_adjust = custom_p_summary_long_name
+            custom_p_summary_long_name_adjust.loc[custom_p_summary_long_name_adjust['weight'] < 0.03, 'index'] = 'Minor holdings'
+            
 
     st.subheader(option)
     if option == "Past performance":
@@ -814,7 +818,7 @@ if download_sucess:
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
                 st.pyplot()
-            
+            st.dataframe(custom_p_summary_long_name_adjust)
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
             # Simulate performance
