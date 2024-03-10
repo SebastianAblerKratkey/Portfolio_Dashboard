@@ -964,13 +964,13 @@ if download_sucess:
         mvf_plot_data["return"] = acheivable_returns
         mvf_plot_data["std"] = min_var_list
 
-        txt = "Minimum varriance frontier and capital allocation line"
-        st.write(f"**{txt}**")
+        headline1 = "Minimum varriance frontier and capital allocation line"
+        st.write(f"**{headline1}**")
         create_mvf_cal_visual()
         st.pyplot()
         
-        txt_ = "Output portfolios"
-        st.write(f"**{txt_}**")
+        headline2 = "Output portfolios"
+        st.write(f"**{headline2}**")
         # Show MVP
         st.write("""
                  In the **minimum variance portfolio (MVP)**, assets are allocated in such a way as to achieve the lowest possible 
@@ -1024,6 +1024,8 @@ if download_sucess:
             p.a. at a standard deviation of {float(KPIs_ocp['protfolio std']):.2%}.
             """)
         
+        headline3 = "Savings plan simulation"
+        st.write(f"**{headline3}**")
         # Simulate performance
         num_trials = 10000
 
@@ -1083,8 +1085,9 @@ if download_sucess:
 
         
         total_additional_investments = num_years * additional_investment_per_year
-
-        run_and_display_monte_carlo_sim()
+        
+        if st.button("Run simulation"):
+            run_and_display_monte_carlo_sim()
 
     if option == "CAPM":
         
