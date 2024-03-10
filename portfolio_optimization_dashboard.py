@@ -842,7 +842,7 @@ if download_sucess:
             st.markdown("<div style='font-size: 13px;'><b>*Minor holdings:</b></div>", unsafe_allow_html=True)
             s = ''
             for i in string_list:
-                s += f"&nbsp;&nbsp;* {i}<br>"  # Add non-breaking space to maintain indentation  
+                s += f"- {i}<br>" 
             st.markdown(f"<div style='font-size: 13px;'>{s}</div>", unsafe_allow_html=True)
             st.markdown("")
             st.markdown("")
