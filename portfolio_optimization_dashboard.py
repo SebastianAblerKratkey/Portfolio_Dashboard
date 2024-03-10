@@ -683,7 +683,7 @@ if download_sucess:
         #display_summary["YTD return"] = display_summary["YTD return"].map('{:.2%}'.format)
         display_summary.sort_values("Sharpe ratio*", inplace=True, ascending=False)
         st.dataframe(display_summary)
-        st.write("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
+        st.markdown("* The 3-month U.S. T-bill rate is used as a proxy for the risk-free rate.")
 
         visualize_summary(summary)
         st.pyplot()
