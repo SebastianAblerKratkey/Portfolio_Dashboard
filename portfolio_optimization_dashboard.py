@@ -826,10 +826,7 @@ if download_sucess:
             #Ask user to enter amount of money they want to save each year
             additional_investment_per_month = st.number_input("How much money do you want to save each month?",min_value=0.0, value=100.0)
             additional_investment_per_year = additional_investment_per_month*12
-    
-            col1, col2 = st.columns([1,3])
-            col1.metric("Expected return p.a.", f"{r_custom_p:.2%}")
-            col2.metric("Volatility p.a.", f"{std_custom_p:.2%}")
+            
             sim_summary = custom_p_summary.copy()
             sim_summary["mean return"] = custom_p_summary["mean return"] / 12
             sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
