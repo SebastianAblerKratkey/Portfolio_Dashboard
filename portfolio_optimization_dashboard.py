@@ -666,11 +666,16 @@ if download_sucess:
 
     st.subheader(option)
     if option == "Past performance":
+        # get 3-month T-Bill data for Sharpe ratio calculation
+        UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=10))
+        UST_3_mo.dropna(inplace=True)
+        UST_3_mo = float(UST_3_mo.iloc[-1])
+        
         display_summary = pd.DataFrame()
         display_summary["Full name"] = pd.Series(long_name_dict)
         display_summary["Mean return p.a."] = summary["mean return"].map('{:.2%}'.format)
         display_summary["Volatility p.a."] = summary["standard deviation"].map('{:.2%}'.format)
-        display_summary["Sharpe ratio"] = (summary["mean return"]- rf_l) / summary['standard deviation']
+        display_summary["Sharpe ratio"] = (summary["mean return"]- UST_3_mo) / summary['standard deviation']
         display_summary["YTD return"] = ytd_returns.map('{:.2%}'.format)
         display_summary["Maximum drawdown"] = max_dds.map('{:.2%}'.format)
         #display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
