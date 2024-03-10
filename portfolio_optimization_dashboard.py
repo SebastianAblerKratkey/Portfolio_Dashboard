@@ -815,7 +815,7 @@ if download_sucess:
 
             display_option = st.selectbox("Select a view setting for the portfolio visualization.", ["Individual asset view", "Asset class view"])
             if display_option == "Individual asset view":
-                create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', custom_p_summary_long_name, KPIs_custom_p)
+                create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', custom_p_summary_long_name_adjust, KPIs_custom_p)
                 st.pyplot()
             elif display_option == "Asset class view": 
                 create_portfolio_visual(f'{currency_formatter_signs(custom_p_worth, currency=currency)}', asset_class_df, KPIs_custom_p)
