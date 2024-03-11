@@ -654,6 +654,16 @@ if input_tickers or custom_p:
     price_df = price_df.dropna()
 
     eurusd = yf.download(["EURUSD=X","EUR=X"], period='max')["Adj Close"]
+
+    # get 3-month T-Bill data for Sharpe ratio calculation
+    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
+    UST_3_mo.dropna(inplace=True)
+    UST_3_mo = float(UST_3_mo.iloc[-1])/100
+
+    # get SOFR data
+    SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
+    SOFR_90_day.dropna(inplace=True)
+    SOFR_90_day = float(SOFR_90_day.iloc[-1])
     
     if len(price_df) < 1:
         st.error("(Some) assets could not be found.")
@@ -729,11 +739,6 @@ if download_sucess:
     summary["mean return"] = annualized_mean_returns
     summary["standard deviation"] = annualized_std_returns
     summary["weight"] = 1/len(summary)
-
-    # get 3-month T-Bill data for Sharpe ratio calculation
-    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
-    UST_3_mo.dropna(inplace=True)
-    UST_3_mo = float(UST_3_mo.iloc[-1])/100
     
     # Custom portfolio dataframe and metrics
     if custom_p:
@@ -1256,11 +1261,6 @@ if download_sucess:
         daily_vola = daily_std_returns[asset_name]
         
         assumed_trading_days = 252
-
-        # get SOFR data
-        SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
-        SOFR_90_day.dropna(inplace=True)
-        SOFR_90_day = float(SOFR_90_day.iloc[-1])
         
         reference_rate = st.number_input("Enter a reference interest rate in percent p.a. The default value is the current 90-day average Secured Overnight Financing Rate (SOFR).", value=SOFR_90_day)
         reference_rate = reference_rate/100
