@@ -130,7 +130,6 @@ def visualize_summary(summary):
     ax2.set_yticklabels([])
     ax2.set_xticklabels([])
     summary_sorted = summary.copy()
-    #summary_sorted["r/std"] = summary["mean return"] / summary['standard deviation']
     summary_sorted.sort_values("Sharpe ratio", inplace=True)
     bar_width = 0.6  # Set a fixed width for the horizontal bars
     for index, row in summary_sorted.iterrows():
