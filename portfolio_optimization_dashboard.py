@@ -130,8 +130,8 @@ def visualize_summary(summary):
     ax2.set_yticklabels([])
     ax2.set_xticklabels([])
     summary_sorted = summary.copy()
-    summary_sorted["r/std"] = summary["mean return"] / summary['standard deviation']
-    #summary_sorted.sort_values("r/std", inplace=True)
+    #summary_sorted["r/std"] = summary["mean return"] / summary['standard deviation']
+    summary_sorted.sort_values("Sharpe ratio", inplace=True)
     bar_width = 0.6  # Set a fixed width for the horizontal bars
     for index, row in summary_sorted.iterrows():
         ax1.barh(index, row['standard deviation'], height=bar_width, color="steelblue")
@@ -713,6 +713,16 @@ if download_sucess:
 
     montly_adjusted_closing_prices = get_monthly_closing_prices(price_df_daily=daily_adjusted_closing_prices)
 
+    # get 3-month T-Bill data for Sharpe ratio calculation
+    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
+    UST_3_mo.dropna(inplace=True)
+    UST_3_mo = float(UST_3_mo.iloc[-1])/100
+
+    # get SOFR data
+    SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
+    SOFR_90_day.dropna(inplace=True)
+    SOFR_90_day = float(SOFR_90_day.iloc[-1])
+
      # calculate maximum drawdown
     max_dds = maximum_drawdowns(price_df=daily_adjusted_closing_prices)
 
@@ -728,18 +738,9 @@ if download_sucess:
 
     summary["mean return"] = annualized_mean_returns
     summary["standard deviation"] = annualized_std_returns
+    summary["Sharpe ratio"] = (summary["mean return"]- UST_3_mo) / summary['standard deviation']
     summary["weight"] = 1/len(summary)
 
-    # get 3-month T-Bill data for Sharpe ratio calculation
-    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
-    UST_3_mo.dropna(inplace=True)
-    UST_3_mo = float(UST_3_mo.iloc[-1])/100
-
-    # get SOFR data
-    SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
-    SOFR_90_day.dropna(inplace=True)
-    SOFR_90_day = float(SOFR_90_day.iloc[-1])
-    
     # Custom portfolio dataframe and metrics
     if custom_p:
             custom_p_df = custom_p_df.join(price_df.loc[now, tickers_template].rename("Current price"), on="Yahoo finance ticker")
@@ -793,7 +794,7 @@ if download_sucess:
         display_summary["Full name"] = pd.Series(long_name_dict)
         display_summary["Mean return p.a."] = summary["mean return"].map('{:.2%}'.format)
         display_summary["Volatility p.a."] = summary["standard deviation"].map('{:.2%}'.format)
-        display_summary["Sharpe ratio*"] = (summary["mean return"]- UST_3_mo) / summary['standard deviation']
+        display_summary["Sharpe ratio*"] = summary["Sharpe ratio"]
         display_summary["YTD return"] = ytd_returns.map('{:.2%}'.format)
         display_summary["Maximum drawdown"] = max_dds.map('{:.2%}'.format)
         #display_summary["Mean return p.a."] = display_summary["Mean return p.a."].map('{:.2%}'.format)
