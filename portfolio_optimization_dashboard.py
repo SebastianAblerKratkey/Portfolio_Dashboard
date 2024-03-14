@@ -75,8 +75,8 @@ def visualize_performance(prices, list_of_names):
     for col in benchmarking_data_filtered.columns:
         #plt.scatter(benchmarking_data_filtered.index[-1], benchmarking_data_filtered[col].iloc[-1], color=color_list[list_of_names.index(col)], zorder=5)
         #text lablel is offset by a number of days to the right
-        plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=days_to_add1), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1]*100, 2))+"%",color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
-
+        plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=days_to_add1), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1]*100, 2))+"%",color=color_list[list_of_names.index(col)], size=12, verticalalignment='center')
+        #plt.text(benchmarking_data_filtered.index[-1] + pd.Timedelta(days=days_to_add1), benchmarking_data_filtered[col].iloc[-1], str(round(benchmarking_data_filtered[col].iloc[-1]*100, 2))+"%",color=color_list[list_of_names.index(col)], size=12, verticalalignment='bottom')
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
     plt.gca().xaxis.set_major_locator(MaxNLocator())
     plt.gca().set_xlim(left=benchmarking_data.head(1).index.max())
