@@ -559,7 +559,7 @@ def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
       CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
       CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
     
-  return CAPM_summary
+  return CAPM_summary, mean_rf, mean_MRP
 
 #Technical Analysis functions
 def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
@@ -1198,7 +1198,10 @@ if download_sucess:
             download_sucess2 = True
 
         if download_sucess2:
-            CAPM_summary = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
+            CAPM_output = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
+            CAPM_summary = CAPM_output[0]
+            mean_rf = CAPM_output[1]
+            mean_MRP = CAPM_output[2]
             
             display_CAPM_summary = pd.DataFrame()
             display_CAPM_summary["Mean rf"] = CAPM_summary["Mean rf"].map('{:.2%}'.format)
