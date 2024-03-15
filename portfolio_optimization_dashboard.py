@@ -529,6 +529,38 @@ def create_colormap_for_plt_charts(data_values, color_list):
 
     return colors
 
+def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
+  CAPM_quotes = pd.DataFrame()
+  CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
+  CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
+  CAPM_quotes = CAPM_quotes.merge(price_df_monthly, left_index=True, right_index=True, how="inner")
+  CAPM_returns = np.log(CAPM_quotes / CAPM_quotes.shift(1))
+  CAPM_returns["risk-free"] = CAPM_quotes["risk-free"]*(1/12)
+  CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
+
+  for asset in monthly_log_returns.columns:
+      CAPM_returns[f"{asset}-rf"] = CAPM_returns[asset] - CAPM_returns["risk-free"]
+
+  CAPM_returns.dropna(inplace=True)
+
+  mean_rf = CAPM_returns["risk-free"].mean()*12
+  mean_MRP = CAPM_returns["MRP"].mean()*12
+
+  CAPM_summary = pd.DataFrame()
+  for asset in monthly_log_returns.columns:
+      Y=CAPM_returns[f"{asset}-rf"]
+      X= sm.add_constant(CAPM_returns["MRP"])
+      regress = sm.OLS(Y, X)
+      result = regress.fit()
+      CAPM_summary.loc[asset,"Mean rf"] = mean_rf
+      CAPM_summary.loc[asset,"Beta"] = float(result.params[1])
+      CAPM_summary.loc[asset,"Mean MRP"] = mean_MRP
+      CAPM_summary.loc[asset,"Fair return"] = CAPM_summary.loc[asset,"Mean rf"] + CAPM_summary.loc[asset,"Beta"]*CAPM_summary.loc[asset,"Mean MRP"]
+      CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
+      CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
+    
+  return CAPM_summary
+
 #Technical Analysis functions
 def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
     short_ema = data[price].ewm(span=days_fast, adjust=False).mean()
@@ -1166,35 +1198,8 @@ if download_sucess:
             download_sucess2 = True
 
         if download_sucess2:
-            CAPM_quotes = pd.DataFrame()
-            CAPM_quotes[["Market", "risk-free"]] = CAPM_data[proxys_M_rf]
-            CAPM_quotes["risk-free"] = CAPM_quotes["risk-free"]/100
-            CAPM_quotes = CAPM_quotes.merge(montly_adjusted_closing_prices, left_index=True, right_index=True, how="inner")
-            CAPM_returns = np.log(CAPM_quotes / CAPM_quotes.shift(1))
-            CAPM_returns["risk-free"] = CAPM_quotes["risk-free"]*(1/12)
-            CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
+            CAPM_summary = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
             
-            for asset in monthly_log_returns.columns:
-                CAPM_returns[f"{asset}-rf"] = CAPM_returns[asset] - CAPM_returns["risk-free"]
-        
-            CAPM_returns.dropna(inplace=True)
-
-            mean_rf = CAPM_returns["risk-free"].mean()*12
-            mean_MRP = CAPM_returns["MRP"].mean()*12
-            
-            CAPM_summary = pd.DataFrame()
-            for asset in monthly_log_returns.columns:
-                Y=CAPM_returns[f"{asset}-rf"]
-                X= sm.add_constant(CAPM_returns["MRP"])
-                regress = sm.OLS(Y, X)
-                result = regress.fit()
-                CAPM_summary.loc[asset,"Mean rf"] = mean_rf
-                CAPM_summary.loc[asset,"Beta"] = float(result.params[1])
-                CAPM_summary.loc[asset,"Mean MRP"] = mean_MRP
-                CAPM_summary.loc[asset,"Fair return"] = CAPM_summary.loc[asset,"Mean rf"] + CAPM_summary.loc[asset,"Beta"]*CAPM_summary.loc[asset,"Mean MRP"]
-                CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
-                CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
-
             display_CAPM_summary = pd.DataFrame()
             display_CAPM_summary["Mean rf"] = CAPM_summary["Mean rf"].map('{:.2%}'.format)
             display_CAPM_summary["Beta"] = CAPM_summary["Beta"].map('{:.2f}'.format)
