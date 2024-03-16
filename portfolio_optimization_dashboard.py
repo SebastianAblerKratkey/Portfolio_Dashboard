@@ -559,7 +559,7 @@ def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
       CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
       CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
     
-  return CAPM_summary, mean_rf, mean_MRP
+  return CAPM_summary, mean_rf, mean_MRP, CAPM_returns[price_df_monthly.columns].mean()*12
 
 #Technical Analysis functions
 def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
@@ -916,6 +916,7 @@ if download_sucess:
                 st.dataframe(custom_p_df["weight"])
                 st.write(test)
                 st.write(test2)
+                st.dataframe(CAPM_output[3])
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
