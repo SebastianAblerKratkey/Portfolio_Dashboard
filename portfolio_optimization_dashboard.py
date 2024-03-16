@@ -883,11 +883,11 @@ if download_sucess:
             benchmark_rf_input = st.text_input("As per default, 10-year U.S. Treasury yields (^TNX) are used as the benchmark risk-free rate. You may enter the ticker of a different proxy below (make sure the proxy is quoted in yields, not prices; e.g. 13-week U.S. Treasury yields: ^IRX, 5-year U.S. Treasury yields: ^FVX, 30-year U.S. Treasury yields: ^TYX)")
     
             if benchmark_p_input:
-                benchmark_p = benchmark_p_input
+                benchmark_p = benchmark_p_input.upper()
             else:
                 benchmark_p = "^GSPC"
             if benchmark_rf_input:
-                benchmark_rf = benchmark_rf_input
+                benchmark_rf = benchmark_rf_input.upper()
             else:
                 benchmark_rf = "^TNX"
     
