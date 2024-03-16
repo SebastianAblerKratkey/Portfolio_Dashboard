@@ -559,7 +559,7 @@ def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
       CAPM_summary.loc[asset,"Alpha"] = float(result.params[0]*12)
       CAPM_summary.loc[asset,"Mean return"] = CAPM_summary.loc[asset,"Fair return"] + CAPM_summary.loc[asset,"Alpha"]
     
-  return CAPM_summary, mean_rf, mean_MRP, CAPM_returns[price_df_monthly.columns].mean()*12
+  return CAPM_summary, mean_rf, mean_MRP
 
 #Technical Analysis functions
 def calculate_macd(data, price="Close", days_fast=12, days_slow=26, days_signal=9):
@@ -910,13 +910,12 @@ if download_sucess:
                 CAPM_summary = CAPM_output[0]
                 mean_rf = CAPM_output[1]
                 mean_MRP = CAPM_output[2]
-                st.dataframe(CAPM_summary)
-                test = np.sum((CAPM_summary["Beta"] * custom_p_df["weight"]), axis=0)
-                test2 = np.sum((CAPM_summary["Mean return"] * custom_p_df["weight"]), axis=0)
-                st.dataframe(custom_p_df["weight"])
-                st.write(test)
-                st.write(test2)
-                st.dataframe(CAPM_output[3])
+                Beta_p = np.sum((CAPM_summary["Beta"] * custom_p_df["weight"]), axis=0)
+                Expected_r_p_CAPM = np.sum((CAPM_summary["Mean return"] * custom_p_df["weight"]), axis=0)
+                Alpha_p = Expected_r_p_CAPM - (mean_rf + Beta_p*mean_MRP)
+                st.write(Beta_p)
+                st.write(Alpha_p)
+    
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
