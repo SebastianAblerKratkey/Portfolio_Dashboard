@@ -913,8 +913,10 @@ if download_sucess:
                 Beta_p = np.sum((CAPM_summary["Beta"] * custom_p_df["weight"]), axis=0)
                 Expected_r_p_CAPM = np.sum((CAPM_summary["Mean return"] * custom_p_df["weight"]), axis=0)
                 Alpha_p = Expected_r_p_CAPM - (mean_rf + Beta_p*mean_MRP)
-                st.write(Beta_p)
-                st.write(Alpha_p)
+                
+                col1, col2 = st.columns([1,3])
+                col1.metric("Portfolio Beta", f"{Beta_p:.2}")
+                col2.metric("Portfolio Beta", f"{Alpha_p:.2%}")
     
             
             headline2 = "Savings plan simulation"
