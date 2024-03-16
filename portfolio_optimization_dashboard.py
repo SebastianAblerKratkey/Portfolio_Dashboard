@@ -871,7 +871,7 @@ if download_sucess:
                 st.markdown("")
 
             # benchmark performance
-            test_df = daily_adjusted_closing_prices[custom_p_df.index]
+            test_df = daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]
             st.dataframe(test_df)
             
             headline = "Savings plan simulation"
