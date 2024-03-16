@@ -893,17 +893,17 @@ if download_sucess:
     
             benchmarks_p_rf = [benchmark_p, benchmark_rf]
     
-            CAPM_data = yf.download(benchmarks_p_rf, period='max')["Adj Close"]
-            CAPM_data.dropna(inplace=True)
+            CAPM_data_daily = yf.download(benchmarks_p_rf, period='max')["Adj Close"]
+            CAPM_data_daily.dropna(inplace=True)
     
             download_sucess2 = False
-            if len(CAPM_data) < 1:
+            if len(CAPM_data_daily) < 1:
                 st.error("Asset could not be found.")
             else:
                 if benchmark_p_input or benchmark_rf_input:
                     st.success("Benchmark updated!")
                 download_sucess2 = True
-                CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
+                CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data_daily)
     
             if download_sucess2:
                 CAPM_output = run_CAPM(custom_p_monthly_price_df, CAPM_data, benchmarks_p_rf)
@@ -920,7 +920,7 @@ if download_sucess:
 
                 custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
                 custom_p_weighted_daily_price_df.rename("Portfolio", inplace=True)
-                benchmarking_df = custom_p_weighted_daily_price_df.to_frame().merge(CAPM_data[benchmark_p], left_index=True, right_index=True, how="inner")
+                benchmarking_df = custom_p_weighted_daily_price_df.to_frame().merge(CAPM_data_daily[benchmark_p], left_index=True, right_index=True, how="inner")
                 st.dataframe(benchmarking_df)
             
             headline2 = "Savings plan simulation"
