@@ -910,9 +910,11 @@ if download_sucess:
                 CAPM_summary = CAPM_output[0]
                 mean_rf = CAPM_output[1]
                 mean_MRP = CAPM_output[2]
-
+                st.dataframe(CAPM_summary)
                 test = np.sum((CAPM_summary["Beta"] * custom_p_df["weight"]), axis=0)
+                test2 = np.sum((CAPM_summary["Mean return"] * custom_p_df["weight"]), axis=0)
                 st.write(test)
+                st.write(test2)
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
