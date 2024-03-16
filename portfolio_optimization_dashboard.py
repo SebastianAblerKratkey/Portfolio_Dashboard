@@ -538,7 +538,7 @@ def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
   CAPM_returns["risk-free"] = CAPM_quotes["risk-free"]*(1/12)
   CAPM_returns["MRP"] = CAPM_returns["Market"] - CAPM_returns["risk-free"]
 
-  for asset in monthly_log_returns.columns:
+  for asset in price_df_monthly.columns:
       CAPM_returns[f"{asset}-rf"] = CAPM_returns[asset] - CAPM_returns["risk-free"]
 
   CAPM_returns.dropna(inplace=True)
