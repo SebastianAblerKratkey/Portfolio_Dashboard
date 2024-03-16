@@ -900,7 +900,7 @@ if download_sucess:
             if len(CAPM_data) < 1:
                 st.error("Asset could not be found.")
             else:
-                if market_proxy_input or riskfree_proxy_input:
+                if benchmark_p_input or benchmark_rf_input:
                     st.success("Proxy updated!")
                 download_sucess2 = True
     
