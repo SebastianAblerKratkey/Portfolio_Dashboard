@@ -913,6 +913,7 @@ if download_sucess:
                 st.dataframe(CAPM_summary)
                 test = np.sum((CAPM_summary["Beta"] * custom_p_df["weight"]), axis=0)
                 test2 = np.sum((CAPM_summary["Mean return"] * custom_p_df["weight"]), axis=0)
+                st.dataframe(custom_p_df["weight"])
                 st.write(test)
                 st.write(test2)
             
