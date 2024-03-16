@@ -915,8 +915,8 @@ if download_sucess:
                 Alpha_p = Expected_r_p_CAPM - (mean_rf + Beta_p*mean_MRP)
                 
                 col1, col2 = st.columns([1,3])
-                col1.metric("Portfolio Beta", f"{Beta_p:.2}")
-                col2.metric("Portfolio Beta", f"{Alpha_p:.2%}")
+                col1.metric("Portfolio Beta", f"{Beta_p:.2f}")
+                col2.metric("Portfolio Alpha", f"{Alpha_p:.2%}")
     
             
             headline2 = "Savings plan simulation"
