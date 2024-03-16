@@ -872,7 +872,7 @@ if download_sucess:
 
             # benchmark performance
             test_df = daily_adjusted_closing_prices[custom_p_df.index]
-            st.df(test_df)
+            st.dataframe(test_df)
             
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
