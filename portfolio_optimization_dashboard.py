@@ -911,7 +911,7 @@ if download_sucess:
                 mean_rf = CAPM_output[1]
                 mean_MRP = CAPM_output[2]
 
-                test = CAPM_summary[["Beta", "Mean return"]] * custom_p_df["weight"]
+                test = CAPM_summary["Beta"] * custom_p_df["weight"]
                 st.dataframe(test)
             
             headline2 = "Savings plan simulation"
