@@ -917,7 +917,11 @@ if download_sucess:
                 col1, col2 = st.columns([1,3])
                 col1.metric("Portfolio Beta", f"{Beta_p:.2f}")
                 col2.metric("Portfolio Alpha", f"{Alpha_p:.2%}")
-    
+
+                custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
+                custom_p_weighted_daily_price_df.rename("Portfolio", inplace=True)
+                benchmarking_df = custom_p_weighted_daily_price_df.merge(CAPM_data[benchmark_p], left_index=True, right_index=True, how="inner")
+                st.dataframe(benchmarking_df)
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
