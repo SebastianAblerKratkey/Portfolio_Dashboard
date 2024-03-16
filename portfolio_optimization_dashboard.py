@@ -1224,11 +1224,11 @@ if download_sucess:
         riskfree_proxy_input = st.text_input("As per default, 10-year U.S. Treasury yields (^TNX) are used as a proxy for the risk-free rate. You may enter the ticker of a different proxy below (make sure the proxy is quoted in yields, not prices; e.g. 13-week U.S. Treasury yields: ^IRX, 5-year U.S. Treasury yields: ^FVX, 30-year U.S. Treasury yields: ^TYX)")
 
         if market_proxy_input:
-            market_proxy = market_proxy_input
+            market_proxy = market_proxy_input.upper()
         else:
             market_proxy = "^GSPC"
         if riskfree_proxy_input:
-            riskfree_proxy = riskfree_proxy_input
+            riskfree_proxy = riskfree_proxy_input.upper()
         else:
             riskfree_proxy = "^TNX"
 
