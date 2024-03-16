@@ -875,6 +875,7 @@ if download_sucess:
             
             # benchmark performance
             custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
+            custom_p_weighted_daily_price_df.rename("Portfolio prices", inplace=True)
             custom_p_weighted_monthly_price_df = get_monthly_closing_prices(price_df_daily=custom_p_weighted_daily_price_df)
             st.dataframe(custom_p_weighted_daily_price_df)
 
