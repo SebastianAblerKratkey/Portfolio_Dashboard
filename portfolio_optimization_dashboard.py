@@ -870,12 +870,47 @@ if download_sucess:
                 st.markdown("")
                 st.markdown("")
 
-            # benchmark performance
-            test_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
-            st.dataframe(test_df)
+            headline1 = "Benchmarking"
+            st.write(f"**{headline1}**")
             
-            headline = "Savings plan simulation"
-            st.write(f"**{headline}**")
+            # benchmark performance
+            custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
+            st.dataframe(custom_p_weighted_daily_price_df)
+
+            benchmark_p_input = st.text_input("As per default, the S&P 500 Index (^GSPC) is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker below (E.g. STOXX Europe 600: ^STOXX, Dax-Performance-Index: ^GDAXI, FTSE 100 Index: ^FTSE)")
+            benchmark_rf_input = st.text_input("As per default, 10-year U.S. Treasury yields (^TNX) are used as a proxy for the risk-free rate. You may enter the ticker of a different proxy below (make sure the proxy is quoted in yields, not prices; e.g. 13-week U.S. Treasury yields: ^IRX, 5-year U.S. Treasury yields: ^FVX, 30-year U.S. Treasury yields: ^TYX)")
+    
+            if benchmark_p_input:
+                benchmark_p = benchmark_p_input
+            else:
+                benchmark_p = "^GSPC"
+            if benchmark_rf_input:
+                benchmark_rf = benchmark_rf_input
+            else:
+                benchmark_rf = "^TNX"
+    
+            benchmarks_p_rf = [benchmark_p, benchmark_rf]
+    
+            CAPM_data = yf.download(benchmarks_p_rf, period='max')["Adj Close"]
+            CAPM_data.dropna(inplace=True) 
+            CAPM_data = get_monthly_closing_prices(price_df_daily=benchmarks_p_rf)
+    
+            download_sucess2 = False
+            if len(CAPM_data) < 1:
+                st.error("Asset could not be found.")
+            else:
+                if market_proxy_input or riskfree_proxy_input:
+                    st.success("Proxy updated!")
+                download_sucess2 = True
+    
+            if download_sucess2:
+                CAPM_output = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
+                CAPM_summary = CAPM_output[0]
+                mean_rf = CAPM_output[1]
+                mean_MRP = CAPM_output[2]
+            
+            headline2 = "Savings plan simulation"
+            st.write(f"**{headline2}**")
             # Simulate performance
             num_trials = 10000
            
@@ -1193,15 +1228,15 @@ if download_sucess:
         CAPM_data.dropna(inplace=True) 
         CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
 
-        download_sucess2 = False
+        download_sucess3 = False
         if len(CAPM_data) < 1:
             st.error("Asset could not be found.")
         else:
             if market_proxy_input or riskfree_proxy_input:
                 st.success("Proxy updated!")
-            download_sucess2 = True
+            download_sucess3 = True
 
-        if download_sucess2:
+        if download_sucess3:
             CAPM_output = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
             CAPM_summary = CAPM_output[0]
             mean_rf = CAPM_output[1]
