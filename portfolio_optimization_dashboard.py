@@ -922,7 +922,7 @@ if download_sucess:
                 custom_p_weighted_daily_price_df.rename("Portfolio", inplace=True)
                 benchmarking_df = custom_p_weighted_daily_price_df.to_frame().merge(CAPM_data_daily[benchmark_p], left_index=True, right_index=True, how="inner")
                 #st.dataframe(benchmarking_df)
-                visualize_performance(benchmarking_df, [benchmarking_df.columns])
+                visualize_performance(benchmarking_df, list(benchmarking_df.columns))
                 st.pyplot()
             
             headline2 = "Savings plan simulation"
@@ -1546,6 +1546,7 @@ if download_sucess:
         asset_data_visual[["Benchmark", "MACD Backtest", "RSI Backtest"]] = asset_data[["benchmark_payment_t0", "macd_backtest", "rsi_backtest"]]
         
         visualize_performance(asset_data_visual, ["Benchmark", "MACD Backtest", "RSI Backtest"])
+        
         txt_ = "Backtest"
         st.write(f"**{txt_}**")
         st.pyplot()
