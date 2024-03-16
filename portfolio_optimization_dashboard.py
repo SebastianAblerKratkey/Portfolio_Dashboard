@@ -547,7 +547,7 @@ def run_CAPM(price_df_monthly, CAPM_data, proxys_M_rf):
   mean_MRP = CAPM_returns["MRP"].mean()*12
 
   CAPM_summary = pd.DataFrame()
-  for asset in monthly_log_returns.columns:
+  for asset in price_df_monthly.columns:
       Y=CAPM_returns[f"{asset}-rf"]
       X= sm.add_constant(CAPM_returns["MRP"])
       regress = sm.OLS(Y, X)
