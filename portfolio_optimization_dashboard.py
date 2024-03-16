@@ -920,7 +920,7 @@ if download_sucess:
 
                 custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
                 custom_p_weighted_daily_price_df.rename("Portfolio", inplace=True)
-                benchmarking_df = custom_p_weighted_daily_price_df.merge(CAPM_data[benchmark_p], left_index=True, right_index=True, how="inner")
+                benchmarking_df = custom_p_weighted_daily_price_df.to_frame().merge(CAPM_data[benchmark_p], left_index=True, right_index=True, how="inner")
                 st.dataframe(benchmarking_df)
             
             headline2 = "Savings plan simulation"
