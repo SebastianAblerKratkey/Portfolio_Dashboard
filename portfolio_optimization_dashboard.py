@@ -894,8 +894,7 @@ if download_sucess:
             benchmarks_p_rf = [benchmark_p, benchmark_rf]
     
             CAPM_data = yf.download(benchmarks_p_rf, period='max')["Adj Close"]
-            CAPM_data.dropna(inplace=True) 
-            CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
+            CAPM_data.dropna(inplace=True)
     
             download_sucess2 = False
             if len(CAPM_data) < 1:
@@ -904,6 +903,7 @@ if download_sucess:
                 if benchmark_p_input or benchmark_rf_input:
                     st.success("Benchmark updated!")
                 download_sucess2 = True
+                CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
     
             if download_sucess2:
                 CAPM_output = run_CAPM(custom_p_monthly_price_df, CAPM_data, benchmarks_p_rf)
@@ -1236,7 +1236,7 @@ if download_sucess:
 
         CAPM_data = yf.download(proxys_M_rf, period='max')["Adj Close"]
         CAPM_data.dropna(inplace=True) 
-        CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
+        
 
         download_sucess3 = False
         if len(CAPM_data) < 1:
@@ -1245,6 +1245,7 @@ if download_sucess:
             if market_proxy_input or riskfree_proxy_input:
                 st.success("Proxy updated!")
             download_sucess3 = True
+            CAPM_data = get_monthly_closing_prices(price_df_daily=CAPM_data)
 
         if download_sucess3:
             CAPM_output = run_CAPM(montly_adjusted_closing_prices, CAPM_data, proxys_M_rf)
