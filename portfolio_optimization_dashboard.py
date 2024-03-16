@@ -869,6 +869,10 @@ if download_sucess:
                 st.markdown(f"<div style='font-size: 13px;'>{s}</div>", unsafe_allow_html=True)
                 st.markdown("")
                 st.markdown("")
+
+            # benchmark performance
+            test_df = daily_adjusted_closing_prices[custom_p_df.index]
+            st.df(test_df)
             
             headline = "Savings plan simulation"
             st.write(f"**{headline}**")
