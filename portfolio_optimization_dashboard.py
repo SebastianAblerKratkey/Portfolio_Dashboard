@@ -878,7 +878,6 @@ if download_sucess:
             #custom_p_weighted_daily_price_df.rename("Portfolio", inplace=True)
             #custom_p_weighted_monthly_price_df = get_monthly_closing_prices(price_df_daily=custom_p_weighted_daily_price_df).to_frame()
             custom_p_monthly_price_df = montly_adjusted_closing_prices[custom_p_df.index]
-            st.dataframe(custom_p_monthly_price_df)
 
             benchmark_p_input = st.text_input("As per default, the custom portfolio is benchmarked against the S&P 500 Index (^GSPC). If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker below (E.g. STOXX Europe 600: ^STOXX, Dax-Performance-Index: ^GDAXI, FTSE 100 Index: ^FTSE)")
             benchmark_rf_input = st.text_input("As per default, 10-year U.S. Treasury yields (^TNX) are used as the benchmark risk-free rate. You may enter the ticker of a different proxy below (make sure the proxy is quoted in yields, not prices; e.g. 13-week U.S. Treasury yields: ^IRX, 5-year U.S. Treasury yields: ^FVX, 30-year U.S. Treasury yields: ^TYX)")
@@ -911,7 +910,9 @@ if download_sucess:
                 CAPM_summary = CAPM_output[0]
                 mean_rf = CAPM_output[1]
                 mean_MRP = CAPM_output[2]
-                st.dataframe(CAPM_summary)
+
+                test = CAPM_summary[["Beta", "Mean return"]] * custom_p_df["weight"]
+                st.dataframe(test)
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
