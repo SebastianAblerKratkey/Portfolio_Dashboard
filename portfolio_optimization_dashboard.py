@@ -924,6 +924,8 @@ if download_sucess:
                 #st.dataframe(benchmarking_df)
                 visualize_performance(benchmarking_df, list(benchmarking_df.columns))
                 st.pyplot()
+                st.markdown("")
+                st.markdown("")
             
             headline2 = "Savings plan simulation"
             st.write(f"**{headline2}**")
