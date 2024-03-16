@@ -876,7 +876,7 @@ if download_sucess:
             # benchmark performance
             custom_p_weighted_daily_price_df = np.sum((daily_adjusted_closing_prices[custom_p_df.index] * custom_p_df["weight"]), axis=1)
             custom_p_weighted_daily_price_df.rename("Portfolio prices", inplace=True)
-            custom_p_weighted_monthly_price_df = get_monthly_closing_prices(price_df_daily=custom_p_weighted_daily_price_df)
+            custom_p_weighted_monthly_price_df = get_monthly_closing_prices(price_df_daily=custom_p_weighted_daily_price_df).to_frame()
             st.dataframe(custom_p_weighted_monthly_price_df)
 
             benchmark_p_input = st.text_input("As per default, the S&P 500 Index (^GSPC) is used as a proxy for the market portfolio. If you consider another index more suitable for your analysis, you can enter its [Yahoo Finace](https://finance.yahoo.com) ticker below (E.g. STOXX Europe 600: ^STOXX, Dax-Performance-Index: ^GDAXI, FTSE 100 Index: ^FTSE)")
