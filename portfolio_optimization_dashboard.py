@@ -1044,7 +1044,7 @@ if download_sucess:
     UST_3_mo = float(UST_3_mo.iloc[-1])/100
 
     # get SOFR data
-    SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - datetime.timedelta(days=10))
+    SOFR_90_day = dr("SOFR90DAYAVG", 'fred',  start=now - timedelta(days=10))
     SOFR_90_day.dropna(inplace=True)
     SOFR_90_day = float(SOFR_90_day.iloc[-1])
 
