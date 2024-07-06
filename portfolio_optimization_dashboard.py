@@ -1967,6 +1967,9 @@ if download_sucess:
         plt.legend()
         plt.show()
         st.pyplot()
+        
+        txt_ = "Simulation"
+        st.write(f"**{txt_}**")
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
