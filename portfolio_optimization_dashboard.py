@@ -1861,7 +1861,7 @@ if download_sucess:
         return_data = np.sort(return_data)
 
         spot_price = price_data["Close"].iloc[-1]
-        strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100;0)*100)
+        strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100,0)*100)
 
     
     
