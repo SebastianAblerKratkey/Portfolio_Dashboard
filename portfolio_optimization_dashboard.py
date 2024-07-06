@@ -1875,7 +1875,7 @@ if download_sucess:
         trading_days = mcal.date_range(cal.schedule(start_date=current_date, end_date=expiration_date), frequency='1D')
         number_trading_days = len(trading_days) - 1                 #excluding current day from trading days
         
-        trading_days_per_year = 365                                 #fair to assume 252
+        trading_days_per_year = 252                                 #fair to assume 252
         time_in_years = number_trading_days/trading_days_per_year
         delta_t = time_in_years / number_trading_days               #leangth of time step
 
