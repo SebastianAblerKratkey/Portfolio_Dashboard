@@ -1968,8 +1968,28 @@ if download_sucess:
         plt.show()
         st.pyplot()
         
-        txt_ = "Simulation"
-        st.write(f"**{txt_}**")
+        txt = "Greeks"
+        st.write(f"**{txt}**")
+        
+        #Delta
+        call_deltas = call_delta(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        plt.figure(figsize=(7, 4))
+        plt.gca().set_xlim(left=0, right=2*strike_price)
+        plt.plot(S0_prices, call_deltas, color=color1)
+        # Add a black horizontal line at y=0
+        plt.axhline(0, color='black', linewidth=0.5)
+        # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
+        plt.scatter(spot_price, call_delta_spot, color=color2, zorder=5, label="Current Delta")
+        # Add text annotation for the Black-Scholes value
+        plt.text(spot_price, call_delta_spot, f'{call_delta_spot:.2f} ', color=color2, fontsize=9, ha='right', va='bottom')
+        plt.title("Delta")
+        # Add labels, title, and legend
+        plt.grid('on', ls="--")
+        plt.xlabel('Price underlying (S)')
+        plt.legend()
+        plt.show()
+        st.pyplot()
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
