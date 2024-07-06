@@ -16,6 +16,7 @@ import mplfinance as mpf
 import seaborn as sns
 import scipy.stats as stats
 from scipy.optimize import minimize
+from scipy.optimize import brentq
 from scipy.optimize import Bounds
 from scipy.stats import norm
 import os
