@@ -1913,6 +1913,38 @@ if download_sucess:
         colmn_2.metric("Spot price underlying", f"{spot_price:.2f}")
         colmn_3.metric("Breakeven price at exiry", f"{breakeven_at_exiry:.2f}")
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
+
+        #Plot chart
+        S0_prices = np.arange(0.0001, 2*strike_price)
+        S0_prices_till_spot = np.arange(0.0001, spot_price)
+        black_scholes_values = black_scholes_call_value(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
+        black_scholes_values_till_spot = black_scholes_call_value(S0=S0_prices_till_spot, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
+        call_payoffs = call_payoff(S0=S0_prices, K=5000) * subscription_ratio
+        call_payoffs_till_spot = call_payoff(S0=S0_prices_till_spot, K=strike_price) * subscription_ratio
+        color1 = 'cornflowerblue'
+        color2 = 'darkmagenta'
+        plt.figure(figsize=(7, 5))
+        plt.gca().set_xlim(left=0, right=2*strike_price)
+        plt.plot(S0_prices, black_scholes_values, color=color1, label='Option value')
+        plt.plot(S0_prices, call_payoffs, color='slategrey', label='Payoff')
+        plt.fill_between(S0_prices_till_spot, black_scholes_values_till_spot, call_payoffs_till_spot,
+                                color='limegreen', alpha=0.17, label="Time value", edgecolor='green', hatch='\/\/\/\/\/\/')
+    
+        plt.fill_between(S0_prices_till_spot, call_payoffs_till_spot, 0,
+                                color='limegreen', alpha=0.17, label="Internal value")
+        # Add a black horizontal line at y=0
+        plt.axhline(0, color='black', linewidth=0.5)
+        # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
+        plt.scatter(spot_price, black_scholes_value, color=color2, zorder=5, label="Current option value")
+        # Add text annotation for the Black-Scholes value
+        plt.text(spot_price, black_scholes_value, f'{black_scholes_value:.2f} ', color=color2, fontsize=9, ha='right', va='bottom')
+        plt.title("Black-Scholes option value")
+        # Add labels, title, and legend
+        plt.grid('on', ls="--")
+        plt.xlabel('Price underlying (S)')
+        plt.legend()
+        plt.show()
+        st.pyplot()
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
