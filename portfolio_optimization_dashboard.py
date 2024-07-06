@@ -17,6 +17,7 @@ from scipy.optimize import Bounds
 from scipy.stats import norm
 import os
 import datetime
+#from datetime import datetime, timedelta
 import statsmodels.api as sm
 import base64
 from io import StringIO, BytesIO
@@ -1861,7 +1862,7 @@ if download_sucess:
 
         spot_price = price_data["Close"].iloc[-1]
         strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100,0)*100)
-        current_date = datetime.now()
+        current_date = now()
         expiration_date = st.date_input("Expiration date", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1))
 
     
