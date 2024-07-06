@@ -1877,7 +1877,7 @@ if download_sucess:
         delta_t = time_in_years / number_trading_days               #leangth of time step
 
         default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
-        impl_vol = st.number_input("(Implied) volatility – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
+        impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
     
     
     if option == "Data":
