@@ -1998,7 +1998,7 @@ if download_sucess:
         color1 = 'cornflowerblue'
         color2 = 'darkmagenta'
         plt.figure(figsize=(7, 4))
-        plt.gca().set_xlim(left=0.5*strike_price, right=2*strike_price)
+        plt.gca().set_xlim(left=0.5*strike_price, right=1.5*strike_price)
         plt.plot(S0_prices_lambda, call_lambdas, color=color1)
         # Add a black horizontal line at y=0
         plt.axhline(0, color='black', linewidth=0.5)
