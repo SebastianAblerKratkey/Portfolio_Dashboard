@@ -1039,7 +1039,7 @@ if download_sucess:
     montly_adjusted_closing_prices = get_monthly_closing_prices(price_df_daily=daily_adjusted_closing_prices)
 
     # get 3-month T-Bill data for Sharpe ratio calculation
-    UST_3_mo = dr("TB3MS", 'fred',  start=now - datetime.timedelta(days=65))
+    UST_3_mo = dr("TB3MS", 'fred',  start=now - timedelta(days=65))
     UST_3_mo.dropna(inplace=True)
     UST_3_mo = float(UST_3_mo.iloc[-1])/100
 
