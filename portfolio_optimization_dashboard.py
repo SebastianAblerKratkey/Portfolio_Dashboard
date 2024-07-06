@@ -1892,7 +1892,9 @@ if download_sucess:
         
         # risk-free rate
         rf = curve_fit(time_in_years)
-        
+
+        #subscription ratio
+        subscription_ratio = st.number_input("Subscription ratio (how many units of the underlying the option refers to)", value=0.01)
 
         default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
