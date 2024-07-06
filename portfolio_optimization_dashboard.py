@@ -10,6 +10,8 @@ import matplotlib.patches as mpatches
 from matplotlib.ticker import MaxNLocator
 from matplotlib.ticker import FuncFormatter
 from matplotlib import gridspec
+from nelson_siegel_svensson import NelsonSiegelSvenssonCurve
+from nelson_siegel_svensson.calibrate import calibrate_nss_ols
 import mplfinance as mpf
 import seaborn as sns
 import scipy.stats as stats
