@@ -1990,6 +1990,28 @@ if download_sucess:
         plt.legend()
         plt.show()
         st.pyplot()
+
+        #Lambda
+        S0_prices_lambda = np.arange(0.5*strike_price, 1.5*strike_price)
+        call_lambdas = call_lambda(S0=S0_prices_lambda, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        color1 = 'cornflowerblue'
+        color2 = 'darkmagenta'
+        plt.figure(figsize=(7, 4))
+        plt.gca().set_xlim(left=0.5*strike_price, right=1.5*strike_price)
+        plt.plot(S0_prices_lambda, call_lambdas, color=color1)
+        # Add a black horizontal line at y=0
+        plt.axhline(0, color='black', linewidth=0.5)
+        # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
+        plt.scatter(spot_price, call_lambda_spot, color=color2, zorder=5, label="Current Lambda")
+        # Add text annotation for the Black-Scholes value
+        plt.text(spot_price, call_lambda_spot, f'  {call_lambda_spot:.2f}', color=color2, fontsize=9, ha='left', va='bottom')
+        plt.title("Lambda (Leverage)")
+        # Add labels, title, and legend
+        plt.grid('on', ls="--")
+        plt.xlabel('Price underlying (S)')
+        plt.legend()
+        plt.show()
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
