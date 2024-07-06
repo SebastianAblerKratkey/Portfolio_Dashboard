@@ -1876,6 +1876,22 @@ if download_sucess:
         time_in_years = number_trading_days/trading_days_per_year
         delta_t = time_in_years / number_trading_days               #leangth of time step
 
+
+        # calculate riskfree-rate via the Nelson-Siegel-Svensson method based on U.S. Treasury yields
+
+        # get yield curve data 
+        syms = ['DGS1MO', 'DGS3MO', 'DGS6MO', 'DGS1', 'DGS2', 'DGS3', 'DGS5', 'DGS7', 'DGS10', 'DGS20', 'DGS30']
+        yc = dr(syms, 'fred', start=current_date - timedelta(days=10))
+        yield_maturities = np.array([1/12, 3/12, 6/12, 1, 2, 3, 5, 7, 10, 20, 30])
+        yeilds = np.array(yc.iloc[-1,:]).astype(float)/100
+        
+        #NSS model calibrate
+        curve_fit, status = calibrate_nss_ols(yield_maturities,yeilds) 
+        
+        # risk-free rate
+        rf = curve_fit(time_in_years)
+        
+
         default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
     
