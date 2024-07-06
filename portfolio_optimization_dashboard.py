@@ -1868,7 +1868,13 @@ if download_sucess:
         strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100,0)*100)
         current_date = datetime.now()
         expiration_date = st.date_input("Expiration date (dd/mm/yyyy)", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
-
+        cal = mcal.get_calendar(exchange)
+        trading_days = mcal.date_range(cal.schedule(start_date=current_date, end_date=expiration_date), frequency='1D')
+        number_trading_days = len(trading_days) - 1                 #excluding current day from trading days
+        
+        trading_days_per_year = 252                                 #fair to assume 252
+        time_in_years = number_trading_days/trading_days_per_year
+        delta_t = time_in_years / number_trading_days               #leangth of time step
     
     
     if option == "Data":
