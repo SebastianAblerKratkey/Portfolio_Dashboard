@@ -1945,6 +1945,28 @@ if download_sucess:
         plt.legend()
         plt.show()
         st.pyplot()
+
+        color1 = 'cornflowerblue'
+        color2 = 'darkmagenta'
+        plot_maturities = np.arange(0, 40, 0.01)
+        plot_yields = curve_fit(plot_maturities)
+        plt.figure(figsize=(7, 5))
+        plt.gca().set_xlim(left=0, right=10)
+        plt.plot(plot_maturities, plot_yields, color=color1)
+        # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
+        plt.scatter(time_in_years, rf, color=color2, zorder=5, label="Risk-free rate")
+        # Add text annotation for the Black-Scholes value
+        plt.text(time_in_years, rf+0.002, f'{rf*100:.2f}'+"%", color=color2, fontsize=9, ha='center', va='bottom')
+        plt.ylim(0, 0.10) 
+        plt.xlim(0) 
+        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+        plt.title("Yield curve (US Treasuries)")
+        # Add labels, title, and legend
+        plt.grid('on', ls="--")
+        plt.xlabel('Years to maturity')
+        plt.legend()
+        plt.show()
+        st.pyplot()
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
