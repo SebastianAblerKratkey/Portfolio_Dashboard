@@ -1906,7 +1906,8 @@ if download_sucess:
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
-        
+
+        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
         colmn_1.metric("Black-Scholes option value", f"{black_scholes_value:.2f}")
         colmn_2.metric("Spot price underlying", f"{spot_price:.2f}")
