@@ -1865,7 +1865,7 @@ if download_sucess:
         return_data = np.sort(return_data)
 
         spot_price = price_data["Close"].iloc[-1]
-        strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100,0)*100)
+        strike_price = st.number_input("Strike price", value=round(spot_price/100,0)*100)
         current_date = datetime.now()
         expiration_date = st.date_input("Expiration date (dd/mm/yyyy)", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
         cal = mcal.get_calendar(exchange)
@@ -1875,6 +1875,9 @@ if download_sucess:
         trading_days_per_year = 252                                 #fair to assume 252
         time_in_years = number_trading_days/trading_days_per_year
         delta_t = time_in_years / number_trading_days               #leangth of time step
+
+        default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
+        impl_vol = st.number_input("(Implied) volatility – default is annualized volatility of daily log returns", value=default_impl_vol)
     
     
     if option == "Data":
