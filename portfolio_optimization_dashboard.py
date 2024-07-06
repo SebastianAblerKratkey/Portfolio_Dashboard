@@ -1923,7 +1923,7 @@ if download_sucess:
         call_payoffs_till_spot = call_payoff(S0=S0_prices_till_spot, K=strike_price) * subscription_ratio
         color1 = 'cornflowerblue'
         color2 = 'darkmagenta'
-        plt.figure(figsize=(7, 5))
+        plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=2*strike_price)
         plt.plot(S0_prices, black_scholes_values, color=color1, label='Option value')
         plt.plot(S0_prices, call_payoffs, color='slategrey', label='Payoff')
@@ -1950,7 +1950,7 @@ if download_sucess:
         color2 = 'darkmagenta'
         plot_maturities = np.arange(0, 40, 0.01)
         plot_yields = curve_fit(plot_maturities)
-        plt.figure(figsize=(7, 5))
+        plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=10)
         plt.plot(plot_maturities, plot_yields, color=color1)
         # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
