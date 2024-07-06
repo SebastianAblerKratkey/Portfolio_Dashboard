@@ -1904,7 +1904,12 @@ if download_sucess:
         adj_price = black_scholes_value * (1/subscription_ratio)
         default_impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
-    
+
+        colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
+        colmn_1.metric("Black-Scholes option value", f"{black_scholes_value:.2f}")
+        colmn_2.metric("Spot price underlying", f"{spot_price:.2f}")
+        colmn_3.metric("Breakeven price at exiry", f"{0:.2%}")
+        colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
