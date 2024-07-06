@@ -654,8 +654,301 @@ def apply_investment_signal(returns, starting_value, signal):
 
   return values
 
+#Options
+def call_payoff(S0, K):
+    """ Call option payoff
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Data"))
+    :param S0: spot price
+    :param K: strike price
+    :return: Call option option payoff
+    """
+    return np.maximum(S0 - K, 0)
+
+def call_PnL(S0, K, C):
+    """ Call option profit or loss
+
+    :param S0: spot price
+    :param K: strike price
+    :param C: call option premium
+    :return: Call option profit or loss
+    """
+    return np.maximum(S0 - K, 0) - C
+
+def N(z):
+    """ Normal cumulative density function
+
+    :param z: point at which cumulative density is calculated 
+    :return: cumulative density under normal curve
+    """
+    return stats.norm.cdf(z)
+
+def black_scholes_call_value(S0, K, rf, T, vol):
+    """ Black-Scholes call option
+
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: BS call option value
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    return N(d1) * S0 - N(d2) * K * np.exp(-rf * T)
+
+def black_scholes_put_value(S0, K, rf, T, vol):
+    """ Black-Scholes put option
+
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: BS call option value
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    return N(-d2) * K * np.exp(-rf * T) - N(-d1) * S0
+
+def phi(x):
+    """ Phi helper function
+    
+    """
+    return np.exp(-0.5 * x * x) / (np.sqrt(2.0 * np.pi))
+
+def call_delta(S0, K, rf, T, vol):
+    """ Black-Scholes call delta
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call delta
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    
+    return N(d1)
+
+def put_delta(S0, K, rf, T, vol):
+    """ Black-Scholes put delta
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: put delta
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    
+    return N(d1) - 1.0
+
+def gamma(S0, K, rf, T, vol):
+    """ Black-Scholes gamma
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: gamma
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    
+    return phi(d1) / (S0 * vol * np.sqrt(T))
+
+def vega(S0, K, rf, T, vol):
+    """ Black-Scholes vega
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: vega
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    
+    return (S0 * phi(d1) * np.sqrt(T)) / 100.0
+
+def call_theta(S0, K, rf, T, vol):
+    """ Black-Scholes call theta
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call theta
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    theta = -((S0 * phi(d1) * vol) / (2.0 * np.sqrt(T))) - (rf * K * np.exp(-rf * T) * N(d2))
+    return theta / 365.0
+
+def put_theta(S0, K, rf, T, vol):
+    """ Black-Scholes put theta
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: put theta
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    theta = -((S0 * phi(d1) * vol) / (2.0 * np.sqrt(T))) + (rf * K * np.exp(-rf * T) * N(-d2))
+    return theta / 365.0
+
+def call_rho(S0, K, rf, T, vol):
+    """ Black-Scholes call rho
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call rho
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    rho = K * T * np.exp(-rf * T) * N(d2)
+    return rho / 100.0
+
+def put_rho(S0, K, rf, T, vol):
+    """ Black-Scholes put rho
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: put rho
+    """
+    d1 = (1.0/(vol * np.sqrt(T))) * (np.log(S0/K) + (rf + 0.5 * vol**2.0) * T)
+    d2 = d1 - (vol * np.sqrt(T))
+    
+    rho = -K * T * np.exp(-rf * T) * N(-d2)
+    return rho / 100.0
+
+def call_lambda(S0, K, rf, T, vol):
+    """ Black-Scholes call lambda (leverage)
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call lambda
+    """
+    return call_delta(S0, K, rf, T, vol) * (S0 / black_scholes_call_value(S0, K, rf, T, vol))
+
+def call_implied_volatility_objective_function(S0, K, rf, T, vol, call_option_market_price):
+    """ Objective function which sets market and model prices to zero
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :param call_option_market_price: market observed option price
+    :return: error between market and model price
+    """
+    return call_option_market_price - black_scholes_call_value(S0, K, rf, T, vol)
+
+def call_implied_volatility(S0, K, rf, T, call_option_market_price, a=-2.0, b=2.0, xtol=1e-6):
+    """ Call implied volatility function
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param call_option_market_price: market observed option price
+    :param a: lower bound for brentq method
+    :param b: upper gound for brentq method
+    :param xtol: tolerance which is considered good enough
+    :return: volatility to sets the difference between market and model price to zero
+    
+    """
+    # avoid mirroring outer scope  
+    _S, _K, _r, _t, _call_option_market_price = S0, K, rf, T, call_option_market_price
+    
+    # define a nested function that takes our target param as the input
+    def fcn(vol):
+        
+        # returns the difference between market and model price at given volatility
+        return call_implied_volatility_objective_function(_S, _K, _r, _t, vol, _call_option_market_price)
+    
+    # first we try to return the results from the brentq algorithm
+    try:
+        result = brentq(fcn, a=a, b=b, xtol=xtol)
+        
+        # if the results are *too* small, sent to np.nan so we can later interpolate
+        return np.nan if result <= 1.0e-6 else result
+    
+    # if it fails then we return np.nan so we can later interpolate the results
+    except ValueError:
+        return np.nan
+
+def put_implied_volatility_objective_function(S0, K, rf, T, vol, put_option_market_price):
+    """ Objective function which sets market and model prices to zero
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :param call_option_market_price: market observed option price
+    :return: error between market and model price
+    """
+    return put_option_market_price - black_scholes_put_value(S0, K, rf, T, vol)
+
+def put_implied_volatility(S0, K, rf, T, put_option_market_price, a=-2.0, b=2.0, xtol=1e-6):
+    """ Put implied volatility function
+    
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param call_option_market_price: market observed option price
+    :param a: lower bound for brentq method
+    :param b: upper gound for brentq method
+    :param xtol: tolerance which is considered good enough
+    :return: volatility to sets the difference between market and model price to zero
+    
+    """
+    
+    # avoid mirroring out scope  
+    _S, _K, _r, _t, _put_option_market_price = S0, K, rf, T, put_option_market_price
+    
+    # define a nsted function that takes our target param as the input
+    def fcn(vol):
+        
+        # returns the difference between market and model price at given volatility
+        return put_implied_volatility_objective_function(_S, _K, _r, _t, vol, _put_option_market_price)
+    
+    # first we try to return the results from the brentq algorithm
+    try:
+        result = brentq(fcn, a=a, b=b, xtol=xtol)
+        
+        # if the results are *too* small, sent to np.nan so we can later interpolate
+        return np.nan if result <= 1.0e-6 else result
+    
+    # if it fails then we return np.nan so we can later interpolate the results
+    except ValueError:
+        return np.nan
+
+
+
+
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Options", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -1553,6 +1846,10 @@ if download_sucess:
         st.write(f"**{txt_}**")
         st.pyplot()
 
+
+    if option == "Options":
+        asset_name = st.selectbox("Select the asset you want to analyze", tickers)
+        asset_data = yf.download(asset_name)
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
