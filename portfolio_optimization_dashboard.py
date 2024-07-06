@@ -1848,8 +1848,22 @@ if download_sucess:
 
 
     if option == "Options":
-        asset_name = st.selectbox("Select the asset you want to analyze", tickers)
+        asset_name = st.selectbox("Select an underlying", tickers)
         asset_data = yf.download(asset_name)
+
+        # maybe add start date input
+        input_start_date = None
+
+        # Download stock data
+        price_data = yf.download(ticker, start=input_start_date)[["Close", "Adj Close"]]
+        start_date = price_data.index.min()
+        return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
+        return_data = np.sort(return_data)
+
+        spot_price = price_data["Close"].iloc[-1]
+        strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100;0)*100)
+
+    
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
