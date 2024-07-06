@@ -2009,6 +2009,7 @@ if download_sucess:
         plt.xlabel('Price underlying (S)')
         plt.legend()
         plt.show()
+        st.pyplot()
 
         #Vega
         call_vegas = vega(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
