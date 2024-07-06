@@ -11,3 +11,4 @@ streamlit==1.29.0
 yfinance==0.2.37
 openpyxl==3.0.10
 pandas_datareader==0.10.0
+pandas_market_calendars==4.3.3
