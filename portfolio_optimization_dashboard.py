@@ -1863,7 +1863,7 @@ if download_sucess:
         spot_price = price_data["Close"].iloc[-1]
         strike_price = reference_rate = st.number_input("Strike price", value=round(spot_price/100,0)*100)
         current_date = datetime.now()
-        expiration_date = st.date_input("Expiration date", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
+        expiration_date = st.date_input("Expiration date (dd/mm/yyyy)", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
 
     
     
