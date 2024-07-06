@@ -952,7 +952,7 @@ def put_implied_volatility(S0, K, rf, T, put_option_market_price, a=-2.0, b=2.0,
 
 
 
-option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Options", "Data"))
+option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Call Options", "Data"))
 
 st.header("Portfolio Analysis")
 
@@ -1851,7 +1851,7 @@ if download_sucess:
         st.pyplot()
 
 
-    if option == "Options":
+    if option == "Call Options":
         asset_name = st.selectbox("Select an underlying", tickers)
         exchanges = mcal.get_calendar_names()
         default_exchange = exchanges.index("NYSE")
@@ -1897,6 +1897,10 @@ if download_sucess:
         subscription_ratio = st.number_input("Subscription ratio (how many units of the underlying the option refers to)", value=0.01)
 
         default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
+        default_black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=default_impl_vol) * subscription_ratio
+        black_scholes_value = st.number_input("Call opiton price – default assumes volatility equalt to annualized std of daily log returns", value=default_black_scholes_value)
+        
+        
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
     
     
