@@ -1899,8 +1899,9 @@ if download_sucess:
         default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
         default_black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=default_impl_vol) * subscription_ratio
         black_scholes_value = st.number_input("Call opiton price – default assumes volatility equalt to annualized std of daily log returns", value=default_black_scholes_value)
-        
-        
+
+        adj_price = price * (1/subscription_ratio)
+        default_impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
     
     
