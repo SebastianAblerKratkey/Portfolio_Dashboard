@@ -1851,7 +1851,9 @@ if download_sucess:
 
     if option == "Options":
         asset_name = st.selectbox("Select an underlying", tickers)
-        exchange = st.selectbox("Select exchange where the underlying is traded", mcal.get_calendar_names())
+        exchanges = mcal.get_calendar_names()
+        default_exchange = exchanges.index("NYSE")
+        exchange = st.selectbox("Select exchange where the underlying is traded", exchanges, index=default_exchange)
 
         # maybe add start date input
         input_start_date = None
