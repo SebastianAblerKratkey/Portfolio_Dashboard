@@ -1903,7 +1903,7 @@ if download_sucess:
 
         adj_price = black_scholes_value * (1/subscription_ratio)
         default_impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
-        impl_vol = st.number_input("(Implied) volatility (in %) – default is annualized volatility of daily log returns", value=default_impl_vol*100)/100
+        impl_vol = st.number_input("Implied volatility (in %)", value=default_impl_vol*100)/100
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
 
