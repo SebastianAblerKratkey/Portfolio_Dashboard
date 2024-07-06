@@ -2012,6 +2012,8 @@ if download_sucess:
         plt.xlabel('Price underlying (S)')
         plt.legend()
         plt.show()
+        st.pyplot()
+
     
     if option == "Data":
         st.write("Monthly adjusted closing prices:")
