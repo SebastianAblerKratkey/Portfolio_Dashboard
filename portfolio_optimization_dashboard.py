@@ -1908,7 +1908,10 @@ if download_sucess:
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
 
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
-        call_option_leverage = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+
+        req_r_be = np.log(breakeven_at_exiry/spot_price) * (1/time_in_years)
         
         # Row 1
         colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
@@ -1918,9 +1921,9 @@ if download_sucess:
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
         # Row 2
         colmn_5, colmn_6, colmn_7, colmn_8 = st.columns([0.5, 0.5, 0.5, 0.5]) 
-        colmn_5.metric("Leverage", f"{call_option_leverage:.2f}")
-        colmn_6.metric("Spot price underlying", f"{spot_price:.2f}")
-        colmn_7.metric("Breakeven price at exiry", f"{breakeven_at_exiry:.2f}")
+        colmn_5.metric("Delta", f"{call_delta_spot:.2f}")
+        colmn_6.metric("Leverage", f"{call_lambda_spot:.2f}x")
+        colmn_7.metric("Req. return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Trading days to expiration", f"{number_trading_days:.0f}")
 
         headline1 = "Distribution fitting"
@@ -2041,7 +2044,6 @@ if download_sucess:
         
         #Delta
         call_deltas = call_delta(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
-        call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=2*strike_price)
         plt.plot(S0_prices, call_deltas, color=color1)
@@ -2102,7 +2104,6 @@ if download_sucess:
         #Lambda
         S0_prices_lambda = np.arange(0.5*strike_price, 1.5*strike_price)
         call_lambdas = call_lambda(S0=S0_prices_lambda, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
-        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0.5*strike_price, right=1.5*strike_price)
         plt.plot(S0_prices_lambda, call_lambdas, color=color1)
