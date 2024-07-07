@@ -2035,7 +2035,7 @@ if download_sucess:
             color2 = "deepskyblue"
             color4 = "mediumslateblue"
             
-            plt.figure(figsize=(15, 10))
+            plt.figure(figsize=(10, 5))
             plt.gca().set_xlim(left=simulation_df.index.min(), right=simulation_df.index.max())
             
             
@@ -2070,6 +2070,7 @@ if download_sucess:
             
             # Add labels, title, and legend
             plt.grid('on', ls="--")
+            plt.title("Price simulation of underlying based on Johnson SU distribution")
             
             plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
             plt.gca().xaxis.set_major_locator(MaxNLocator())
