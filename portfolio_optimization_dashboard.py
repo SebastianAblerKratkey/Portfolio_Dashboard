@@ -1915,7 +1915,7 @@ if download_sucess:
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
 
         headline1 = "Simulation"
-            st.write(f"**{headline1}**")
+        st.write(f"**{headline1}**")
 
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
