@@ -2008,6 +2008,78 @@ if download_sucess:
                     """
                     )
         
+        headline2 = "Simulation"
+        st.write(f"**{headline2}**")
+        sim_runs_option = st.number_input("Choose a number of simulation runs", value=10000)
+        
+        if st.button("Run simulation"):
+            returns_option_sim = stats.johnsonsu.ppf(np.random.uniform(cdf.min(), cdf.max(), size=(number_trading_days, sim_runs_option)), a=su_loc_2, b=su_scale_2, loc=su_loc_1, scale=su_scale_1)
+            
+            random_growth_factors = np.exp(returns_option_sim)
+            growth_t0 = np.ones((1, random_growth_factors.shape[1])) * spot_price
+            growth_paths = np.vstack((growth_t0, random_growth_factors))
+            cumulative_growth_paths = np.cumprod(growth_paths, axis=0)
+            
+            simulation_df = pd.DataFrame(cumulative_growth_paths)
+            simulation_df.set_index(pd.Index(trading_days), inplace=True)
+
+            prices_at_expiry = simulation_df.iloc[-1,:]
+            chance_above_be = (prices_at_expiry >= breakeven_at_exiry).mean()
+            chance_below_be = 1 - chance_above_be
+            path_max_val_at_expiry = simulation_df.iloc[: ,prices_at_expiry.idxmax()]
+            path_min_val_at_expiry = simulation_df.iloc[: ,prices_at_expiry.idxmin()]
+
+            #Plot
+            color1 = 'cornflowerblue'
+            color3 = 'darkmagenta'
+            color2 = "deepskyblue"
+            color4 = "mediumslateblue"
+            
+            plt.figure(figsize=(15, 10))
+            plt.gca().set_xlim(left=simulation_df.index.min(), right=simulation_df.index.max())
+            
+            
+            plt.plot(simulation_df.iloc[:, :300], color='lightgrey', alpha=0.8)
+            plt.plot(path_max_val_at_expiry, color='lightgrey', alpha=0.8)
+            plt.plot(path_min_val_at_expiry, color='lightgrey', alpha=0.8)
+            
+            # Calculate the number of days to add
+            num_days = (simulation_df.index.max() - simulation_df.index.min()).days
+            days_to_add1 = num_days / 120
+            
+            # Display strike price
+            plt.axhline(strike_price, color=color1, linewidth=1.25, label="Strike price")
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), strike_price, str(round(strike_price, 2)),color=color1, verticalalignment='center')
+            
+            # Display spot price
+            plt.axhline(spot_price, color=color2, linewidth=1.25, label="Spot price")
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), spot_price, str(round(spot_price, 2)),color=color2, verticalalignment='center')
+            
+            # Display breakeven price @ expiry
+            plt.axhline(breakeven_at_exiry, color=color3, linewidth=1.25, label="Breakeven price @ exiry")
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), breakeven_at_exiry, str(round(breakeven_at_exiry, 2)),color=color3, verticalalignment='center')
+            
+            # Display above/below breakeven probabilities
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_exiry+prices_at_expiry.max())/2, str(round(chance_above_be*100, 2))+"%",color=color3, verticalalignment='center')
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_exiry+prices_at_expiry.min())/2, str(round(chance_below_be*100, 2))+"%",color=color3, verticalalignment='center')
+            
+            mean_sim_prices = simulation_df.mean(axis=1)
+            plt.plot(mean_sim_prices, color=color4, linewidth=1.25, label="Mean simulated price")
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), mean_sim_prices.iloc[-1], str(round(mean_sim_prices.iloc[-1], 2)),color=color4, verticalalignment='center')
+            
+            
+            # Add labels, title, and legend
+            plt.grid('on', ls="--")
+            
+            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format dates to show month and year
+            plt.gca().xaxis.set_major_locator(MaxNLocator())
+            plt.minorticks_off()
+            
+            plt.legend()
+            plt.show()
+            st.pyplot()
+
+
 
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
