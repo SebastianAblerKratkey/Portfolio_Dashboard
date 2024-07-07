@@ -1923,8 +1923,8 @@ if download_sucess:
         colmn_5, colmn_6, colmn_7, colmn_8 = st.columns([0.5, 0.5, 0.5, 0.5]) 
         colmn_5.metric("Delta", f"{call_delta_spot:.2f}")
         colmn_6.metric("Leverage", f"{call_lambda_spot:.2f}x")
-        colmn_7.metric("Req. return to reach BE (p.a.)", f"{req_r_be:.2%}")
-        colmn_8.metric("Trading days to expiration", f"{number_trading_days:.0f}")
+        colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
+        colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
         headline1 = "Distribution fitting"
         st.write(f"**{headline1}**")
