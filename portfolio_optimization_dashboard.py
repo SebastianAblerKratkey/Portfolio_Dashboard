@@ -1959,6 +1959,50 @@ if download_sucess:
 
         headline0 = "Strike price guidance"
         st.write(f"**{headline0}**")
+        
+        strike_prices = np.arange(0.001, 2*target_price)
+        returns_long_call_at_expiry = return_long_call_at_expiry(ST=target_price, S0=spot_price, K=strike_prices, rf=rf, T=time_in_years, vol=impl_vol, pa=True)
+        returns_long_call_series = pd.Series(returns_long_call_at_expiry, index=strike_prices, name='Returns Long Call at Expiry')
+        optimal_strike_price = returns_long_call_series.idxmax()
+        color1 = 'cornflowerblue'
+        color2 = 'darkmagenta'
+        color3 = "deepskyblue"
+        color4 = "slategrey"
+        top_border = returns_long_call_at_expiry.max()*1.2
+        plt.figure(figsize=(7, 5))
+        plt.gca().set_xlim(left=0.3*target_price, right=1.2*target_price)
+        plt.gca().set_ylim(bottom=0, top=top_border)
+        plt.plot(strike_prices, returns_long_call_at_expiry, color=color1)
+        # Text alignment
+        if spot_price >= optimal_strike_price:
+            ha_spot = "left"
+            offset_spot = 1.01
+            ha_opt = "right"
+            offset_opt = 0.99
+        else:
+            ha_spot = "right"
+            offset_spot = 0.99
+            ha_opt = "left"
+            offset_opt = 1.01
+        # Target price
+        plt.axvline(target_price, color=color3, linewidth=1.5, label="Target price")
+        plt.text(target_price*1.01, top_border*0.01, str(round(target_price, 2)),color=color3, verticalalignment='bottom')
+        # Optimal strike price
+        plt.axvline(optimal_strike_price, color=color2, linewidth=1.5, label="Optimal strike")
+        plt.text(optimal_strike_price*offset_opt, top_border*0.01, str(round(optimal_strike_price, 2)),color=color2, ha=ha_opt,  verticalalignment='bottom')
+        plt.scatter(optimal_strike_price, returns_long_call_at_expiry.max(), color=color2, zorder=5)
+        plt.text(optimal_strike_price*offset_opt, returns_long_call_at_expiry.max()*offset_opt, f'{returns_long_call_at_expiry.max():.2%} ', color=color2, ha=ha_opt, va='bottom')
+        # Spot price
+        plt.axvline(spot_price, color=color4, linewidth=1.5, label="Spot price")
+        plt.text(spot_price*offset_spot, top_border*0.01, str(round(spot_price, 2)),color=color4, verticalalignment='bottom',ha=ha_spot)
+        plt.title("Return p.a. per strike price")
+        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+        # Add labels, title, and legend
+        plt.grid('on', ls="--")
+        plt.xlabel('Strike price (K)')
+        plt.legend(loc='upper left')
+        plt.show()
+        st.pyplot()
 
         
         headline1 = "Distribution fitting"
