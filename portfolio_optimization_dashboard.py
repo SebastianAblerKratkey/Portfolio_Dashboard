@@ -2093,7 +2093,7 @@ if download_sucess:
                     """
                     )
         
-        headline2 = "Simulation"
+        headline2 = "Price simulation based on fitted Johnson SU distribution"
         st.write(f"**{headline2}**")
         sim_runs_option = st.number_input("Choose a number of simulation runs", value=10000)
         
@@ -2165,7 +2165,10 @@ if download_sucess:
             plt.show()
             st.pyplot()
 
-
+        price_sim_text = (
+            f"Simulated returns are generated using a Johnson SU distribution fitted to historical daily log-return data of the underlying asset. Based on the simulation, there is a **{chance_above_be:.2%}** chance that the underlying will close above the breakeven price at expiration and a **{chance_below_be:.2%}** chance that it will close below. The mean closing price at expiration is **{mean_sim_prices.iloc[-1]:.2f}**."
+            )
+        st.write(price_sim_text)
 
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
