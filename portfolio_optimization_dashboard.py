@@ -2170,6 +2170,9 @@ if download_sucess:
                 )
             st.write(price_sim_text)
 
+        headline3 = "Option value and yield curve"
+        st.write(f"**{headline3}**")
+        
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
         S0_prices_till_spot = np.arange(0.0001, spot_price)
