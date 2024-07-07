@@ -1914,6 +1914,9 @@ if download_sucess:
         colmn_3.metric("Breakeven price at exiry", f"{breakeven_at_exiry:.2f}")
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
 
+        headline1 = "Simulation"
+            st.write(f"**{headline1}**")
+
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
         S0_prices_till_spot = np.arange(0.0001, spot_price)
