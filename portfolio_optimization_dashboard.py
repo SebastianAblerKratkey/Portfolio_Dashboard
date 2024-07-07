@@ -1920,7 +1920,7 @@ if download_sucess:
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         black_scholes_values = black_scholes_call_value(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         black_scholes_values_till_spot = black_scholes_call_value(S0=S0_prices_till_spot, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
-        call_payoffs = call_payoff(S0=S0_prices, K=5000) * subscription_ratio
+        call_payoffs = call_payoff(S0=S0_prices, K=strike_price) * subscription_ratio
         call_payoffs_till_spot = call_payoff(S0=S0_prices_till_spot, K=strike_price) * subscription_ratio
         color1 = 'cornflowerblue'
         color2 = 'darkmagenta'
