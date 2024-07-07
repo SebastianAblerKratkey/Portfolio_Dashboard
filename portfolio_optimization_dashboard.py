@@ -1968,7 +1968,8 @@ if download_sucess:
         color2 = 'darkmagenta'
         color3 = "deepskyblue"
         color4 = "slategrey"
-        top_border = returns_long_call_at_expiry.max()*1.2
+        max_return_long_call_at_expiry = returns_long_call_at_expiry.max()
+        top_border = max_return_long_call_at_expiry*1.2
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0.3*target_price, right=1.2*target_price)
         plt.gca().set_ylim(bottom=0, top=top_border)
@@ -1990,8 +1991,8 @@ if download_sucess:
         # Optimal strike price
         plt.axvline(optimal_strike_price, color=color2, linewidth=1.5, label="Optimal strike")
         plt.text(optimal_strike_price*offset_opt, top_border*0.01, str(round(optimal_strike_price, 2)),color=color2, ha=ha_opt,  verticalalignment='bottom')
-        plt.scatter(optimal_strike_price, returns_long_call_at_expiry.max(), color=color2, zorder=5)
-        plt.text(optimal_strike_price*offset_opt, returns_long_call_at_expiry.max()*offset_opt, f'{returns_long_call_at_expiry.max():.2%} ', color=color2, ha=ha_opt, va='bottom')
+        plt.scatter(optimal_strike_price, max_return_long_call_at_expiry, color=color2, zorder=5)
+        plt.text(optimal_strike_price*offset_opt, max_return_long_call_at_expiry*offset_opt, f'{max_return_long_call_at_expiry:.2%} ', color=color2, ha=ha_opt, va='bottom')
         # Spot price
         plt.axvline(spot_price, color=color4, linewidth=1.5, label="Spot price")
         plt.text(spot_price*offset_spot, top_border*0.01, str(round(spot_price, 2)),color=color4, verticalalignment='bottom',ha=ha_spot)
@@ -2003,6 +2004,11 @@ if download_sucess:
         plt.legend(loc='upper left')
         plt.show()
         st.pyplot()
+
+        strike_price_text = (
+            f"Based on a target underlying price of **{target_price:.2f}** at expiration and profits calculated using the Black-Scholes formula, setting a strike price of **{optimal_strike_price:.2f}** would yield the highest possible return of **{max_return_long_call_at_expiry:.2%}** p.a. if the option is held until expiration."
+            )
+        st.write(strike_price_text)
 
         
         headline1 = "Distribution fitting"
