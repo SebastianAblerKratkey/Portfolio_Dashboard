@@ -483,7 +483,7 @@ def simulate_leveraged_daily_compounded_annual_return(daily_return,
 
 def create_leverage_sim_visual(results_df):
     # Create figure and axis objects
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    fig, ax1 = plt.subplots(figsize=(10, 7))
 
     # Plot mean return on primary y-axis
     ax1.scatter(results_df['Leverage'], results_df['Mean_Return'], label='Simulated return', color='cornflowerblue')
