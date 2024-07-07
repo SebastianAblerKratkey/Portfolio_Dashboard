@@ -1935,6 +1935,9 @@ if download_sucess:
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
 
+        default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
+        target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
+        
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
         call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
@@ -1954,6 +1957,10 @@ if download_sucess:
         colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
+        headline0 = "Strike price guidance"
+        st.write(f"**{headline0}**")
+
+        
         headline1 = "Distribution fitting"
         st.write(f"**{headline1}**")
 
