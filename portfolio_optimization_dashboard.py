@@ -1969,7 +1969,7 @@ if download_sucess:
         color3 = "deepskyblue"
         color4 = "slategrey"
         top_border = returns_long_call_at_expiry.max()*1.2
-        plt.figure(figsize=(7, 5))
+        plt.figure(figsize=(10, 6))
         plt.gca().set_xlim(left=0.3*target_price, right=1.2*target_price)
         plt.gca().set_ylim(bottom=0, top=top_border)
         plt.plot(strike_prices, returns_long_call_at_expiry, color=color1)
