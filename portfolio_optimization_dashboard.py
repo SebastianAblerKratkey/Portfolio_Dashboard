@@ -2035,7 +2035,7 @@ if download_sucess:
             color2 = "deepskyblue"
             color4 = "mediumslateblue"
             
-            plt.figure(figsize=(10, 5))
+            plt.figure(figsize=(10, 6))
             plt.gca().set_xlim(left=simulation_df.index.min(), right=simulation_df.index.max())
             
             
