@@ -1247,7 +1247,7 @@ if download_sucess:
             p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
                           min_value=0.05, max_value=0.95, step=0.05, value=0.8)
             
-            current_year = now = datetime.datetime.now().year
+            current_year = datetime.now().year
             total_additional_investments = num_years * additional_investment_per_year
             selected_p = "custom portfolio"
             
@@ -1516,7 +1516,7 @@ if download_sucess:
         p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
                       min_value=0.05, max_value=0.95, step=0.05, value=0.8)
         
-        current_year = now = datetime.datetime.now().year
+        current_year = datetime.now().year
 
         
         total_additional_investments = num_years * additional_investment_per_year
