@@ -1993,10 +1993,10 @@ if download_sucess:
         st.markdown(
                     f"""
                     Distribution moments:
-                    - Mean {mean_emp:.0%} 
-                    - Standard deviation {std_emp:.0%} 
-                    - Skewness {skewness_emp:.0%}
-                    - Kurtosis {kurtosis_emp:.0%}
+                    - Mean {mean_emp:.2%} 
+                    - Standard deviation {std_emp:.2%} 
+                    - Skewness {skewness_emp:.2f}
+                    - Kurtosis {kurtosis_emp:.2f}
                     """
                     )
         
