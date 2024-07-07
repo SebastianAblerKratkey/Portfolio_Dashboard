@@ -1917,6 +1917,7 @@ if download_sucess:
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
         S0_prices_till_spot = np.arange(0.0001, spot_price)
+        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         black_scholes_values = black_scholes_call_value(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         black_scholes_values_till_spot = black_scholes_call_value(S0=S0_prices_till_spot, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         call_payoffs = call_payoff(S0=S0_prices, K=5000) * subscription_ratio
@@ -1929,7 +1930,6 @@ if download_sucess:
         plt.plot(S0_prices, call_payoffs, color='slategrey', label='Payoff')
         plt.fill_between(S0_prices_till_spot, black_scholes_values_till_spot, call_payoffs_till_spot,
                                 color='limegreen', alpha=0.17, label="Time value", edgecolor='green', hatch='\/\/\/\/\/\/')
-    
         plt.fill_between(S0_prices_till_spot, call_payoffs_till_spot, 0,
                                 color='limegreen', alpha=0.17, label="Internal value")
         # Add a black horizontal line at y=0
