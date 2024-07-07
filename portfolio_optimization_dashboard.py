@@ -1945,7 +1945,6 @@ if download_sucess:
         
         # Plot1: Histogram and PDFs
         ax1.hist(return_data, bins=200, density=True, alpha=0.7, color=color1, label="Histogram of daily log-returns")
-        pdf = stats.johnsonsu.pdf(return_data, a=su_loc_2, b=su_scale_2, loc=su_loc_1, scale=su_scale_1)
         ax1.plot(return_data, pdf, color=color2, label="PDF fitted Johnson SU Dist.")
         ax1.plot(return_data, pdf_nom, color=color3, label="PDF fitted Normal Dist.")
         
