@@ -1914,8 +1914,65 @@ if download_sucess:
         colmn_3.metric("Breakeven price at exiry", f"{breakeven_at_exiry:.2f}")
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
 
-        headline1 = "Simulation"
+        headline1 = "Distribution fitting"
         st.write(f"**{headline1}**")
+
+        #construct empirical distribution function
+        edf = np.arange(1, len(return_data)+1)/len(return_data)
+        # fit Johnson SU distribution to return data
+        su_loc_2, su_scale_2, su_loc_1, su_scale_1  = stats.johnsonsu.fit(return_data)
+        cdf = stats.johnsonsu.cdf(return_data, a=su_loc_2, b=su_scale_2, loc=su_loc_1, scale=su_scale_1)
+        pdf = stats.johnsonsu.pdf(return_data, a=su_loc_2, b=su_scale_2, loc=su_loc_1, scale=su_scale_1)
+
+        # fit Normal distribution to return data  
+        cdf_norm = stats.norm.cdf(return_data, loc=return_data.mean(), scale=return_data.std())
+        pdf_nom = stats.norm.pdf(return_data, loc=return_data.mean(), scale=return_data.std())
+
+        #evaluate the goodness-of-fit using Kolmogorov-Smirnov test
+        supremum = max(abs(edf - cdf))
+        p_value = np.exp(-supremum**2*len(return_data))
+        supremum_norm = max(abs(edf - cdf_norm))
+        p_value_norm = np.exp(-supremum_norm**2*len(return_data))
+
+        #Plot
+        # Create a figure with two subplots side-by-side
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # Define colors
+        color1 = 'cornflowerblue'
+        color2 = 'darkmagenta'
+        color3 = 'royalblue'
+        
+        # Plot1: Histogram and PDFs
+        ax1.hist(return_data, bins=200, density=True, alpha=0.7, color=color1, label="Histogram of daily log-returns")
+        pdf = stats.johnsonsu.pdf(return_data, a=su_loc_2, b=su_scale_2, loc=su_loc_1, scale=su_scale_1)
+        ax1.plot(return_data, pdf, color=color2, label="PDF fitted Johnson SU Dist.")
+        ax1.plot(return_data, pdf_nom, color=color3, label="PDF fitted Normal Dist.")
+        
+        # Adding labels, title, and legend to Plot1
+        ax1.set_xlabel('Daily log-returns')
+        ax1.set_ylabel('Frequency')
+        ax1.grid('on', ls="--")
+        ax1.legend(loc='upper left')
+        ax1.xaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+        
+        # Plot2: Distribution functions
+        ax2.plot(return_data, edf, color=color1, label="Empirical distribution function")
+        ax2.plot(return_data, cdf, color=color2, label="CDF fitted Johnson SU Dist.")
+        ax2.plot(return_data, cdf_norm, color=color3, label="CDF fitted Normal Dist.")
+        
+        # Adding labels, title, and legend to Plot2
+        ax2.set_xlabel('Daily log-returns')
+        ax2.set_ylabel('Cumulative probability')
+        ax2.grid('on', ls="--")
+        ax2.legend(loc='upper left')
+        ax2.xaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+        
+        # Adjust layout and show the plot
+        plt.tight_layout()
+        plt.show()
+        st.pyplot()
+        
 
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
