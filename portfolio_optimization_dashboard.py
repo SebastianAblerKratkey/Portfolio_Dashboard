@@ -1992,7 +1992,15 @@ if download_sucess:
 
         st.markdown(
                     f"""
-                    Distribution moments:
+                    Goodness-of-fit evaluation using Kolmogorov-Smirnov test:
+                    - P-value fitted Johnson SU distribution {p_value:.2%} 
+                    - P-value fitted Normal distribution {p_value_norm:.2%} 
+                    """
+                    )
+        
+        st.markdown(
+                    f"""
+                    Distribution moments of daily log-returns:
                     - Mean {mean_emp:.2%} 
                     - Standard deviation {std_emp:.2%} 
                     - Skewness {skewness_emp:.2f}
