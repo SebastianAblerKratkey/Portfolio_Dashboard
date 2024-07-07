@@ -1936,7 +1936,7 @@ if download_sucess:
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
-        target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=spot_price * np.exp(return_data.mean()*number_trading_days))
+        target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
         
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
