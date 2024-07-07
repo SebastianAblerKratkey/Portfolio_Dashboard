@@ -950,7 +950,35 @@ def put_implied_volatility(S0, K, rf, T, put_option_market_price, a=-2.0, b=2.0,
     except ValueError:
         return np.nan
 
+def profit_long_call_at_expiry(ST, S0, K, rf, T, vol):
+    """ Long call profit at expiry
+    
+    :param ST: target price at expiry
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call lambda
+    """
+    return np.maximum((ST - K),0) - black_scholes_call_value(S0, K, rf, T, vol)
 
+def return_long_call_at_expiry(ST, S0, K, rf, T, vol, pa=True):
+    """ Long call profit at expiry
+    
+    :param pa: return p.a. or total return
+    :param ST: target price at expiry
+    :param S0: spot price
+    :param K: strike price
+    :param rf: riskfree rate
+    :param T: time to expiration
+    :param vol: volatility
+    :return: call lambda
+    """
+    if pa:
+        return np.log(np.maximum((ST - K),0) / black_scholes_call_value(S0, K, rf, T, vol)) * (1/T)
+    else:
+        return np.log(np.maximum((ST - K),0) / black_scholes_call_value(S0, K, rf, T, vol))
 
 
 option = st.sidebar.selectbox("What do you want to see?", ("Past performance", "Custom portfolio","Return correlation", "Portfolio optimization (Markowitz model)", "CAPM", "Daily leverage simulation", "Technical Analysis", "Call Options", "Data"))
