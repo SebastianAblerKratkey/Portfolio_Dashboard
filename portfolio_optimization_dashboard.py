@@ -1936,7 +1936,7 @@ if download_sucess:
 
         #Plot
         # Create a figure with two subplots side-by-side
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 9))
         
         # Define colors
         color1 = 'cornflowerblue'
