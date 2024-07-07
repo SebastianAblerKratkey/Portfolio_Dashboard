@@ -1983,6 +1983,22 @@ if download_sucess:
         plt.tight_layout()
         plt.show()
         st.pyplot()
+
+        # Calculate first four moments
+        mean_emp = pd.Series(return_data).mean()
+        std_emp = pd.Series(return_data).std()
+        skewness_emp = pd.Series(return_data).skew()
+        kurtosis_emp = pd.Series(return_data).kurtosis()
+
+        st.markdown(
+                    f"""
+                    Distribution moments:
+                    - Mean {mean_emp:.0%} 
+                    - Standard deviation {std_emp:.0%} 
+                    - Skewness {skewness_emp:.0%}
+                    - Kurtosis {kurtosis_emp:.0%}
+                    """
+                    )
         
 
         #Plot chart
