@@ -2007,9 +2007,7 @@ if download_sucess:
 
         strike_price_text = (
             f"Based on a target underlying price of **{target_price:.2f}** at expiration and profits calculated using the Black-Scholes formula, setting a strike price of **{optimal_strike_price:.0f}** would yield the highest possible return of **{max_return_long_call_at_expiry:.2%}** p.a. if the option is held until expiration."
-            "\n"
-            "\n"
-            "\n"
+            f" "
             )
         st.write(strike_price_text)
 
