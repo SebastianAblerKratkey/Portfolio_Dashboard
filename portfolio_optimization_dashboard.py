@@ -1967,7 +1967,8 @@ if download_sucess:
         st.write(f"**{headline00}**")
         
         option_price = st.number_input("Input current call opiton price", value=black_scholes_value)
-        impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = option_price, a=-2.0, b=2.0, xtol=1e-6)
+        adj_price = option_price * (1/subscription_ratio)
+        impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         st.metric("Implied volatility", f"{impl_vol:.2%}")
         
         headline0 = "Strike price guidance"
