@@ -1971,6 +1971,87 @@ if download_sucess:
         impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         st.metric("Implied volatility", f"{impl_vol:.2%}")
         
+        rolling_window = st.number_input("Input number of days for rolling volatility calculation", value=30)
+        vol_start_date = st.date_input("Set starting date for long-run volatilty calculation", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
+        lookback_years = st.number_input("How many previous years shall be displayed?", value=5)
+
+        # Create vol_data as a copy of price_data
+        vol_data = price_data.copy()
+        
+        # Calculate log returns in vol_data
+        vol_data["Log returns"] = np.log(vol_data["Adj Close"] / vol_data["Adj Close"].shift(1))
+        
+        # Filter vol_data for long-run volatility calculation
+        vol_data = vol_data[vol_data.index >= vol_start_date]
+        
+        # Calculate long-run volatility
+        long_run_vol = vol_data["Log returns"].std() * np.sqrt(trading_days_per_year)
+        
+        # Calculate rolling volatility in vol_data
+        vol_data["Rolling vol"] = (
+            vol_data["Log returns"]
+            .rolling(rolling_window)
+            .std()
+            * np.sqrt(trading_days_per_year)
+        )
+        
+        # Filter vol_data for the chart based on lookback_years
+        chart_start_date = pd.Timestamp.now() - pd.DateOffset(years=lookback_years)
+        vol_data_chart = vol_data[vol_data.index >= chart_start_date]
+        
+        # Plotting
+        
+        # Calculate values for annotations
+        last_rolling_vol = vol_data_chart["Rolling vol"].iloc[-1]
+        last_rolling_vol_date = vol_data_chart.index[-1]
+        days_to_add = (vol_data_chart.index.max() - vol_data_chart.index.min()).days / 120
+        
+        # Plotting
+        plt.figure(figsize=(10, 6))
+        plt.gca().set_xlim(left=vol_data_chart.index.min(), right=vol_data_chart.index.max())
+        
+        # Plot rolling volatility
+        plt.plot(vol_data_chart.index, vol_data_chart["Rolling vol"], label=f"Rolling volatility ({rolling_window} days)", color='cornflowerblue', linewidth=1.25)
+        
+        # Extract and format the start date for long-run volatility
+        vol_start_date_str = pd.Timestamp(vol_start_date).strftime("%b %Y")
+        
+        # Plot long-run volatility as a horizontal line
+        plt.axhline(long_run_vol, color='darkmagenta', linestyle="--", linewidth=1.25, label=f"Long-run average volatility (since {vol_start_date_str})")
+        
+        # Annotations for rolling volatility
+        plt.text(
+            last_rolling_vol_date + pd.Timedelta(days=days_to_add), 
+            last_rolling_vol, 
+            f"{last_rolling_vol:.2%}", 
+            color='cornflowerblue', 
+            verticalalignment='center'
+        )
+        
+        # Annotations for long-run volatility
+        plt.text(
+            last_rolling_vol_date + pd.Timedelta(days=days_to_add), 
+            long_run_vol, 
+            f"{long_run_vol:.2%}", 
+            color='darkmagenta', 
+            verticalalignment='center'
+        )
+        
+        # Chart details
+        plt.grid('on', linestyle="--")
+        plt.title("Historic volatility")
+        plt.ylabel("Volatility (annualized)")
+        plt.legend()
+        
+        # Format x-axis to show months and years
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+        plt.gca().xaxis.set_major_locator(MaxNLocator())
+        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter('{:,.0%}'.format))
+        plt.minorticks_off()
+        
+        plt.tight_layout()
+        plt.show()
+        
         headline0 = "Strike price guidance"
         st.write(f"**{headline0}**")
         
