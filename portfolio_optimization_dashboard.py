@@ -1933,7 +1933,7 @@ if download_sucess:
         
         #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
-        selected_vol = st.number_input("Volatility (in %)", value=historic_vol*100)/100
+        selected_vol = st.number_input("Volatility (in %) – default based on historic standard deviation of returns", value=historic_vol*100)/100
         
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
@@ -2131,8 +2131,8 @@ if download_sucess:
             
             
             plt.plot(simulation_df.iloc[:, :300], color='lightgrey', alpha=0.8)
-            plt.plot(path_max_val_at_expiry, color='lightgrey', alpha=0.8)
-            plt.plot(path_min_val_at_expiry, color='lightgrey', alpha=0.8)
+            #plt.plot(path_max_val_at_expiry, color='lightgrey', alpha=0.8)
+            #plt.plot(path_min_val_at_expiry, color='lightgrey', alpha=0.8)
             
             # Calculate the number of days to add
             num_days = (simulation_df.index.max() - simulation_df.index.min()).days
