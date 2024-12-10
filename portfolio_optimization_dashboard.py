@@ -1940,7 +1940,7 @@ if download_sucess:
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
         
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
-        adj_price = black_scholes_value * (1/subscription_ratio)
+        #adj_price = black_scholes_value * (1/subscription_ratio)
 
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
@@ -1963,6 +1963,13 @@ if download_sucess:
         colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
+        headline00 = "Implied volatility"
+        st.write(f"**{headline00}**")
+        
+        option_price = st.number_input("Input current call opiton price", value=black_scholes_value)
+        impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = option_price, a=-2.0, b=2.0, xtol=1e-6)
+        st.metric("Implied volatility", f"{impl_vol:.2%}")
+        
         headline0 = "Strike price guidance"
         st.write(f"**{headline0}**")
         
