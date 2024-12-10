@@ -1972,7 +1972,7 @@ if download_sucess:
         st.metric("Implied volatility", f"{impl_vol:.2%}")
         
         rolling_window = st.number_input("Input number of days for rolling volatility calculation", value=30)
-        vol_start_date = st.date_input("Set starting date for long-run volatilty calculation", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
+        vol_start_date = st.date_input("Set starting date for long-run volatilty calculation", value=price_data.index.min(), max_value= current_date - timedelta(days=3*365), min_value=price_data.index.min(), format="DD.MM.YYYY")
         lookback_years = st.number_input("How many previous years shall be displayed?", value=5)
 
         # Create vol_data as a copy of price_data
@@ -2051,6 +2051,9 @@ if download_sucess:
         
         plt.tight_layout()
         plt.show()
+        st.pyplot()
+
+        
         
         headline0 = "Strike price guidance"
         st.write(f"**{headline0}**")
