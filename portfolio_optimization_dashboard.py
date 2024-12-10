@@ -1930,7 +1930,7 @@ if download_sucess:
         historic_vol = return_data.std() * (trading_days_per_year)**0.5
         #black_scholes_value = st.number_input("Call opiton price – default assumes volatility equalt to annualized std of daily log returns", value=black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=historic_vol) * subscription_ratio)
 
-        adj_price = black_scholes_value * (1/subscription_ratio)
+        
         #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
         selected_vol = st.number_input("Volatility (in %)", value=historic_vol*100)/100
@@ -1941,6 +1941,7 @@ if download_sucess:
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
         
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
+        adj_price = black_scholes_value * (1/subscription_ratio)
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
 
