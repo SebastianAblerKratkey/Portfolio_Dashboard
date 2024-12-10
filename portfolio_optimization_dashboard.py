@@ -1925,22 +1925,24 @@ if download_sucess:
         #subscription ratio
         subscription_ratio = st.number_input("Subscription ratio (how many units of the underlying the option refers to)", value=0.01)
 
-        #default_impl_vol = return_data.std() * (trading_days_per_year)**0.5
-        #default_black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=default_impl_vol) * subscription_ratio
-        black_scholes_value = st.number_input("Call opiton price – default assumes volatility equalt to annualized std of daily log returns", value=black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=return_data.std() * (trading_days_per_year)**0.5) * subscription_ratio)
+        #default_selected_vol = return_data.std() * (trading_days_per_year)**0.5
+        #default_black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=default_selected_vol) * subscription_ratio
+        historic_vol = return_data.std() * (trading_days_per_year)**0.5
+        #black_scholes_value = st.number_input("Call opiton price – default assumes volatility equalt to annualized std of daily log returns", value=black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=historic_vol) * subscription_ratio)
 
         adj_price = black_scholes_value * (1/subscription_ratio)
-        #default_impl_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
-        impl_vol = st.number_input("Implied volatility (in %)", value=call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100)/100
+        #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
+        #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
+        selected_vol = st.number_input("Volatility (in %)", value=historic_vol*100)/100
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
         breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
         
-        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
-        call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
-        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
+        call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
+        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
 
         req_r_be = np.log(breakeven_at_exiry/spot_price) * (1/time_in_years)
         
@@ -1961,7 +1963,7 @@ if download_sucess:
         st.write(f"**{headline0}**")
         
         strike_prices = np.arange(0.001, 2*target_price)
-        returns_long_call_at_expiry = return_long_call_at_expiry(ST=target_price, S0=spot_price, K=strike_prices, rf=rf, T=time_in_years, vol=impl_vol, pa=True)
+        returns_long_call_at_expiry = return_long_call_at_expiry(ST=target_price, S0=spot_price, K=strike_prices, rf=rf, T=time_in_years, vol=selected_vol, pa=True)
         returns_long_call_series = pd.Series(returns_long_call_at_expiry, index=strike_prices, name='Returns Long Call at Expiry')
         optimal_strike_price = returns_long_call_series.idxmax()
         color1 = 'cornflowerblue'
@@ -2176,9 +2178,9 @@ if download_sucess:
         #Plot chart
         S0_prices = np.arange(0.0001, 2*strike_price)
         S0_prices_till_spot = np.arange(0.0001, spot_price)
-        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
-        black_scholes_values = black_scholes_call_value(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
-        black_scholes_values_till_spot = black_scholes_call_value(S0=S0_prices_till_spot, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol) * subscription_ratio
+        black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
+        black_scholes_values = black_scholes_call_value(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
+        black_scholes_values_till_spot = black_scholes_call_value(S0=S0_prices_till_spot, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
         call_payoffs = call_payoff(S0=S0_prices, K=strike_price) * subscription_ratio
         call_payoffs_till_spot = call_payoff(S0=S0_prices_till_spot, K=strike_price) * subscription_ratio
         color1 = 'cornflowerblue'
@@ -2231,7 +2233,7 @@ if download_sucess:
         st.write(f"**{txt}**")
         
         #Delta
-        call_deltas = call_delta(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_deltas = call_delta(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=2*strike_price)
         plt.plot(S0_prices, call_deltas, color=color1)
@@ -2250,8 +2252,8 @@ if download_sucess:
         st.pyplot()
 
         #Gamma
-        call_gammas = gamma(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
-        call_gamma_spot = gamma(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_gammas = gamma(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
+        call_gamma_spot = gamma(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=2*strike_price)
         plt.plot(S0_prices, call_gammas, color=color1)
@@ -2270,8 +2272,8 @@ if download_sucess:
         st.pyplot()
 
         #Vega
-        call_vegas = vega(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
-        call_vega_spot = vega(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_vegas = vega(S0=S0_prices, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
+        call_vega_spot = vega(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0, right=2*strike_price)
         plt.plot(S0_prices, call_vegas, color=color1)
@@ -2291,7 +2293,7 @@ if download_sucess:
 
         #Lambda
         S0_prices_lambda = np.arange(0.5*strike_price, 1.5*strike_price)
-        call_lambdas = call_lambda(S0=S0_prices_lambda, K=strike_price, rf=rf, T=time_in_years, vol=impl_vol)
+        call_lambdas = call_lambda(S0=S0_prices_lambda, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0.5*strike_price, right=1.5*strike_price)
         plt.plot(S0_prices_lambda, call_lambdas, color=color1)
