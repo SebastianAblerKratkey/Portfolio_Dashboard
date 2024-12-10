@@ -1963,7 +1963,7 @@ if download_sucess:
         colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
-        headline00 = "Implied volatility"
+        headline00 = "Volatility guidance"
         st.write(f"**{headline00}**")
         
         option_price = st.number_input("Input current call opiton price", value=black_scholes_value)
