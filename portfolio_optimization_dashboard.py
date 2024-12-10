@@ -1934,14 +1934,17 @@ if download_sucess:
         #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
         selected_vol = st.number_input("Volatility (in %)", value=historic_vol*100)/100
-        call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
-        breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
+        
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
         
         black_scholes_value = black_scholes_call_value(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol) * subscription_ratio
         adj_price = black_scholes_value * (1/subscription_ratio)
+
+        call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
+        breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
+        
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
 
