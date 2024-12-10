@@ -1972,7 +1972,7 @@ if download_sucess:
         st.metric("Implied volatility", f"{impl_vol:.2%}")
         
         rolling_window = st.number_input("Input number of days for rolling volatility calculation", value=30)
-        vol_start_date = st.date_input("Set starting date for long-run volatilty calculation", value=price_data.index.min(), max_value= current_date - timedelta(days=3*365), min_value=price_data.index.min(), format="DD.MM.YYYY")
+        vol_start_date = st.date_input("Set start date for long term volatility calculation", value=price_data.index.min(), max_value= current_date - timedelta(days=3*365), min_value=price_data.index.min(), format="DD.MM.YYYY")
         vol_start_date = pd.Timestamp(vol_start_date)
         lookback_years = st.number_input("How many previous years shall be displayed?", value=5)
 
