@@ -1943,18 +1943,18 @@ if download_sucess:
         #adj_price = black_scholes_value * (1/subscription_ratio)
 
         call_price_at_purchase = st.number_input("Call opiton price at purchase – default equal to current price", value=black_scholes_value)
-        breakeven_at_exiry = strike_price + call_price_at_purchase/subscription_ratio
+        breakeven_at_expiration = strike_price + call_price_at_purchase/subscription_ratio
         
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
 
-        req_r_be = np.log(breakeven_at_exiry/spot_price) * (1/time_in_years)
+        req_r_be = np.log(breakeven_at_expiration/spot_price) * (1/time_in_years)
         
         # Row 1
         colmn_1, colmn_2, colmn_3, colmn_4 = st.columns([0.5, 0.5, 0.5, 0.5]) 
         colmn_1.metric("Black-Scholes option value", f"{black_scholes_value:.2f}")
         colmn_2.metric("Spot price underlying", f"{spot_price:.2f}")
-        colmn_3.metric("Breakeven price at exiry", f"{breakeven_at_exiry:.2f}")
+        colmn_3.metric("Breakeven price at expiration", f"{breakeven_at_expiration:.2f}")
         colmn_4.metric("Trading days to expiration", f"{number_trading_days:.0f}")
         # Row 2
         colmn_5, colmn_6, colmn_7, colmn_8 = st.columns([0.5, 0.5, 0.5, 0.5]) 
@@ -2208,7 +2208,7 @@ if download_sucess:
             simulation_df.set_index(pd.Index(trading_days), inplace=True)
 
             prices_at_expiry = simulation_df.iloc[-1,:]
-            chance_above_be = (prices_at_expiry >= breakeven_at_exiry).mean()
+            chance_above_be = (prices_at_expiry >= breakeven_at_expiration).mean()
             chance_below_be = 1 - chance_above_be
             path_max_val_at_expiry = simulation_df.iloc[: ,prices_at_expiry.idxmax()]
             path_min_val_at_expiry = simulation_df.iloc[: ,prices_at_expiry.idxmin()]
@@ -2240,12 +2240,12 @@ if download_sucess:
             plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), spot_price, str(round(spot_price, 2)),color=color2, verticalalignment='center')
             
             # Display breakeven price @ expiry
-            plt.axhline(breakeven_at_exiry, color=color3, linewidth=1.25, label="Breakeven price @ exiry")
-            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), breakeven_at_exiry, str(round(breakeven_at_exiry, 2)),color=color3, verticalalignment='center')
+            plt.axhline(breakeven_at_expiration, color=color3, linewidth=1.25, label="Breakeven price @ expiration")
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), breakeven_at_expiration, str(round(breakeven_at_expiration, 2)),color=color3, verticalalignment='center')
             
             # Display above/below breakeven probabilities
-            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_exiry+prices_at_expiry.max())/2, str(round(chance_above_be*100, 2))+"%",color=color3, verticalalignment='center')
-            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_exiry+prices_at_expiry.min())/2, str(round(chance_below_be*100, 2))+"%",color=color3, verticalalignment='center')
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_expiration+prices_at_expiry.max())/2, str(round(chance_above_be*100, 2))+"%",color=color3, verticalalignment='center')
+            plt.text(simulation_df.index[-1] + pd.Timedelta(days=days_to_add1), (breakeven_at_expiration+prices_at_expiry.min())/2, str(round(chance_below_be*100, 2))+"%",color=color3, verticalalignment='center')
             
             mean_sim_prices = simulation_df.mean(axis=1)
             plt.plot(mean_sim_prices, color=color4, linewidth=1.25, label="Mean simulated price")
