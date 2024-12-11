@@ -843,15 +843,15 @@ def put_rho(S0, K, rf, T, vol):
     rho = -K * T * np.exp(-rf * T) * N(-d2)
     return rho / 100.0
 
-def call_lambda(S0, K, rf, T, vol):
-    """ Black-Scholes call lambda (leverage)
+def call_omega(S0, K, rf, T, vol):
+    """ Black-Scholes call omega (leverage)
     
     :param S0: spot price
     :param K: strike price
     :param rf: riskfree rate
     :param T: time to expiration
     :param vol: volatility
-    :return: call lambda
+    :return: call omega
     """
     return call_delta(S0, K, rf, T, vol) * (S0 / black_scholes_call_value(S0, K, rf, T, vol))
 
@@ -959,7 +959,6 @@ def profit_long_call_at_expiry(ST, S0, K, rf, T, vol):
     :param rf: riskfree rate
     :param T: time to expiration
     :param vol: volatility
-    :return: call lambda
     """
     return np.maximum((ST - K),0) - black_scholes_call_value(S0, K, rf, T, vol)
 
@@ -973,7 +972,6 @@ def return_long_call_at_expiry(ST, S0, K, rf, T, vol, pa=True):
     :param rf: riskfree rate
     :param T: time to expiration
     :param vol: volatility
-    :return: call lambda
     """
     if pa:
         return np.log(np.maximum((ST - K),0) / black_scholes_call_value(S0, K, rf, T, vol)) * (1/T)
@@ -1946,7 +1944,7 @@ if download_sucess:
         breakeven_at_expiration = strike_price + call_price_at_purchase/subscription_ratio
         
         call_delta_spot = call_delta(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
-        call_lambda_spot = call_lambda(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
+        call_omega_spot = call_omega(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
 
         req_r_be = np.log(breakeven_at_expiration/spot_price) * (1/time_in_years)
         
@@ -1959,7 +1957,7 @@ if download_sucess:
         # Row 2
         colmn_5, colmn_6, colmn_7, colmn_8 = st.columns([0.5, 0.5, 0.5, 0.5]) 
         colmn_5.metric("Delta", f"{call_delta_spot:.2f}")
-        colmn_6.metric("Leverage", f"{call_lambda_spot:.2f}x")
+        colmn_6.metric("Leverage", f"{call_omega_spot:.2f}x")
         colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
@@ -2389,19 +2387,19 @@ if download_sucess:
         plt.show()
         st.pyplot()
 
-        #Lambda
-        S0_prices_lambda = np.arange(0.5*strike_price, 1.5*strike_price)
-        call_lambdas = call_lambda(S0=S0_prices_lambda, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
+        #omega
+        S0_prices_omega = np.arange(0.5*strike_price, 1.5*strike_price)
+        call_omegas = call_omega(S0=S0_prices_omega, K=strike_price, rf=rf, T=time_in_years, vol=selected_vol)
         plt.figure(figsize=(7, 4))
         plt.gca().set_xlim(left=0.5*strike_price, right=1.5*strike_price)
-        plt.plot(S0_prices_lambda, call_lambdas, color=color1)
+        plt.plot(S0_prices_omega, call_omegas, color=color1)
         # Add a black horizontal line at y=0
         plt.axhline(0, color='black', linewidth=0.5)
         # Plot a dark gray point at (spot_price, black_scholes_value_at_spot)
-        plt.scatter(spot_price, call_lambda_spot, color=color2, zorder=5, label="Current Lambda")
+        plt.scatter(spot_price, call_omega_spot, color=color2, zorder=5, label="Current Omega")
         # Add text annotation for the Black-Scholes value
-        plt.text(spot_price, call_lambda_spot, f'  {call_lambda_spot:.2f}', color=color2, fontsize=9, ha='left', va='bottom')
-        plt.title("Lambda (Leverage)")
+        plt.text(spot_price, call_omega_spot, f'  {call_omega_spot:.2f}', color=color2, fontsize=9, ha='left', va='bottom')
+        plt.title("Omega (Leverage)")
         # Add labels, title, and legend
         plt.grid('on', ls="--")
         plt.xlabel('Price underlying (S)')
