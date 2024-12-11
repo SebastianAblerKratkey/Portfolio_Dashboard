@@ -1269,7 +1269,7 @@ if download_sucess:
             sim_summary["mean return"] = custom_p_summary["mean return"] / 12
             sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
             num_years = st.slider("For how many years do you want to save?",
-                              min_value=1, max_value=100, step=1, value=20.00)
+                              min_value=1, max_value=100, step=1, value=20)
             num_months = 12*num_years
     
             p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
@@ -1934,7 +1934,7 @@ if download_sucess:
         #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
         #selected_vol = st.number_input("Volatility (in %) – default based on historic standard deviation of returns", value=historic_vol*100)/100
-        selected_vol = st.number_input("Volatility (in %) – default 20%", value=20)/100
+        selected_vol = st.number_input("Volatility (in %) – default 20%", value=20.00)/100
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
