@@ -1880,7 +1880,7 @@ if download_sucess:
         st.pyplot()
 
     for tick in tickers:
-            price_data = yf.download(ticker, start=input_start_date)[["Close", "Adj Close"]]
+            price_data = yf.download(ticker)[["Close", "Adj Close"]]
             dataframes[ticker] = price_data
     
     if option == "Call Options":
@@ -1891,7 +1891,7 @@ if download_sucess:
         exchange = st.selectbox("Select exchange where the underlying is traded", exchanges, index=default_exchange)
 
         # maybe add start date input
-        input_start_date = None
+        #input_start_date = None
 
         # Download stock data
         #price_data = yf.download(asset_name, start=input_start_date)[["Close", "Adj Close"]]
