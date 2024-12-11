@@ -1934,7 +1934,7 @@ if download_sucess:
         #default_selected_vol = call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)
         #call_implied_volatility(S0=spot_price, K=strike_price, rf=rf, T=time_in_years, call_option_market_price = adj_price, a=-2.0, b=2.0, xtol=1e-6)*100
         #selected_vol = st.number_input("Volatility (in %) – default based on historic standard deviation of returns", value=historic_vol*100)/100
-        selected_vol = st.number_input("Volatility (in %) – default 20%")/100
+        selected_vol = st.number_input("Volatility (in %) – default 20%", value=20)/100
 
         default_target_price = spot_price * np.exp(return_data.mean()*number_trading_days)
         target_price = st.number_input("Expected price of underlying at expiration – default based on historic mean return", value=default_target_price)
