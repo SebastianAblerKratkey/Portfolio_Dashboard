@@ -1027,10 +1027,6 @@ currency = st.selectbox("Select a currency.", ["EUR", "USD"])
 
 
 if download_sucess:
-    dataframes = {}
-    for tick in tickers:
-        price_data = yf.download(tick)[["Close", "Adj Close"]]
-        dataframes[tick] = price_data
 
     # Currency conversion and long name dictionary creation
     curr_conv_tabl = pd.DataFrame(index=price_df.index, columns=price_df.columns)
@@ -1883,20 +1879,18 @@ if download_sucess:
         st.write(f"**{txt_}**")
         st.pyplot()
 
-    
+
     if option == "Call Options":
-            
         asset_name = st.selectbox("Select an underlying", tickers)
         exchanges = mcal.get_calendar_names()
         default_exchange = exchanges.index("NYSE")
         exchange = st.selectbox("Select exchange where the underlying is traded", exchanges, index=default_exchange)
 
         # maybe add start date input
-        #input_start_date = None
+        input_start_date = None
 
         # Download stock data
-        #price_data = yf.download(asset_name, start=input_start_date)[["Close", "Adj Close"]]
-        price_data = dataframes[asset_name]
+        price_data = yf.download(asset_name, start=input_start_date)[["Close", "Adj Close"]]
         start_date = price_data.index.min()
         return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
         return_data = np.sort(return_data)
