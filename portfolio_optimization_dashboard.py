@@ -1882,7 +1882,7 @@ if download_sucess:
     dataframes = []
     for tick in tickers:
         price_data = yf.download(tick)[["Close", "Adj Close"]]
-        dataframes.append(price_data)
+        dataframes[ticker] = price_data
     
     if option == "Call Options":
             
