@@ -1879,9 +1879,10 @@ if download_sucess:
         st.write(f"**{txt_}**")
         st.pyplot()
 
+    dataframes = []
     for tick in tickers:
         price_data = yf.download(ticker)[["Close", "Adj Close"]]
-        dataframes[ticker] = price_data
+        dataframes.append(price_data)
     
     if option == "Call Options":
             
