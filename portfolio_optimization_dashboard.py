@@ -1957,7 +1957,7 @@ if download_sucess:
         # Row 2
         colmn_5, colmn_6, colmn_7, colmn_8 = st.columns([0.5, 0.5, 0.5, 0.5]) 
         colmn_5.metric("Delta", f"{call_delta_spot:.2f}")
-        colmn_6.metric("Leverage", f"{call_omega_spot:.2f}x")
+        colmn_6.metric("Omega (leverage)", f"{call_omega_spot:.2f}x")
         colmn_7.metric("Return to reach BE (p.a.)", f"{req_r_be:.2%}")
         colmn_8.metric("Assumed risk-free rate", f"{rf:.2%}")
 
@@ -1973,7 +1973,7 @@ if download_sucess:
         rolling_window = st.number_input("Input number of days for rolling volatility calculation", value=30)
         vol_start_date = st.date_input("Set start date for long term volatility calculation", value=price_data.index.min(), max_value= current_date - timedelta(days=3*365), min_value=price_data.index.min(), format="DD.MM.YYYY")
         vol_start_date = pd.Timestamp(vol_start_date)
-        lookback_years = st.number_input("How many previous years shall be displayed?", value=5)
+        lookback_years = st.number_input("How many previous years shall be displayed?", value=3)
 
         # Create vol_data as a copy of price_data
         vol_data = price_data.copy()
