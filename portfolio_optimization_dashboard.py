@@ -1027,6 +1027,10 @@ currency = st.selectbox("Select a currency.", ["EUR", "USD"])
 
 
 if download_sucess:
+    dataframes = {}
+    for tick in tickers:
+        price_data = yf.download(tick)[["Close", "Adj Close"]]
+        dataframes[tick] = price_data
 
     # Currency conversion and long name dictionary creation
     curr_conv_tabl = pd.DataFrame(index=price_df.index, columns=price_df.columns)
@@ -1879,10 +1883,6 @@ if download_sucess:
         st.write(f"**{txt_}**")
         st.pyplot()
 
-    dataframes = {}
-    for tick in tickers:
-        price_data = yf.download(tick)[["Close", "Adj Close"]]
-        dataframes[tick] = price_data
     
     if option == "Call Options":
             
