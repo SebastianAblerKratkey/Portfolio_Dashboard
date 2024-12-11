@@ -1879,7 +1879,7 @@ if download_sucess:
         st.write(f"**{txt_}**")
         st.pyplot()
 
-    dataframes = []
+    dataframes = {}
     for tick in tickers:
         price_data = yf.download(tick)[["Close", "Adj Close"]]
         dataframes[ticker] = price_data
