@@ -1896,7 +1896,7 @@ if download_sucess:
 
         # Download stock data
         #price_data = yf.download(asset_name, start=input_start_date)[["Close", "Adj Close"]]
-        price_data = dataframe(dataframes[asset_name])
+        price_data = dataframes[asset_name]
         start_date = price_data.index.min()
         return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
         return_data = np.sort(return_data)
