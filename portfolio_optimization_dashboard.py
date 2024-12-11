@@ -1269,7 +1269,7 @@ if download_sucess:
             sim_summary["mean return"] = custom_p_summary["mean return"] / 12
             sim_summary["standard deviation"] = custom_p_summary["standard deviation"] / (12**0.5)
             num_years = st.slider("For how many years do you want to save?",
-                              min_value=1, max_value=100, step=1, value=20)
+                              min_value=1, max_value=100, step=1, value=20.00)
             num_months = 12*num_years
     
             p = st.slider("Define the percentage of simulation outcomes to be contained in a symmetrical bandwidth around the simulation mean:",
