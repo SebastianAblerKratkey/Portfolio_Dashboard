@@ -1730,7 +1730,7 @@ if download_sucess:
             col5.metric("Volatility p.a.", f"{sim_std_daily_compounded_unleveraged_annual_returns:.2%}")
             col6.metric("Leverage", f"{leverage:.1f}x")
 
-        st.write("The simulation is based on Equation (21) in the 2009 research paper Path-dependence of Leveraged ETF returns by Marco Avellaneda & Stanley Zhang [Avellaneda & Zhang (2009)](https://doi.org/10.1137/090760805).")
+        st.write("The simulation is based on Equation (20) in the 2009 research paper Path-dependence of Leveraged ETF returns by Marco Avellaneda & Stanley Zhang [Avellaneda & Zhang (2009)](https://doi.org/10.1137/090760805).")
 
     if option == "Technical Analysis":
         asset_name = st.selectbox("Select the asset you want to analyze", tickers)
