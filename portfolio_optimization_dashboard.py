@@ -1734,7 +1734,7 @@ if download_sucess:
 
     if option == "Technical Analysis":
         asset_name = st.selectbox("Select the asset you want to analyze", tickers)
-        asset_data = yf.download(asset_name, auto_adjust=False)
+        asset_data = yf.download([asset_name], auto_adjust=False)
 
         days_back_period = st.number_input("Days back window", value=int(min(100,len(asset_data)*(9/10))), min_value=50, max_value=int(len(asset_data)*(9/10)))
         
