@@ -1890,8 +1890,8 @@ if download_sucess:
         # Download stock data
         price_data = yf.download(asset_name, start=input_start_date, auto_adjust=False)[["Close", "Adj Close"]]
         start_date = price_data.index.min().date()
-        return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
-        return_data = np.sort(return_data)
+        return_data = np.log(price_data["Adj Close"].squeeze()/price_data["Adj Close"].squeeze().shift(1)).dropna()
+        return_data = np.sort(return_data.values)  # .values converts to plain numpy array
 
         spot_price = float(price_data["Close"].iloc[-1])
         strike_price = st.number_input("Strike price", value=round(spot_price/100,0)*100)
@@ -2134,9 +2134,9 @@ if download_sucess:
         pdf_nom = stats.norm.pdf(return_data, loc=return_data.mean(), scale=return_data.std())
 
         #evaluate the goodness-of-fit using Kolmogorov-Smirnov test
-        supremum = max(abs(edf - cdf))
+        supremum = np.max(np.abs(edf - cdf))
         p_value = np.exp(-supremum**2*len(return_data))
-        supremum_norm = max(abs(edf - cdf_norm))
+        supremum_norm = np.max(np.abs(edf - cdf_norm))
         p_value_norm = np.exp(-supremum_norm**2*len(return_data))
 
         #Plot
