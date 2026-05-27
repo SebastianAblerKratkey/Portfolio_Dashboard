@@ -1888,10 +1888,11 @@ if download_sucess:
         input_start_date = None
 
         # Download stock data
-        price_data = yf.download(asset_name, start=input_start_date)[["Close", "Adj Close"]]
+        price_data = yf.download([asset_name], start=input_start_date, auto_adjust=False)[["Close", "Adj Close"]]
+        price_data.columns = price_data.columns.droplevel(1)  # drop the ticker level from MultiIndex
         start_date = price_data.index.min().date()
-        return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
-        return_data = np.sort(return_data)
+        return_data = np.log(price_data["Adj Close"] / price_data["Adj Close"].shift(1)).dropna()
+        return_data = np.sort(return_data.values)
 
         spot_price = float(price_data["Close"].iloc[-1])
         strike_price = st.number_input("Strike price", value=round(spot_price/100,0)*100)
