@@ -1889,7 +1889,7 @@ if download_sucess:
 
         # Download stock data
         price_data = yf.download(asset_name, start=input_start_date, auto_adjust=False)[["Close", "Adj Close"]]
-        start_date = price_data.index.min()
+        start_date = price_data.index.min().date()
         return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
         return_data = np.sort(return_data)
 
@@ -1971,7 +1971,7 @@ if download_sucess:
         st.metric("Implied volatility", f"{impl_vol:.2%}")
         
         rolling_window = st.number_input("Input number of days for rolling volatility calculation", value=30)
-        vol_start_date = st.date_input("Set start date for long term volatility calculation", value=price_data.index.min(), max_value= current_date - timedelta(days=3*365), min_value=price_data.index.min(), format="DD.MM.YYYY")
+        vol_start_date = st.date_input("Set start date for long term volatility calculation", value=price_data.index.min().date(), max_value=current_date - timedelta(days=3*365), min_value=price_data.index.min().date(), format="DD.MM.YYYY")
         vol_start_date = pd.Timestamp(vol_start_date)
         lookback_years = st.number_input("How many previous years shall be displayed?", value=3)
 
