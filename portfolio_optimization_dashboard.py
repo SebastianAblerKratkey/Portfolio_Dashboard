@@ -1005,10 +1005,10 @@ if custom_p:
 download_sucess = False
 if input_tickers or custom_p:
     tickers = [x.upper() for x in tickers]
-    price_df = yf.download(tickers, period='max')["Adj Close"]
+    price_df = yf.download(tickers, period='max', auto_adjust=False)["Adj Close"]
     price_df = price_df.dropna()
 
-    eurusd = yf.download(["EURUSD=X","EUR=X"], period='max')["Adj Close"]
+    eurusd = yf.download(["EURUSD=X","EUR=X"], period='max', auto_adjust=False)["Adj Close"]
     
     if len(price_df) < 1:
         st.error("(Some) assets could not be found.")
@@ -1217,7 +1217,7 @@ if download_sucess:
     
             benchmarks_p_rf = [benchmark_p, benchmark_rf]
     
-            CAPM_data_daily = yf.download(benchmarks_p_rf, period='max')["Adj Close"]
+            CAPM_data_daily = yf.download(benchmarks_p_rf, period='max', auto_adjust=False)["Adj Close"]
             CAPM_data_daily.dropna(inplace=True)
     
             download_sucess2 = False
@@ -1566,7 +1566,7 @@ if download_sucess:
 
         proxys_M_rf = [market_proxy, riskfree_proxy]
 
-        CAPM_data = yf.download(proxys_M_rf, period='max')["Adj Close"]
+        CAPM_data = yf.download(proxys_M_rf, period='max', auto_adjust=False)["Adj Close"]
         CAPM_data.dropna(inplace=True) 
         
 
