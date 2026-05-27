@@ -1890,8 +1890,12 @@ if download_sucess:
         # Download stock data
         price_data = yf.download(asset_name, start=input_start_date, auto_adjust=False)[["Close", "Adj Close"]]
         start_date = price_data.index.min().date()
-        return_data = np.log(price_data["Adj Close"].squeeze()/price_data["Adj Close"].squeeze().shift(1)).dropna()
-        return_data = np.sort(return_data.values)  # .values converts to plain numpy array
+        adj_close = price_data["Adj Close"]
+        if isinstance(adj_close, pd.DataFrame):
+            adj_close = adj_close.iloc[:, 0]
+        adj_close = adj_close.astype(float)
+        return_data = np.log(adj_close / adj_close.shift(1)).dropna()
+        return_data = np.sort(return_data.values)
 
         spot_price = float(price_data["Close"].iloc[-1])
         strike_price = st.number_input("Strike price", value=round(spot_price/100,0)*100)
