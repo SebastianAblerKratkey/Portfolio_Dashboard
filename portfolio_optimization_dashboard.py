@@ -1893,7 +1893,7 @@ if download_sucess:
         return_data = np.log(price_data["Adj Close"]/price_data["Adj Close"].shift(1)).dropna()
         return_data = np.sort(return_data)
 
-        spot_price = price_data["Close"].iloc[-1]
+        spot_price = float(price_data["Close"].iloc[-1])
         strike_price = st.number_input("Strike price", value=round(spot_price/100,0)*100)
         current_date = datetime.now()
         expiration_date = st.date_input("Expiration date (dd/mm/yyyy)", value=current_date + timedelta(days=3*365), min_value=current_date + timedelta(days=1), format="DD.MM.YYYY")
